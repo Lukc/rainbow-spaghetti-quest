@@ -1,0 +1,3 @@
+
+./build.zsh -c -g
+
