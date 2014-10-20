@@ -141,20 +141,24 @@ battle(Entity *player, Entity *enemy)
 			printf("\nYou are DEAD.\n");
 			printf("\nPress any key to continue...\n\n");
 			getchar();
+			free(line);
 			return -1;
 		}
 		if (enemy->health <= 0)
 		{
 			printf("\nYou are VICTORIOUS.\n");
 			printf("\nPress any key to continue...\n\n");
+			free(line);
 			getchar();
 			return 1;
 		}
 
+		free(line);
 		line = readline(">> ");
 	}
 
 	/* ^D or "quit" entered */
+	free(line);
 	exit(0);
 
 	return 0;
@@ -169,8 +173,6 @@ enter_battle(void *p, void *e)
 	enemy = e;
 
 	init_entity(enemy);
-
-	enemy->health = 40;
 
 	if (battle(player, enemy) == 1)
 	{
@@ -198,7 +200,7 @@ main(int argc, char* argv[])
 
 	player.name = "Player";
 
-	line = "";
+	line = strdup("");
 	while (line && strcmp(line, "quit"))
 	{
 		int i;
@@ -238,8 +240,11 @@ main(int argc, char* argv[])
 			printf("%s\n", commands[i].description);
 		}
 
+		free(line);
 		line = readline(">> ");
 	}
+
+	free(line);
 
 	return 0;
 }
