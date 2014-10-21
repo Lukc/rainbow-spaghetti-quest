@@ -65,7 +65,7 @@ static const char*
 health_color(Entity *e)
 {
 	int cur, max, ratio;
-	
+
 	cur = e->health;
 	max = get_max_health(e);
 	ratio = 100 * cur / max;

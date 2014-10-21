@@ -11,14 +11,20 @@ enum EQUIPMENT_SLOTS {
 };
 
 typedef struct {
-	int id; /* @fixme: should be class_id at best */
+	char *name;
+	int damage;
+	char *type;
+	int mana; /* mana requirement to use */
+} Attack;
+
+typedef struct {
+	int id; /* @fixme: should be class_id or removed */
 	char *name;
 	int health;
 	int mana;
 	unsigned int kills;
 	int caps; /* Bottle Caps */
 
-	/*  */
 	Class *class;
 
 	int equipment[sizeof(enum EQUIPMENT_SLOTS)];

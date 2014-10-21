@@ -4,7 +4,7 @@
 
 #include "entities.h"
 
-typedef char** CommandFunction(void*, void*);
+typedef char** CommandFunction(void*);
 
 typedef struct {
 	char *name;
@@ -13,7 +13,7 @@ typedef struct {
 	char *description;
 } Command;
 
-char** execute_commands(char*, Command*, Entity*, Entity*);
+char** execute_commands(char*, Command*, void*);
 void print_commands(Command*);
 void print_logs(char**);
 

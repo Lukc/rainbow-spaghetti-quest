@@ -6,7 +6,7 @@
 #include "colors.h"
 
 char**
-execute_commands(char* line, Command *commands, Entity *player, Entity *enemy)
+execute_commands(char* line, Command *commands, void *opts)
 {
 	char **logs = NULL;
 	int i;
@@ -20,7 +20,7 @@ execute_commands(char* line, Command *commands, Entity *player, Entity *enemy)
 		{
 			if (commands[i].callback)
 			{
-				return commands[i].callback(player, enemy);
+				return commands[i].callback(opts);
 			}
 			else
 			{
