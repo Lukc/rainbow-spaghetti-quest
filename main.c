@@ -9,6 +9,14 @@
 #include "colors.h"
 #include "entities.h"
 
+/* GLOBAL ALERT */
+Class classes[] = {
+	{1,  "Warrior",     30, 20, 35, 5, 3},
+	{42, "Stray Kitty", 7,  1,  2,  4, 1},
+	{43, "Stray Puppy", 8,  1,  3,  3, 2},
+	{0,  NULL, 0, 0, 0, 0, 0}
+};
+
 char**
 command_attack(void *p, void *e)
 {
@@ -19,12 +27,13 @@ command_attack(void *p, void *e)
 	int logs_i;
 
 	logs_i = 0;
-	logs = (char**) malloc(sizeof(char*) * 6);
+	logs = (char**) malloc(sizeof(char*) * 5);
 
 	player = p;
 	enemy = e;
 
 	damageInflicted = get_attack(player) - get_defense(enemy);
+	damageInflicted = damageInflicted <= 0 ? 1 : damageInflicted;
 	enemy->health -= damageInflicted;
 
 	logs[logs_i] = (char*) malloc(sizeof(char) * 128);
@@ -36,15 +45,13 @@ command_attack(void *p, void *e)
 
 	if (enemy->health <= 0)
 	{
-		logs[logs_i] = (char*) malloc(sizeof(char) * 128);
-		snprintf(
-			logs[logs_i], 128,
-			"You killed your enemy!");
+		logs[logs_i] = strdup("You killed your enemy.");
 		logs_i++;
 	}
 	else
 	{
 		damageReceived = get_attack(enemy) - get_defense(player);
+		damageReceived = damageReceived <= 0 ? 1 : damageReceived;
 		player->health -= damageReceived;
 
 		logs[logs_i] = (char*) malloc(sizeof(char) * 128);
@@ -56,27 +63,12 @@ command_attack(void *p, void *e)
 
 		if (player->health <= 0)
 		{
-			logs[logs_i] = (char*) malloc(sizeof(char) * 128);
-			snprintf(
-				logs[logs_i], 128,
-				"Your enemy killed you...");
+			logs[logs_i] = strdup("Your enemy killed you...");
 			logs_i++;
 		}
 	}
 
-	logs[logs_i + 1] = NULL;
-
-	return logs;
-}
-
-char**
-command_special(void *p, void *e)
-{
-	char **logs;
-
-	logs = (char**) malloc(sizeof(char*) * 2);
-	logs[0] = strdup("Uh. Got too lazy to implement that one. Also, it duplicates code from the “attack” one…");
-	logs[1] = NULL;
+	logs[logs_i] = NULL;
 
 	return logs;
 }
@@ -84,11 +76,11 @@ command_special(void *p, void *e)
 int
 battle(Entity *player, Entity *enemy)
 {
-	char **logs;
+	char **logs = NULL;
 	char *line;
 	Command commands[] = {
 		{"attack",   "a",   command_attack,   "A weak attack."},
-		{"special",  "s",   command_special,  "A strong attack that consumes mana."},
+		{"special",  "s",   NULL,             "A strong attack that consumes mana."},
 		{"focus",    "f",   NULL,             "A defensive move that restores mana."},
 		{"flee",     "l",   NULL,             "A desperate move to get out of battle."},
 		{NULL, NULL, NULL, NULL}
@@ -99,46 +91,22 @@ battle(Entity *player, Entity *enemy)
 	line = strdup("");
 	while (line && strcmp(line, "quit"))
 	{
-		int i;
-
 		system("clear");
 
 		logs = execute_commands(line, commands, player, enemy);
 
+		print_entity(player);
+		printf(BRIGHT RED "\n -- " WHITE "versus" RED " --\n\n" NOCOLOR);
 		print_entity(enemy);
 		printf("\n");
-		print_entity(player);
-		printf("\n");
 
-		if (logs)
-		{
-			for (i = 0; logs[i] && i < 16; i++)
-			{
-				printf("%s\n", logs[i]);
-				free(logs[i]);
-			}
+		print_logs(logs);
 
-			free(logs);
-
-			printf("\n");
-		}
-
-		printf("Options:\n");
-		for (i = 0; commands[i].name; i++)
-		{
-			unsigned int j;
-
-			printf("  - %s: ", commands[i].name);
-
-			for (j = 0; j < 8 - strlen(commands[i].name); j++)
-				printf(" ");
-
-			printf("%s\n", commands[i].description);
-		}
+		print_commands(commands);
 
 		if (player->health <= 0)
 		{
-			printf("\nYou are DEAD.\n");
+			printf("You are DEAD.\n");
 			printf("\nPress any key to continue...\n\n");
 			getchar();
 			free(line);
@@ -146,7 +114,10 @@ battle(Entity *player, Entity *enemy)
 		}
 		if (enemy->health <= 0)
 		{
-			printf("\nYou are VICTORIOUS.\n");
+			player->caps += enemy->class->caps_on_kill;
+
+			printf("You are VICTORIOUS.\n");
+			printf("\nYou gain %d bottle caps!\n", enemy->class->caps_on_kill);
 			printf("\nPress any key to continue...\n\n");
 			free(line);
 			getchar();
@@ -172,13 +143,16 @@ enter_battle(void *p, void *e)
 	player = p;
 	enemy = e;
 
-	init_entity(enemy);
+	init_entity_from_class(enemy, &classes[1 + rand() % 2]);
 
 	if (battle(player, enemy) == 1)
 	{
 		player->kills++;
+	} else {
+		player->caps /= 2;
 	}
 
+	remove_entity(enemy);
 
 	system("clear");
 
@@ -192,18 +166,26 @@ main(int argc, char* argv[])
 	char *line;
 	char **logs;
 	Command commands[] = {
-		{"battle", "b", enter_battle, "Find a random enemy to beat to death."},
+		{"battle",  "b", enter_battle, "Find a random enemy to beat to death."},
+		{"shop",    "s", NULL,         "Buy new equipment to improve your stats!"},
+		{"dungeon", "d", NULL,         "Enter a terrible dungeon and fight hordes of enemies!"},
 		{NULL, NULL, NULL, NULL}
 	};
 
-	init_entity(&player);
+	/* For now, repeatability would be useful */
+	srand(42);
 
-	player.name = "Player";
+	init_entity_from_class(&player, &classes[0]);
+
+	player.name = (char*) malloc(sizeof(char) * 80);
+	snprintf(
+		player.name, 80, "%s the %s",
+		argc > 1 ? argv[1] : "Bob", player.class->name
+	);
 
 	line = strdup("");
 	while (line && strcmp(line, "quit"))
 	{
-		int i;
 		system("clear");
 
 		logs = execute_commands(line, commands, &player, &enemy);
@@ -214,36 +196,22 @@ main(int argc, char* argv[])
 		print_entity(&player);
 		printf("\n");
 
-		if (logs)
-		{
-			for (i = 0; logs[i] && i < 16; i++)
-			{
-				printf("%s\n", logs[i]);
-				free(logs[i]);
-			}
+		print_logs(logs);
 
-			free(logs);
+		printf(
+			"Bottle caps: %i\n"
+			"\n"
+			,
+			player.caps
+		);
 
-			printf("\n");
-		}
-
-		printf("Options:\n");
-		for (i = 0; commands[i].name; i++)
-		{
-			unsigned int j;
-
-			printf("  - %s: ", commands[i].name);
-
-			for (j = 0; j < 8 - strlen(commands[i].name); j++)
-				printf(" ");
-
-			printf("%s\n", commands[i].description);
-		}
+		print_commands(commands);
 
 		free(line);
 		line = readline(">> ");
 	}
 
+	remove_entity(&player);
 	free(line);
 
 	return 0;

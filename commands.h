@@ -14,6 +14,8 @@ typedef struct {
 } Command;
 
 char** execute_commands(char*, Command*, Entity*, Entity*);
+void print_commands(Command*);
+void print_logs(char**);
 
 #endif
 
