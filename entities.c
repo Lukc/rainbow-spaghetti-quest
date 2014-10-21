@@ -49,8 +49,8 @@ init_entity_from_class(Entity *e, Class *c)
 	for (i = 0; i < sizeof(enum EQUIPMENT_SLOTS); i++)
 		e->equipment[i] = 0;
 
-	e->inventory = (int*) malloc(sizeof(int) * 42);
-	e->inventory[0] = 0;
+	for (i = 0; i < INVENTORY_SIZE; i++)
+		e->inventory[i] = -1;
 
 	return 42;
 }
@@ -58,7 +58,6 @@ init_entity_from_class(Entity *e, Class *c)
 void
 remove_entity(Entity *e)
 {
-	free(e->inventory);
 }
 
 static const char*

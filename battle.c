@@ -128,47 +128,53 @@ battle(Battle *battle_data)
 	system("clear");
 
 	line = strdup("");
-	while (line && strcmp(line, "quit"))
+	while (!line || (line && strcmp(line, "quit")))
 	{
-		system("clear");
-
-		logs = execute_commands(line, commands, battle_data);
-
-		print_entity(player);
-		printf(BRIGHT RED "\n -- " WHITE "versus" RED " --\n\n" NOCOLOR);
-		print_entity(enemy);
-		printf("\n");
-
-		print_logs(logs);
-
-		print_commands(commands);
-
-		if (player->health <= 0)
+		if (line)
 		{
-			printf("You are DEAD.\n");
-			printf("\nPress any key to continue...\n\n");
-			getchar();
-			free(line);
-			return -1;
-		}
-		if (enemy->health <= 0)
-		{
-			player->caps += enemy->class->caps_on_kill;
+			system("clear");
 
-			printf("You are VICTORIOUS.\n");
-			printf("\nYou gain %d bottle caps!\n", enemy->class->caps_on_kill);
-			printf("\nPress any key to continue...\n\n");
-			free(line);
-			getchar();
-			return 1;
-		}
+			logs = execute_commands(line, commands, battle_data);
 
-		free(line);
-		line = readline(">> ");
+			print_entity(player);
+			printf(BRIGHT RED "\n -- " WHITE "versus" RED " --\n\n" NOCOLOR);
+			print_entity(enemy);
+			printf("\n");
+
+			print_logs(logs);
+
+			print_commands(commands);
+
+			if (player->health <= 0)
+			{
+				printf("You are DEAD.\n");
+				printf("\nPress any key to continue...\n\n");
+				getchar();
+				free(line);
+				return -1;
+			}
+			if (enemy->health <= 0)
+			{
+				player->caps += enemy->class->caps_on_kill;
+
+				printf("You are VICTORIOUS.\n");
+				printf("\nYou gain %d bottle caps!\n", enemy->class->caps_on_kill);
+				printf("\nPress any key to continue...\n\n");
+				free(line);
+				getchar();
+				return 1;
+			}
+
+			free(line);
+			line = readline(">> ");
+		}
+		else
+			line = readline("");
 	}
 
 	/* ^D or "quit" entered */
-	free(line);
+	if (line)
+		free(line);
 	exit(0);
 
 	return 0;

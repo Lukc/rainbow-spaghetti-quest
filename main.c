@@ -8,7 +8,9 @@
 #include "commands.h"
 #include "colors.h"
 #include "entities.h"
+#include "items.h"
 #include "battle.h"
+#include "shop.h"
 
 int
 main(int argc, char* argv[])
@@ -18,14 +20,16 @@ main(int argc, char* argv[])
 	char **logs;
 	Command commands[] = {
 		{"battle",  "b", enter_battle, "Find a random enemy to beat to death."},
-		{"shop",    "s", NULL,         "Buy new equipment to improve your stats!"},
+		{"shop",    "s", enter_shop,   "Buy new equipment to improve your stats!"},
 		{"dungeon", "d", NULL,         "Enter a terrible dungeon and fight hordes of enemies!"},
 		{NULL, NULL, NULL, NULL}
 	};
 	Class *classes;
+	Item *items;
 	Battle battle;
 
 	classes = load_classes("classes");
+	items = load_items("items");
 
 	/* For now, repeatability would be useful */
 	srand(42);
@@ -35,12 +39,13 @@ main(int argc, char* argv[])
 	player.name = (char*) malloc(sizeof(char) * 80);
 	snprintf(
 		player.name, 80, "%s the %s",
-		argc > 1 ? argv[1] : "Bob", player.class->name
+		argc > 1 ? argv[1] : "Kaleth", player.class->name
 	);
 
 	battle.player = &player;
 	battle.enemy = &enemy;
 	battle.classes = classes;
+	battle.items = items;
 
 	line = strdup("");
 	while (line && strcmp(line, "quit"))

@@ -4,6 +4,9 @@
 
 #include "classes.h"
 
+/* Why? Because! */
+#define INVENTORY_SIZE 24
+
 enum EQUIPMENT_SLOTS {
 	EQ_WEAPON,
 	EQ_SHIELD,
@@ -28,7 +31,7 @@ typedef struct {
 	Class *class;
 
 	int equipment[sizeof(enum EQUIPMENT_SLOTS)];
-	int *inventory;
+	int inventory[INVENTORY_SIZE];
 } Entity;
 
 int get_max_mana(Entity*);

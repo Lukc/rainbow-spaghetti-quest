@@ -57,7 +57,10 @@ print_commands(Command *commands)
 		else
 			printf(WHITE);
 
-		printf("  - (%s) %s: ", commands[i].shortcut, commands[i].name);
+		if (commands[i].shortcut)
+			printf("  - (%s) %s: ", commands[i].shortcut, commands[i].name);
+		else
+			printf("  -      %s: ", commands[i].name);
 
 		for (j = 0; j < 8 - strlen(commands[i].name); j++)
 			printf(" ");
