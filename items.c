@@ -86,13 +86,13 @@ load_item (char* filename)
 			item.id = atoi(value);
 		else if (!strcmp(field, "slot"))
 		{
+			for (i = 0; value[i]; i++)
+				value[i] = tolower(value[i]);
+
 			if (!strcmp(value, "weapon"))
 				item.slot = EQ_WEAPON;
 			else
 			{
-				for (i = 0; value[i]; i++)
-					value[i] = tolower(value[i]);
-
 				fprintf(stderr,
 					" [%s]> Field %s has an unrecognized value of %s\n",
 					filename, field, value);

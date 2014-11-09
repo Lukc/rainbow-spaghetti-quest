@@ -77,25 +77,72 @@ health_color(Entity *e)
 		return RED;
 }
 
+static void
+print_bar(
+	const char* statstring, const char* color,
+	int current, int max, int size)
+{
+	int i;
+	int printed;
+
+	printed = printf("%s%s%i/%i  ", statstring, color, current, max);
+
+	for (i = printed; i < 40; i++)
+		printf(" ");
+
+	size = size - 40;
+
+	printf("[");
+	for (i = 0; i < size; i++)
+	{
+		if (current != 0 && ((float) i) / size <= ((float) current) / max)
+			printf("|");
+		else
+			printf(" ");
+	}
+	printf("]\n");
+}
+
 void
 print_entity(Entity *e)
 {
 	printf(BRIGHT BLUE ">> %s\n" NOCOLOR, e->name);
 
+	print_bar(
+		WHITE "  Health:   " NOCOLOR,
+		health_color(e),
+		e->health, get_max_health(e), 80
+	);
+
+	print_bar(
+		WHITE "  Mana:     " NOCOLOR,
+		BLUE,
+		e->mana, get_max_mana(e), 80
+	);
+
 	/* FIXME: Make colors change depending on HP/mana levels */
 	printf(
-		WHITE "  Health:   " "%s"  "%i/%i\n" NOCOLOR
-		WHITE "  Mana:     " BLUE  "%i/%i\n" NOCOLOR
 		WHITE "  Attack:   " RED   "%i\n" NOCOLOR
 		WHITE "  Defense:  " BLUE  "%i\n" NOCOLOR
 		WHITE "  Kills:    " "%i" "\n" NOCOLOR
 		,
-		health_color(e), e->health, get_max_health(e),
-		e->mana, get_max_mana(e),
 		get_attack(e),
 		get_defense(e),
 		e->kills
 	);
+}
+
+char*
+equipment_string(int id)
+{
+	if (id == 0)
+		return "Weapon";
+	else if (id == 1)
+		return "Shield";
+	else if (id == 2)
+		return "Armor";
+	else
+		return "Unknown";
 }
 
 /* vim: set ts=4 sw=4 cc=80 : */

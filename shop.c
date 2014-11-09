@@ -77,10 +77,18 @@ enter_shop(void* opt)
 
 		system("clear");
 
+		printf("Current equipment:\n");
+		for (i = 0; i < EQ_MAX; i++)
+		{
+			printf("  - %s: %i\n", equipment_string(i), player->equipment[i]);
+		}
+		printf("\n");
+
 		if (selected_index != -1)
 		{
 			/* FIXME: Print the fucking stats of the item (att/def bonus, …) */
 			printf("Selected item: %s\n", items[selected_index].name);
+			printf(" Already possessed: %i.\n", -1);
 			printf("\n");
 		}
 
