@@ -57,7 +57,7 @@ main(int argc, char* argv[])
 		player.health = get_max_health(&player);
 		player.mana = get_max_mana(&player);
 
-		print_entity(&player);
+		print_entity(&battle, &player);
 		printf("\n");
 
 		print_logs(logs);
@@ -75,7 +75,6 @@ main(int argc, char* argv[])
 		line = readline(">> ");
 	}
 
-	remove_entity(&player);
 	free(line);
 
 	return 0;

@@ -11,11 +11,11 @@
 #include "entities.h"
 
 static int
-inflict_damage(Entity *attacker, Entity *defender)
+inflict_damage(Battle* data, Entity* attacker, Entity* defender)
 {
 	int damage_inflicted;
 
-	damage_inflicted = get_attack(attacker) - get_defense(defender);
+	damage_inflicted = get_attack(data, attacker) - get_defense(data, defender);
 	damage_inflicted = damage_inflicted <= 0 ? 1 : damage_inflicted;
 	defender->health -= damage_inflicted;
 
@@ -23,7 +23,32 @@ inflict_damage(Entity *attacker, Entity *defender)
 }
 
 char**
-command_attack(void *opt)
+command_flee(void* opt)
+{
+	Battle *battle_data;
+	char **logs;
+	int logs_i;
+
+	logs_i = 0;
+	logs = (char**) malloc(sizeof(char*) * 2);
+
+	logs[logs_i] = (char*) malloc(sizeof(char) * 128);
+	snprintf(
+		logs[logs_i], 128,
+		"You fled from your battle!");
+	logs_i++;
+
+	battle_data = opt;
+
+	battle_data->flee = 1;
+
+	logs[logs_i] = NULL;
+
+	return NULL;
+}
+
+char**
+command_attack(void* opt)
 {
 	Battle *battle_data;
 	Entity *player;
@@ -39,7 +64,7 @@ command_attack(void *opt)
 	player = battle_data->player;
 	enemy = battle_data->enemy;
 
-	damage_inflicted = inflict_damage(player, enemy);
+	damage_inflicted = inflict_damage(battle_data, player, enemy);
 
 	logs[logs_i] = (char*) malloc(sizeof(char) * 128);
 	snprintf(
@@ -55,7 +80,7 @@ command_attack(void *opt)
 	}
 	else
 	{
-		damage_received = inflict_damage(enemy, player);
+		damage_received = inflict_damage(battle_data, enemy, player);
 
 		logs[logs_i] = (char*) malloc(sizeof(char) * 128);
 		snprintf(
@@ -119,11 +144,13 @@ battle(Battle *battle_data)
 		{"attack",   "a",   command_attack,   "A weak attack."},
 		{"special",  "s",   NULL,             "A strong attack that consumes mana."},
 		{"focus",    "f",   command_focus,    "A defensive move that restores mana."},
-		{"flee",     "l",   NULL,             "A desperate move to get out of battle."},
+		{"flee",     "l",   command_flee,     "A desperate move to get out of battle."},
 		{NULL, NULL, NULL, NULL}
 	};
 	Entity *player = battle_data->player;
 	Entity *enemy = battle_data->enemy;
+
+	battle_data->flee = 0;
 
 	system("clear");
 
@@ -136,24 +163,37 @@ battle(Battle *battle_data)
 
 			logs = execute_commands(line, commands, battle_data);
 
-			print_entity(player);
+			print_entity(battle_data, player);
 			printf(BRIGHT RED "\n -- " WHITE "versus" RED " --\n\n" NOCOLOR);
-			print_entity(enemy);
+			print_entity(battle_data, enemy);
 			printf("\n");
 
 			print_logs(logs);
 
 			print_commands(commands);
 
-			if (player->health <= 0)
+			if (battle_data->flee)
 			{
+				/* Fled, or both died simultaneously. Probably simply fled. */
+				printf("You manage to get out of the battle without being "
+						"hurt too badly.\n");
+				printf("\nPress any key to continue...\n\n");
+				getchar();
+				free(line);
+				return 0;
+			}
+			else if (player->health <= 0)
+			{
+				player->caps /= 2;
+
 				printf("You are DEAD.\n");
+				printf("\nYou lost half your bottle caps.\n");
 				printf("\nPress any key to continue...\n\n");
 				getchar();
 				free(line);
 				return -1;
 			}
-			if (enemy->health <= 0)
+			else if (enemy->health <= 0)
 			{
 				player->caps += enemy->class->caps_on_kill;
 
@@ -186,6 +226,7 @@ enter_battle(void *opt)
 	Battle* battle_data;
 	Entity* player, *enemy;
 	Class* classes;
+	int result;
 
 	battle_data = opt;
 	player = battle_data->player;
@@ -195,14 +236,10 @@ enter_battle(void *opt)
 	/* FIXME: Get only a mob that’s made to spawn in random battles */
 	init_entity_from_class(enemy, &classes[rand() % 2]);
 
-	if (battle(battle_data) == 1)
+	if ((result = battle(battle_data)) == 1)
 	{
 		player->kills++;
-	} else {
-		player->caps /= 2;
 	}
-
-	remove_entity(enemy);
 
 	system("clear");
 

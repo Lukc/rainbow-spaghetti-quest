@@ -116,4 +116,29 @@ load_item (char* filename)
 	return item;
 }
 
+Item*
+get_item_from_id(Battle* battle, int id)
+{
+	int i;
+
+	for (i = 0; battle->items[i].id; i++)
+		if (battle->items[i].id == id)
+			return battle->items + i;
+
+	return NULL;
+}
+
+int
+get_count_from_inventory(int inventory[INVENTORY_SIZE], int id)
+{
+	int i;
+	int count = 0;
+
+	for (i = 0; i < INVENTORY_SIZE; i++)
+		if (inventory[i] == id)
+			count++;
+
+	return count;
+}
+
 /* vim: set ts=4 sw=4 cc=80 : */

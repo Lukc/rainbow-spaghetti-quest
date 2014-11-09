@@ -2,7 +2,7 @@
 #ifndef ITEMS_H
 #define ITEMS_H
 
-typedef struct {
+typedef struct Item {
 	int id;
 	char* name;
 
@@ -13,8 +13,13 @@ typedef struct {
 	int defense_bonus;
 } Item;
 
+#include "battle.h"
+
 Item load_item(char*);
 Item* load_items(char*);
+
+Item* get_item_from_id(Battle*, int);
+int get_count_from_inventory(int*, int);
 
 #endif
 

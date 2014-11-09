@@ -2,7 +2,7 @@
 #ifndef CLASSES_H
 #define CLASSES_H
 
-typedef struct {
+typedef struct Class {
 	int id;
 	char *name;
 

@@ -45,6 +45,29 @@ enter_shop(void* opt)
 			free(line);
 			exit(0);
 		}
+		else if (!strcmp(line, "equip") || !strcmp(line, "e"))
+		{
+			if (get_count_from_inventory(player->inventory, items[selected_index].id) > 0)
+			{
+				int slot, id;
+				int oldItem;
+				int i;
+
+				slot = items[selected_index].slot;
+				id = items[selected_index].id;
+				oldItem = player->equipment[slot];
+
+				for (i = 0; player->inventory[i] != id; i++)
+					;;
+
+				player->inventory[i] = player->equipment[slot];
+				player->equipment[slot] = id;
+			}
+			else
+			{
+				err = "You cannot equip an item you do not possess";
+			}
+		}
 		else if (!strcmp(line, "buy") || !strcmp(line, "b"))
 		{
 			if (player->caps > items[selected_index].price)
@@ -71,7 +94,7 @@ enter_shop(void* opt)
 		{
 			selected_index = atoi(line);
 
-			if (selected_index < 0 || selected_index > count_items(items))
+			if (selected_index < 0 || selected_index >= count_items(items))
 				selected_index = -1;
 		}
 
@@ -80,7 +103,18 @@ enter_shop(void* opt)
 		printf("Current equipment:\n");
 		for (i = 0; i < EQ_MAX; i++)
 		{
-			printf("  - %s: %i\n", equipment_string(i), player->equipment[i]);
+			int j, printed;
+			Item* item = get_item_from_id(data, player->equipment[i]);
+
+			printed = printf("  - %s: ", equipment_string(i));
+			for (j = 0; j < 20 - printed; j++)
+				printf("-");
+			printf(" ");
+
+			if (item)
+				printf("%s\n", item->name);
+			else
+				printf("(nothing)\n");
 		}
 		printf("\n");
 
@@ -88,13 +122,20 @@ enter_shop(void* opt)
 		{
 			/* FIXME: Print the fucking stats of the item (att/def bonus, …) */
 			printf("Selected item: %s\n", items[selected_index].name);
-			printf(" Already possessed: %i.\n", -1);
+			printf(" Already possessed: %i.\n", get_count_from_inventory(player->inventory, items[selected_index].id));
 			printf("\n");
 		}
 
 		for (i = 0; i < count_items(items); i++)
 		{
-			printf(" - %i:  %s (%i caps)\n", i, items[i].name, items[i].price);
+			printf(
+				WHITE "  - (%i)" NOCOLOR ":  "
+				BRIGHT BLUE "%s" NOCOLOR " %s(%i caps)\n" NOCOLOR
+				,
+				i, items[i].name,
+				player->caps >= items[i].price ? BRIGHT GREEN : BRIGHT RED,
+				items[i].price
+			);
 		}
 		printf("\n");
 
@@ -106,8 +147,9 @@ enter_shop(void* opt)
 		printf(
 			"Options:\n"
 			WHITE
-			"  - (#) (number of item to examine)\n"
-			"  - (b) buy:   Buy the examined item.\n"
+			"  - (#) (id of item to examine)\n"
+			"  - (b) buy:       Buy the examined item.\n"
+			"  - (e) equip:     Equip the examined item (if possessed).\n"
 			NOCOLOR
 			"\n"
 		);

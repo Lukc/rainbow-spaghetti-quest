@@ -2,6 +2,7 @@
 #ifndef ENTITIES_H
 #define ENTITIES_H
 
+#include "battle.h"
 #include "classes.h"
 
 /* Why? Because! */
@@ -15,14 +16,14 @@ enum EQUIPMENT_SLOTS {
 	EQ_MAX
 };
 
-typedef struct {
+typedef struct Attack {
 	char *name;
 	int damage;
 	char *type;
 	int mana; /* mana requirement to use */
 } Attack;
 
-typedef struct {
+typedef struct Entity {
 	int id; /* @fixme: should be class_id or removed */
 	char *name;
 	int health;
@@ -30,7 +31,7 @@ typedef struct {
 	unsigned int kills;
 	int caps; /* Bottle Caps */
 
-	Class *class;
+	struct Class *class;
 
 	int equipment[EQ_MAX];
 	int inventory[INVENTORY_SIZE];
@@ -38,15 +39,13 @@ typedef struct {
 
 int get_max_mana(Entity*);
 int get_max_health(Entity*);
-int get_attack(Entity*);
-int get_defense(Entity*);
+int get_attack(Battle*, Entity*);
+int get_defense(Battle*, Entity*);
 
 char* equipment_string(int);
 
-int init_entity(Entity*);
 int init_entity_from_class(Entity*, Class*);
-void remove_entity(Entity*);
 
-void print_entity(Entity*);
+void print_entity(Battle*, Entity*);
 
 #endif

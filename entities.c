@@ -7,31 +7,60 @@
 #include "entities.h"
 
 int
-get_max_mana(Entity *e)
+get_max_mana(Entity* e)
 {
 	return e->class->base_mana;
 }
 
 int
-get_max_health(Entity *e)
+get_max_health(Entity* e)
 {
 	return e->class->base_health;
 }
 
 int
-get_attack(Entity *e)
+get_attack(Battle* data, Entity* e)
 {
-	return e->class->base_attack;
+	Item* equipment;
+	int i;
+	int bonus = 0;
+
+	for (i = 0; i < EQ_MAX; i++)
+	{
+		if (e->equipment[i])
+		{
+			equipment = get_item_from_id(data, e->equipment[i]);
+
+			bonus += equipment->attack_bonus;
+		}
+	}
+
+	return e->class->base_attack + bonus;
 }
 
 int
-get_defense(Entity *e)
+get_defense(Battle* data, Entity* e)
 {
-	return e->class->base_defense;
+	Item* equipment;
+	int i;
+	int bonus = 0;
+
+	for (i = 0; i < EQ_MAX; i++)
+	{
+		if (e->equipment[i])
+		{
+			equipment = get_item_from_id(data, e->equipment[i]);
+
+			bonus += equipment->defense_bonus;
+		}
+	}
+
+
+	return e->class->base_defense + bonus;
 }
 
 int
-init_entity_from_class(Entity *e, Class *c)
+init_entity_from_class(Entity* e, Class* c)
 {
 	unsigned int i;
 
@@ -55,13 +84,8 @@ init_entity_from_class(Entity *e, Class *c)
 	return 42;
 }
 
-void
-remove_entity(Entity *e)
-{
-}
-
 static const char*
-health_color(Entity *e)
+health_color(Entity* e)
 {
 	int cur, max, ratio;
 
@@ -104,7 +128,7 @@ print_bar(
 }
 
 void
-print_entity(Entity *e)
+print_entity(Battle* data, Entity *e)
 {
 	printf(BRIGHT BLUE ">> %s\n" NOCOLOR, e->name);
 
@@ -126,8 +150,8 @@ print_entity(Entity *e)
 		WHITE "  Defense:  " BLUE  "%i\n" NOCOLOR
 		WHITE "  Kills:    " "%i" "\n" NOCOLOR
 		,
-		get_attack(e),
-		get_defense(e),
+		get_attack(data, e),
+		get_defense(data, e),
 		e->kills
 	);
 }
