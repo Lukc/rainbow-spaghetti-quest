@@ -6,6 +6,8 @@ targets=(main)
 type[main]=binary
 sources[main]="$(echo *.c)"
 
+dist=(items/*.txt classes/*.txt)
+
 # FIXME: This ought to be cleaner and in build/* (or build.zsh, at the
 #        very least…)
 for c in *.c; do

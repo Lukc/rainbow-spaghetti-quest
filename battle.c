@@ -79,7 +79,7 @@ command_attack(void* opt)
 
 	if (enemy->health <= 0)
 	{
-		logs_add(logs, strdup("You killed your enemy."));
+		logs_add(logs, strdup("Your enemy is dead."));
 	}
 	else
 	{
@@ -94,7 +94,7 @@ command_attack(void* opt)
 
 		if (player->health <= 0)
 		{
-			logs_add(logs, strdup("Your enemy killed you..."));
+			logs_add(logs, strdup("You have been defeated..."));
 		}
 	}
 
@@ -174,8 +174,8 @@ battle(Battle *battle_data)
 
 			if (battle_data->flee)
 			{
-				/* Fled, or both died simultaneously. Probably simply fled. */
-				printf("You manage to get out of the battle without being "
+				system("clear");
+				printf("\nYou manage to get out of the battle without being "
 						"hurt too badly.\n");
 				printf("\nPress any key to continue...\n\n");
 				getchar();
@@ -186,7 +186,8 @@ battle(Battle *battle_data)
 			{
 				player->caps /= 2;
 
-				printf("You are DEAD.\n");
+				system("clear");
+				printf("\nYou are DEAD.\n");
 				printf("\nYou lost half your bottle caps.\n");
 				printf("\nPress any key to continue...\n\n");
 				getchar();
@@ -197,7 +198,8 @@ battle(Battle *battle_data)
 			{
 				player->caps += enemy->class->caps_on_kill;
 
-				printf("You are VICTORIOUS.\n");
+				system("clear");
+				printf("\nYou are VICTORIOUS.\n");
 				printf("\nYou gain %d bottle caps!\n", enemy->class->caps_on_kill);
 				printf("\nPress any key to continue...\n\n");
 				free(line);
@@ -220,6 +222,30 @@ battle(Battle *battle_data)
 	return 0;
 }
 
+static Class*
+get_random_enemy(Class* classes)
+{
+	Class* class;
+	Class* valid_classes[1024];
+	int count = 0;
+
+	class = classes;
+
+	while (class->id)
+	{
+		/* FIXME: Doesn’t this feel a bit hacky? We should add a ->spawnable
+		 *        element or make their spawn location-dependant */
+		if (class->id >= 10)
+		{
+			valid_classes[count++] = class;
+		}
+
+		class = class + 1;
+	}
+
+	return valid_classes[rand() % count];
+}
+
 Logs*
 enter_battle(void *opt)
 {
@@ -234,7 +260,7 @@ enter_battle(void *opt)
 	classes = battle_data->classes;
 
 	/* FIXME: Get only a mob that’s made to spawn in random battles */
-	init_entity_from_class(enemy, &classes[rand() % 2]);
+	init_entity_from_class(enemy, get_random_enemy(classes));
 
 	if ((result = battle(battle_data)) == 1)
 	{

@@ -10,7 +10,15 @@ function binary.build {
 	write
 
 	for i in ${src[@]}; do
-		write "${i%.c}.o: ${i} $([[ -e ${i%.c}.h ]] && echo "${i%.c}.h")"
+		write -n "${i%.c}.o: ${i}"
+
+		for h in *.h; do
+			if grep -q "#include \"$h\"" $i; then
+				write -n " $h"
+			fi
+		done
+		write
+
 		write "\t@echo '$(CC ${i%.c}.o)'"
 		write "\t$Q\$(CC) \$(CFLAGS) ${cflags[$target]} -c ${i}"
 		write

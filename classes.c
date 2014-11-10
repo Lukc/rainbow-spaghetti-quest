@@ -46,6 +46,33 @@ load_classes(char* dirname)
 	return classes;
 }
 
+static int
+check_type_defense(Class* class, char* field, char* value)
+{
+	char* type;
+	int i;
+	size_t len;
+
+	for (i = 0; i < TYPE_MAX; i++)
+	{
+		type = type_string(i);
+
+		len = strlen(type);
+
+		if (
+			!strncmp(field, type, len) &&
+			field[len] == ' ' &&
+			!strcmp(field + len + 1, "defense"))
+		{
+			class->type_defense[i] = atoi(value);
+
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
 /**
  * @todo 
  */
@@ -93,12 +120,7 @@ load_class (Class* class, char* filename)
 			class->base_defense = atoi(value);
 		else if (!strcmp(field, "caps") || !strcmp(field, "caps on kill"))
 			class->caps_on_kill = atoi(value);
-		else if (!strcmp(field, "slashing defense"))
-			class->type_defense[TYPE_SLASHING] = atoi(value);
-		else if (!strcmp(field, "impact defense"))
-			class->type_defense[TYPE_IMPACT] = atoi(value);
-		else if (!strcmp(field, "piercing defense"))
-			class->type_defense[TYPE_PIERCING] = atoi(value);
+		else if (check_type_defense(class, field, value)) ;
 		else
 			fprintf(stderr, " [%s]> Unknown field: %s\n", filename, field);
 	}

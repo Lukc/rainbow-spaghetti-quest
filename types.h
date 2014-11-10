@@ -3,11 +3,14 @@
 #define _TYPES_H
 
 enum TYPES {
-	/* Default type */
+	/* Physical types */
 	TYPE_SLASHING,
-
 	TYPE_IMPACT,
 	TYPE_PIERCING,
+
+	TYPE_ARCANE,
+	TYPE_FIRE,
+	TYPE_COLD,
 
 	TYPE_MAX
 };

@@ -13,6 +13,12 @@ type_string(int type)
 			return "impact";
 		case TYPE_PIERCING:
 			return "piercing";
+		case TYPE_ARCANE:
+			return "arcane";
+		case TYPE_FIRE:
+			return "fire";
+		case TYPE_COLD:
+			return "cold";
 		default:
 			return "unknown";
 	}

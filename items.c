@@ -50,6 +50,33 @@ load_items(char* dirname)
 	return items;
 }
 
+static int
+check_type_defense(Item* item, char* field, char* value)
+{
+	char* type;
+	int i;
+	size_t len;
+
+	for (i = 0; i < TYPE_MAX; i++)
+	{
+		type = type_string(i);
+
+		len = strlen(type);
+
+		if (
+			!strncmp(field, type, len) &&
+			field[len] == ' ' &&
+			!strcmp(field + len + 1, "defense"))
+		{
+			item->defense[i] = atoi(value);
+
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
 void
 load_item (Item* item, char* filename)
 {
@@ -116,12 +143,7 @@ load_item (Item* item, char* filename)
 			else
 				fprintf(stderr, " [%s]> Unknown attack type.\n", filename);
 		}
-		else if (!strcmp(field, "slashing defense"))
-			item->defense[TYPE_SLASHING] = atoi(value);
-		else if (!strcmp(field, "impact defense"))
-			item->defense[TYPE_IMPACT] = atoi(value);
-		else if (!strcmp(field, "piercing defense"))
-			item->defense[TYPE_PIERCING] = atoi(value);
+		else if (check_type_defense(item, field, value)) ;
 		else if (!strcmp(field, "attack bonus"))
 			item->attack_bonus = atoi(value);
 		else if (!strcmp(field, "defense bonus"))

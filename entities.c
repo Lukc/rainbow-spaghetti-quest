@@ -222,11 +222,9 @@ print_entity(Battle* data, Entity *e)
 	printf(
 		BRIGHT WHITE "  Attack:   " RED   "%i" NOCOLOR BRIGHT " - %s\n" NOCOLOR
 		BRIGHT WHITE "  Defense:  " BLUE  "%i\n" NOCOLOR
-		WHITE "  Kills:    " "%i" "\n" NOCOLOR
 		,
 		get_attack(data, e), type_string(get_attack_type(data, e)),
-		get_defense(data, e),
-		e->kills
+		get_defense(data, e)
 	);
 
 	printf("\n");

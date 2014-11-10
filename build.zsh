@@ -196,8 +196,9 @@ function main {
 		fi
 	fi
 
-	for prefix path in ${prefixes[@]}; do
-		write "$prefix := $path"
+	# Got some issues of PATH being replaced by a value of $path…
+	for prefix _path in ${prefixes[@]}; do
+		write "$prefix := $_path"
 	done
 
 	for var val in ${variables[@]}; do

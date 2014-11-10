@@ -1,7 +1,9 @@
-Id: 41
+Id: 42
 Name: Evil Kitten
 Health: 13
 Mana: 6
 Attack: 6
 Defense: 6
+Slashing defense: 5
+Piercing defense: 5
 Caps on kill: 25
