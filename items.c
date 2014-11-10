@@ -10,18 +10,13 @@
 
 #define MAX_ITEMS 255
 
-Item*
+List*
 load_items(char* dirname)
 {
-	Item *items;
+	List* items = NULL;
 	DIR* dir;
 	struct dirent *entry;
 	char* filename;
-	int n = 0;
-
-	items = malloc(sizeof(Item) * MAX_ITEMS);
-
-	memset(items + n, 0, sizeof(Item) * MAX_ITEMS);
 
 	dir = opendir(dirname);
 
@@ -37,15 +32,12 @@ load_items(char* dirname)
 		sprintf(filename, "%s/%s", dirname, entry->d_name);
 
 		printf(" > %s\n", filename);
-		load_item(items + n, filename);
-		n++;
+		list_add(&items, (void*) load_item(filename));
 
 		free(filename);
 	}
 
 	closedir(dir);
-
-	memset(items + n, 0, sizeof(Item));
 
 	return items;
 }
@@ -77,13 +69,18 @@ check_type_resistance(Item* item, char* field, char* value)
 	return 0;
 }
 
-void
-load_item (Item* item, char* filename)
+Item*
+load_item (char* filename)
 {
 	FILE* f = fopen(filename, "r");
 	char* str = NULL;
 	size_t n = 0;
+	Item* item;
 	int i;
+
+	item = (Item*) malloc(sizeof(Item));
+
+	memset(item, 0, sizeof(Item));
 
 	while (getline(&str, &n, f) > 0)
 	{
@@ -155,16 +152,26 @@ load_item (Item* item, char* filename)
 	free(str);
 
 	fclose(f);
+
+	return item;
 }
 
 Item*
 get_item_from_id(Battle* battle, int id)
 {
-	int i;
+	List* container;
+	Item* item;
 
-	for (i = 0; battle->items[i].id; i++)
-		if (battle->items[i].id == id)
-			return battle->items + i;
+	container = battle->items;
+	while (container)
+	{
+		item = container->data;
+
+		if (item->id == id)
+			return item;
+
+		container = container->next;
+	}
 
 	return NULL;
 }

@@ -16,13 +16,12 @@ inflict_damage(Battle* data, Entity* attacker, Entity* defender)
 	int damage_inflicted;
 	int type_modifier;
 
-	damage_inflicted =
-		get_attack(data, attacker) - get_defense(data, defender);
-
 	type_modifier =
 		get_type_resistance(data, defender, get_attack_type(data, attacker));
 
-	damage_inflicted -= (damage_inflicted * 100 * type_modifier) / 100;
+	damage_inflicted =
+		(int) ((get_attack(data, attacker) * (100. - type_modifier)) / 100.) -
+		get_defense(data, defender);
 
 	damage_inflicted = damage_inflicted <= 0 ? 1 : damage_inflicted;
 	defender->health -= damage_inflicted;
@@ -161,7 +160,7 @@ battle(Battle *battle_data)
 
 			print_entity(battle_data, player);
 			printf(BRIGHT RED "\n -- " WHITE "versus" RED " --\n\n" NOCOLOR);
-			print_entity(battle_data, enemy);
+			print_entity_basestats(battle_data, enemy);
 			printf("\n");
 
 			if (logs)
@@ -223,16 +222,16 @@ battle(Battle *battle_data)
 }
 
 static Class*
-get_random_enemy(Class* classes)
+get_random_enemy(List* list)
 {
 	Class* class;
 	Class* valid_classes[1024];
 	int count = 0;
 
-	class = classes;
-
-	while (class->id)
+	while (list)
 	{
+		class = (Class*) list->data;
+
 		/* FIXME: Doesn’t this feel a bit hacky? We should add a ->spawnable
 		 *        element or make their spawn location-dependant */
 		if (class->id >= 10)
@@ -240,7 +239,7 @@ get_random_enemy(Class* classes)
 			valid_classes[count++] = class;
 		}
 
-		class = class + 1;
+		list = list->next;
 	}
 
 	return valid_classes[rand() % count];
@@ -251,7 +250,7 @@ enter_battle(void *opt)
 {
 	Battle* battle_data;
 	Entity* player, *enemy;
-	Class* classes;
+	List* classes;
 	int result;
 
 	battle_data = opt;

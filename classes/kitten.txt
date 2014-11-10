@@ -5,4 +5,5 @@ Health: 7
 Mana: 7
 Attack: 3
 Defense: 1
+Attack type: slashing
 Caps on kill: 3

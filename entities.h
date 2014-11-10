@@ -49,6 +49,7 @@ char* equipment_string(int);
 
 int init_entity_from_class(Entity*, Class*);
 
+void print_entity_basestats(Battle*, Entity*);
 void print_entity(Battle*, Entity*);
 
 #endif

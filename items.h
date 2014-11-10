@@ -21,8 +21,8 @@ typedef struct Item {
 
 #include "battle.h"
 
-void load_item(Item*, char*);
-Item* load_items(char*);
+Item* load_item(char*);
+List* load_items(char*);
 
 Item* get_item_from_id(Battle*, int);
 int get_count_from_inventory(int*, int);

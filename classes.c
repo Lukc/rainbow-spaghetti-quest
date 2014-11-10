@@ -8,18 +8,16 @@
 
 #define MAX_CLASSES 255
 
-Class*
+/**
+ * @return: List* of Class*
+ */
+List*
 load_classes(char* dirname)
 {
-	Class *classes;
+	List* classes = NULL;
 	DIR* dir;
 	struct dirent *entry;
 	char* filename;
-	int n = 0;
-
-	classes = malloc(sizeof(Class) * MAX_CLASSES);
-
-	memset(classes + n, 0, sizeof(Class) * MAX_CLASSES);
 
 	dir = opendir(dirname);
 
@@ -35,8 +33,7 @@ load_classes(char* dirname)
 		sprintf(filename, "%s/%s", dirname, entry->d_name);
 
 		printf(" > %s\n", filename);
-		load_class(classes + n, filename);
-		n++;
+		list_add(&classes, load_class(filename));
 
 		free(filename);
 	}
@@ -73,16 +70,18 @@ check_type_resistance(Class* class, char* field, char* value)
 	return 0;
 }
 
-/**
- * @todo 
- */
-void
-load_class (Class* class, char* filename)
+Class*
+load_class (char* filename)
 {
 	FILE* f = fopen(filename, "r");
 	char* str = NULL;
 	size_t n = 0;
+	Class* class;
 	int i;
+
+	class = (Class*) malloc(sizeof(Class));
+
+	memset(class, 0, sizeof(Class));
 
 	while (getline(&str, &n, f) > 0)
 	{
@@ -116,6 +115,20 @@ load_class (Class* class, char* filename)
 			class->base_mana = atoi(value);
 		else if (!strcmp(field, "attack"))
 			class->base_attack = atoi(value);
+		else if (!strcmp(field, "attack type"))
+		{
+			for (i = 0; i < TYPE_MAX; i++)
+				if (!strcmp(type_string(i), value))
+				{
+					class->attack_type = i;
+
+					i = TYPE_MAX + 1;
+				}
+
+			if (i == TYPE_MAX)
+				fprintf(stderr,
+					" [%s]> Unknown attack type: %s\n", filename, field);
+		}
 		else if (!strcmp(field, "defense"))
 			class->base_defense = atoi(value);
 		else if (!strcmp(field, "caps") || !strcmp(field, "caps on kill"))
@@ -128,17 +141,29 @@ load_class (Class* class, char* filename)
 	free(str);
 
 	fclose(f);
-}
-
-Class*
-get_class_by_name(Class* classes, char* name)
-{
-	Class* class = classes;
-
-	while (class && strcmp(class->name, name))
-		class++;
 
 	return class;
+}
+
+/**
+ * @param list: List* of Class*
+ */
+Class*
+get_class_by_name(List* list, char* name)
+{
+	Class* class;
+
+	while (list)
+	{
+		class = (Class*) list->data;
+
+		if (!strcmp(class->name, name))
+			return class;
+
+		list = list->next;
+	}
+
+	return NULL;
 }
 
 /* vim: set ts=4 sw=4 cc=80 : */

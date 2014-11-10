@@ -2,11 +2,13 @@
 #ifndef BATTLE_H
 #define BATTLE_H
 
+#include "list.h"
+
 typedef struct Battle {
-	struct Entity *player;
-	struct Entity *enemy;
-	struct Class *classes;
-	struct Item *items;
+	struct Entity* player;
+	struct Entity* enemy;
+	List* classes;
+	List* items;
 
 	int flee;
 } Battle;

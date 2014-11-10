@@ -24,8 +24,8 @@ main(int argc, char* argv[])
 		{"dungeon", "d", NULL,         "Enter a terrible dungeon and fight hordes of enemies!"},
 		{NULL, NULL, NULL, NULL}
 	};
-	Class *classes;
-	Item *items;
+	List* classes;
+	List* items;
 	Battle battle;
 
 	classes = load_classes("classes");

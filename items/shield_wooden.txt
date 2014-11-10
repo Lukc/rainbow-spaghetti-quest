@@ -6,3 +6,4 @@ Slot: shield
 Slashing defense: 10
 Piercing defense: 14
 Impact defense: 8
+Fire defense: -20

@@ -8,6 +8,7 @@
 #define YELLOW   "\033[33m"
 #define BLUE     "\033[34m"
 #define WHITE    "\033[37m"
+#define BLACK    "\033[39m"
 #define NOCOLOR  "\033[00m"
 
 #endif

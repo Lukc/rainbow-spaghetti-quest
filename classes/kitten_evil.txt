@@ -6,4 +6,5 @@ Attack: 6
 Defense: 6
 Slashing defense: 5
 Piercing defense: 5
+Attack type: fire
 Caps on kill: 25

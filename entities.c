@@ -87,8 +87,7 @@ get_attack_type(Battle* data, Entity* e)
 			return get_item_from_id(
 				data, e->equipment[EQ_WEAPON])->attack_type;
 	else
-		/* Bare hands... that’s impact, right? */
-		return TYPE_IMPACT;
+		return e->class->attack_type;
 }
 
 int
@@ -174,9 +173,9 @@ print_resistance(Battle* data, Entity* e, int type)
 	for (i = printed; i < 14; i++)
 		printf(" ");
 	
-	resistance = 100 + get_type_resistance(data, e, type);
+	resistance = get_type_resistance(data, e, type);
 
-	printed = 14 + printf(BRIGHT "%i", resistance);
+	printed = 14 + printf(BRIGHT "%i%%", resistance);
 
 	for (i = printed; i < 24; i++)
 		printf(" ");
@@ -184,12 +183,16 @@ print_resistance(Battle* data, Entity* e, int type)
 	printf(YELLOW "[");
 	for (i = 0; i < 46; i++)
 	{
-		if (resistance != 0 && ((float) i) / 46 <= ((float) resistance) / 200)
+		if (((float) i) / 46 <= ((float) resistance + 50) / 100)
 		{
-			if (((float) i / 46) <= .15)
+			if (((float) i / 46) <= .1)
+				printf(BLACK);
+			else if (((float) i / 46) <= .25)
 				printf(RED);
 			else if (((float) i / 46) > 0.5)
 				printf(GREEN);
+			else if (((float) i / 46) > 0.75)
+				printf(WHITE);
 			else
 				printf(YELLOW);
 
@@ -202,7 +205,7 @@ print_resistance(Battle* data, Entity* e, int type)
 }
 
 void
-print_entity(Battle* data, Entity *e)
+print_entity_basestats(Battle* data, Entity* e)
 {
 	printf(BRIGHT BLUE ">> %s\n" NOCOLOR, e->name);
 
@@ -226,6 +229,12 @@ print_entity(Battle* data, Entity *e)
 		get_attack(data, e), type_string(get_attack_type(data, e)),
 		get_defense(data, e)
 	);
+}
+
+void
+print_entity(Battle* data, Entity *e)
+{
+	print_entity_basestats(data, e);
 
 	printf("\n");
 
