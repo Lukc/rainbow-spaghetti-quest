@@ -125,7 +125,9 @@ command_focus(void *opts)
 		points_gained);
 	logs_add(logs, log);
 
-	logs_add(logs, strdup("Strangely enough, the enemy does nothing to take advantage of your temporary weakness."));
+	logs_add(logs, strdup(
+		"Strangely enough, the enemy does nothing to take advantage of your "
+		"temporary weakness."));
 
 	return logs;
 }

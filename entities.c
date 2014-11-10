@@ -248,14 +248,18 @@ print_entity(Battle* data, Entity *e)
 char*
 equipment_string(int id)
 {
-	if (id == 0)
-		return "Weapon";
-	else if (id == 1)
-		return "Shield";
-	else if (id == 2)
-		return "Armor";
+	if (id == EQ_WEAPON)
+		return "weapon";
+	else if (id == EQ_SHIELD)
+		return "shield";
+	else if (id == EQ_ARMOR)
+		return "armor";
+	else if (id == EQ_WEAPON_RANGED)
+		return "ranged weapon";
+	else if (id == EQ_AMULET)
+		return "amulet";
 	else
-		return "Unknown";
+		return "unknown";
 }
 
 /* vim: set ts=4 sw=4 cc=80 : */

@@ -10,24 +10,54 @@
 #include "battle.h"
 #include "shop.h"
 
+static char*
+stat_color(int i)
+{
+	if (i == 0)
+		return WHITE;
+	else if (i > 0)
+		return BRIGHT GREEN;
+	else
+		return BRIGHT RED;
+}
+
 static void
 print_item(Item* item)
 {
 	int i;
 
-	printf("Selected item: %s\n", item->name);
+	printf(BRIGHT BLUE " > Selected item: %s\n" NOCOLOR, item->name);
+
+	if (item->slot == EQ_WEAPON)
+		printf(WHITE "  is a %s weapon\n" NOCOLOR,
+			type_string(item->attack_type));
+	else
+	{
+		char* string;
+
+		string = strdup(equipment_string(item->slot));
+		string[0] = toupper(string[0]);
+
+		printf(WHITE "  is a %s\n" NOCOLOR, string);
+
+		free(string);
+	}
 
 	if (item->attack_bonus)
-		printf("  %i base attack\n", item->attack_bonus);
+		printf("  %s%+i base attack\n" NOCOLOR,
+			stat_color(item->attack_bonus), item->attack_bonus);
 
 	if (item->defense_bonus)
-		printf("  %i base defense\n", item->defense_bonus);
+		printf("  %s%+i base defense\n" NOCOLOR,
+			stat_color(item->defense_bonus), item->defense_bonus);
 
 	for (i = 0; i < TYPE_MAX; i++)
 	{
 		if (item->type_resistance[i])
 		{
-			printf("  %i%% %s resistance\n", item->type_resistance[i], type_string(i));
+			printf("  %s%+i%% %s resistance\n" NOCOLOR,
+				stat_color(item->type_resistance[i]),
+				item->type_resistance[i], type_string(i));
 		}
 	}
 
@@ -96,7 +126,7 @@ print_equipment(Battle* data, Entity* player)
 	int i, j, printed;
 	Item* item;
 
-	printf("Current equipment:\n");
+	printf(BRIGHT BLUE " > Current equipment:\n" NOCOLOR);
 
 	for (i = 0; i < EQ_MAX; i++)
 	{
@@ -178,21 +208,23 @@ enter_shop(void* opt)
 		{
 			print_item(selected_item);
 			printf(
-				"  Already possessed: %i.\n\n",
+				WHITE " > Already possessed: %i.\n\n" NOCOLOR,
 				get_count_from_inventory(player->inventory, item->id));
 		}
 
+		printf(WHITE " > Items sold:\n" NOCOLOR);
 		i = 0;
 		for (list = items; list; list = list->next)
 		{
 			item = (Item*) list->data;
 
 			printf(
-				WHITE "  - (%i)" NOCOLOR ":  "
-				BRIGHT BLUE "%s" NOCOLOR " %s(%i caps)\n" NOCOLOR
+				WHITE "  - (%i)" NOCOLOR ":  %s%-30s" NOCOLOR " %s(%i caps)\n" NOCOLOR
 				,
-				i, item->name,
-				player->caps >= item->price ? BRIGHT GREEN : BRIGHT RED,
+				i,
+				player->caps >= item->price ? BRIGHT BLUE : RED,
+				item->name,
+				player->caps >= item->price ? BRIGHT GREEN : RED,
 				item->price
 			);
 
