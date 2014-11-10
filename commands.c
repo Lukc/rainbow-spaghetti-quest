@@ -5,10 +5,11 @@
 #include "commands.h"
 #include "colors.h"
 
-char**
+Logs*
 execute_commands(char* line, Command *commands, void *opts)
 {
-	char **logs = NULL;
+	Logs* logs;
+	char* log;
 	int i;
 
 	if (line[0] == '\0')
@@ -24,21 +25,20 @@ execute_commands(char* line, Command *commands, void *opts)
 			}
 			else
 			{
-				logs = (char**) malloc(sizeof(char*) * 2);
-				logs[0] = strdup(
-					BRIGHT YELLOW "Command not implemented. :(((" NOCOLOR);
-				logs[1] = NULL;
+				logs = logs_new();
+				logs_add(logs, strdup(
+					BRIGHT YELLOW "Command not implemented. :(((" NOCOLOR));
 
 				return logs;
 			}
 		}
 	}
 
-	logs = (char**) malloc(sizeof(char*) * 2);
-	logs[0] = (char*) malloc(sizeof(char) * 80);
-	snprintf(logs[0], 80,
+	logs = logs_new();
+	log = (char*) malloc(sizeof(char) * 80);
+	snprintf(log, 80,
 		BRIGHT YELLOW "Command not recognized: %s." NOCOLOR, line);
-	logs[1] = NULL;
+	logs_add(logs, log);
 
 	return logs;
 }
@@ -88,6 +88,73 @@ print_logs(char **logs)
 
 		printf("\n");
 	}
+}
+
+Logs*
+logs_new()
+{
+	Logs* l = (Logs*) malloc(sizeof(Logs));
+
+	l->head = NULL;
+	l->tail = NULL;
+
+	return l;
+}
+
+void
+logs_add(Logs* l, char* string)
+{
+	struct logs_list* link;
+
+	link = (struct logs_list*) malloc(sizeof(struct logs_list));
+
+	link->string = string;
+	link->next = NULL;
+
+	if (l->tail)
+		l->tail->next = link;
+	else
+		l->head = link;
+
+	l->tail = link;
+}
+
+void
+logs_print(Logs* l)
+{
+	struct logs_list* link;
+
+	link = l->head;
+
+	while (link)
+	{
+		printf("%s\n", link->string);
+
+		link = link->next;
+	}
+
+	printf("\n");
+}
+
+void
+logs_free(Logs* l)
+{
+	struct logs_list* link, * temp;
+
+	link = l->head;
+
+	while (link)
+	{
+		temp = link;
+
+		free(temp->string);
+
+		link = link->next;
+
+		free(temp);
+	}
+
+	free(l);
 }
 
 /* vim: set ts=4 sw=4 cc=80 : */

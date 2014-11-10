@@ -13,8 +13,9 @@ typedef struct Battle {
 
 #include "entities.h"
 #include "items.h"
+#include "commands.h"
 
-char** enter_battle(void*);
+struct Logs* enter_battle(void*);
 
 #endif
 

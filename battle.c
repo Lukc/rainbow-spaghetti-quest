@@ -29,43 +29,39 @@ inflict_damage(Battle* data, Entity* attacker, Entity* defender)
 	return damage_inflicted;
 }
 
-char**
+Logs*
 command_flee(void* opt)
 {
 	Battle *battle_data;
-	char **logs;
-	int logs_i;
+	Logs* logs;
+	char* log;
 
-	logs_i = 0;
-	logs = (char**) malloc(sizeof(char*) * 2);
+	logs = logs_new();
 
-	logs[logs_i] = (char*) malloc(sizeof(char) * 128);
+	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(
-		logs[logs_i], 128,
+		log, 128,
 		"You fled from your battle!");
-	logs_i++;
+	logs_add(logs, log);
 
 	battle_data = opt;
 
 	battle_data->flee = 1;
 
-	logs[logs_i] = NULL;
-
 	return NULL;
 }
 
-char**
+Logs*
 command_attack(void* opt)
 {
 	Battle *battle_data;
 	Entity *player;
 	Entity *enemy;
 	int damage_inflicted, damage_received;
-	char **logs;
-	int logs_i;
+	Logs* logs;
+	char* log;
 
-	logs_i = 0;
-	logs = (char**) malloc(sizeof(char*) * 5);
+	logs = logs_new();
 
 	battle_data = opt;
 	player = battle_data->player;
@@ -73,71 +69,63 @@ command_attack(void* opt)
 
 	damage_inflicted = inflict_damage(battle_data, player, enemy);
 
-	logs[logs_i] = (char*) malloc(sizeof(char) * 128);
+	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(
-		logs[logs_i], 128,
+		log, 128,
 		"You inflicted %i points of damage to your enemy!",
 		damage_inflicted);
-	logs_i++;
+	logs_add(logs, log);
 
 	if (enemy->health <= 0)
 	{
-		logs[logs_i] = strdup("You killed your enemy.");
-		logs_i++;
+		logs_add(logs, strdup("You killed your enemy."));
 	}
 	else
 	{
 		damage_received = inflict_damage(battle_data, enemy, player);
 
-		logs[logs_i] = (char*) malloc(sizeof(char) * 128);
+		log = (char*) malloc(sizeof(char) * 128);
 		snprintf(
-			logs[logs_i], 128,
+			log, 128,
 			"You received %i points of damage from your enemy!",
 			damage_received);
-		logs_i++;
+		logs_add(logs, log);
 
 		if (player->health <= 0)
 		{
-			logs[logs_i] = strdup("Your enemy killed you...");
-			logs_i++;
+			logs_add(logs, strdup("Your enemy killed you..."));
 		}
 	}
-
-	logs[logs_i] = NULL;
 
 	return logs;
 }
 
-char**
+Logs*
 command_focus(void *opts)
 {
 	Battle *battle_data;
 	Entity *player;
-	char **logs;
-	int logs_i;
 	int points_gained;
+	Logs* logs;
+	char* log;
+
+	logs = logs_new();
 
 	battle_data = opts;
 	player = battle_data->player;
-
-	logs_i = 0;
-	logs = (char**) malloc(sizeof(char*) * 4);
 
 	points_gained = player->class->mana_regen_on_focus;
 	points_gained = player->mana + points_gained > get_max_mana(player) ?
 		get_max_mana(player) - player->mana : points_gained;
 
-	logs[logs_i] = (char*) malloc(sizeof(char) * 128);
+	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(
-		logs[logs_i], 128,
+		log, 128,
 		"You regenerated %i points of mana.",
 		points_gained);
-	logs_i++;
+	logs_add(logs, log);
 
-	logs[logs_i] = strdup("Strangely enough, the enemy does nothing to take advantage of your temporary weakness.");
-	logs_i++;
-
-	logs[logs_i] = NULL;
+	logs_add(logs, strdup("Strangely enough, the enemy does nothing to take advantage of your temporary weakness."));
 
 	return logs;
 }
@@ -145,7 +133,7 @@ command_focus(void *opts)
 int
 battle(Battle *battle_data)
 {
-	char **logs = NULL;
+	Logs* logs;
 	char *line;
 	Command commands[] = {
 		{"attack",   "a",   command_attack,   "A weak attack."},
@@ -175,7 +163,11 @@ battle(Battle *battle_data)
 			print_entity(battle_data, enemy);
 			printf("\n");
 
-			print_logs(logs);
+			if (logs)
+			{
+				logs_print(logs);
+				logs_free(logs);
+			}
 
 			print_commands(commands);
 
@@ -227,7 +219,7 @@ battle(Battle *battle_data)
 	return 0;
 }
 
-char**
+Logs*
 enter_battle(void *opt)
 {
 	Battle* battle_data;

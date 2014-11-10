@@ -21,7 +21,7 @@ count_items(Item* items)
 	return n;
 }
 
-char**
+Logs*
 enter_shop(void* opt)
 {
 	Battle* data;

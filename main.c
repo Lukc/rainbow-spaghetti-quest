@@ -16,8 +16,8 @@ int
 main(int argc, char* argv[])
 {
 	Entity player, enemy;
-	char *line;
-	char **logs;
+	char* line;
+	Logs* logs;
 	Command commands[] = {
 		{"battle",  "b", enter_battle, "Find a random enemy to beat to death."},
 		{"shop",    "s", enter_shop,   "Buy new equipment to improve your stats!"},
@@ -60,7 +60,11 @@ main(int argc, char* argv[])
 		print_entity(&battle, &player);
 		printf("\n");
 
-		print_logs(logs);
+		if (logs)
+		{
+			logs_print(logs);
+			logs_free(logs);
+		}
 
 		printf(
 			"Bottle caps: %i\n"

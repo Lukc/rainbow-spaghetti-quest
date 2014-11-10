@@ -4,13 +4,14 @@
 
 #include "items.h"
 #include "entities.h"
+#include "commands.h"
 
 typedef struct {
 	Entity* player;
 	Item* items;
 } Shop;
 
-char** enter_shop(void*);
+Logs* enter_shop(void*);
 
 #endif
 
