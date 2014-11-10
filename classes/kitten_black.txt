@@ -1,0 +1,7 @@
+Id: 40
+Name: Black Kitten
+Health: 9
+Mana: 9
+Attack: 4
+Defense: 2
+Caps on kill: 10

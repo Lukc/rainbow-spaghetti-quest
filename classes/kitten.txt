@@ -1,0 +1,8 @@
+# Base hostile mob?
+Id: 40
+Name: Kitten
+Health: 7
+Mana: 7
+Attack: 3
+Defense: 1
+Caps on kill: 3

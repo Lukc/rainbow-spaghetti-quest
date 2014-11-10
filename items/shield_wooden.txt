@@ -1,0 +1,6 @@
+Id: 40
+Name: Wooden Shield
+Defense bonus: 4
+Price: 10
+Slot: shield
+Slashing defense: 20 # In percent

@@ -1,0 +1,8 @@
+# Comments \o/
+Id: 0
+Name: Warrior
+Health: 30
+Mana: 5
+Attack: 5-2
+Defense: 3
+Caps on kill: 35
