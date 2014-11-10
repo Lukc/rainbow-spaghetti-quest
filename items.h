@@ -2,6 +2,8 @@
 #ifndef ITEMS_H
 #define ITEMS_H
 
+#include "types.h"
+
 typedef struct Item {
 	int id;
 	char* name;
@@ -11,6 +13,10 @@ typedef struct Item {
 
 	int attack_bonus;
 	int defense_bonus;
+
+	int defense[TYPE_MAX];
+
+	int attack_type;
 } Item;
 
 #include "battle.h"

@@ -2,15 +2,15 @@
 #ifndef _TYPES_H
 #define _TYPES_H
 
-typedef struct {
-	int current;
-	int max;
-} Bar;
+enum TYPES {
+	/* Default type */
+	TYPE_SLASHING,
 
-typedef struct List {
-	struct List *next;
-	void *data;
-} List;
+	TYPE_IMPACT,
+	TYPE_PIERCING,
+
+	TYPE_MAX
+};
 
 #endif
 

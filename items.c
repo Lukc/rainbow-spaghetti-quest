@@ -6,6 +6,7 @@
 
 #include "entities.h"
 #include "items.h"
+#include "types.h"
 
 #define MAX_ITEMS 255
 
@@ -91,6 +92,10 @@ load_item (char* filename)
 
 			if (!strcmp(value, "weapon"))
 				item.slot = EQ_WEAPON;
+			else if (!strcmp(value, "shield"))
+				item.slot = EQ_SHIELD;
+			else if (!strcmp(value, "armor"))
+				item.slot = EQ_ARMOR;
 			else
 			{
 				fprintf(stderr,
@@ -101,6 +106,23 @@ load_item (char* filename)
 		}
 		else if (!strcmp(field, "price"))
 			item.price = atoi(value);
+		else if (!strcmp(field, "attack type"))
+		{
+			if (!strcmp(value, "slashing"))
+				item.attack_type = TYPE_SLASHING;
+			else if (!strcmp(value, "impact"))
+				item.attack_type = TYPE_IMPACT;
+			else if (!strcmp(value, "piercing"))
+				item.attack_type = TYPE_PIERCING;
+			else
+				fprintf(stderr, " [%s]> Unknown attack type.\n", filename);
+		}
+		else if (!strcmp(field, "slashing defense"))
+			item.defense[TYPE_SLASHING] = atoi(value);
+		else if (!strcmp(field, "impact defense"))
+			item.defense[TYPE_IMPACT] = atoi(value);
+		else if (!strcmp(field, "piercing defense"))
+			item.defense[TYPE_PIERCING] = atoi(value);
 		else if (!strcmp(field, "attack bonus"))
 			item.attack_bonus = atoi(value);
 		else if (!strcmp(field, "defense bonus"))

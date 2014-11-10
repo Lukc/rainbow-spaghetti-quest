@@ -42,6 +42,8 @@ int get_max_health(Entity*);
 int get_attack(Battle*, Entity*);
 int get_defense(Battle*, Entity*);
 
+int get_defense_modifier(Battle*, Entity*, int);
+
 char* equipment_string(int);
 
 int init_entity_from_class(Entity*, Class*);

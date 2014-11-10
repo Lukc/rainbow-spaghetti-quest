@@ -60,6 +60,27 @@ get_defense(Battle* data, Entity* e)
 }
 
 int
+get_defense_modifier(Battle* data, Entity* e, int type)
+{
+	Item* equipment;
+	int i;
+	int bonus = 0;
+
+	for (i = 0; i < EQ_MAX; i++)
+	{
+		if (e->equipment[i])
+		{
+			equipment = get_item_from_id(data, e->equipment[i]);
+
+			bonus += equipment->defense[type];
+		}
+	}
+
+
+	return e->class->base_defense + bonus;
+}
+
+int
 init_entity_from_class(Entity* e, Class* c)
 {
 	unsigned int i;

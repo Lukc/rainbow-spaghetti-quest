@@ -14,8 +14,15 @@ static int
 inflict_damage(Battle* data, Entity* attacker, Entity* defender)
 {
 	int damage_inflicted;
+	int type_modifier;
 
 	damage_inflicted = get_attack(data, attacker) - get_defense(data, defender);
+
+	/* FIXME: Get type from attacker’s weapon or impact */
+	type_modifier = get_defense_modifier(data, defender, TYPE_SLASHING);
+
+	damage_inflicted += (damage_inflicted * 100 * type_modifier) / 100;
+
 	damage_inflicted = damage_inflicted <= 0 ? 1 : damage_inflicted;
 	defender->health -= damage_inflicted;
 
