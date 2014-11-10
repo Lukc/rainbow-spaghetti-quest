@@ -14,7 +14,7 @@ typedef struct Item {
 	int attack_bonus;
 	int defense_bonus;
 
-	int defense[TYPE_MAX];
+	int type_resistance[TYPE_MAX];
 
 	int attack_type;
 } Item;

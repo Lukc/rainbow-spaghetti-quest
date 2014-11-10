@@ -51,7 +51,7 @@ load_items(char* dirname)
 }
 
 static int
-check_type_defense(Item* item, char* field, char* value)
+check_type_resistance(Item* item, char* field, char* value)
 {
 	char* type;
 	int i;
@@ -68,7 +68,7 @@ check_type_defense(Item* item, char* field, char* value)
 			field[len] == ' ' &&
 			!strcmp(field + len + 1, "defense"))
 		{
-			item->defense[i] = atoi(value);
+			item->type_resistance[i] = atoi(value);
 
 			return 1;
 		}
@@ -143,7 +143,7 @@ load_item (Item* item, char* filename)
 			else
 				fprintf(stderr, " [%s]> Unknown attack type.\n", filename);
 		}
-		else if (check_type_defense(item, field, value)) ;
+		else if (check_type_resistance(item, field, value)) ;
 		else if (!strcmp(field, "attack bonus"))
 			item->attack_bonus = atoi(value);
 		else if (!strcmp(field, "defense bonus"))

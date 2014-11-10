@@ -73,10 +73,9 @@ get_type_resistance(Battle* data, Entity* e, int type)
 		{
 			equipment = get_item_from_id(data, e->equipment[i]);
 
-			bonus += equipment->defense[type];
+			bonus += equipment->type_resistance[type];
 		}
 	}
-
 
 	return bonus;
 }
@@ -85,7 +84,8 @@ int
 get_attack_type(Battle* data, Entity* e)
 {
 	if (e->equipment[EQ_WEAPON])
-			return get_item_from_id(data, e->equipment[EQ_WEAPON])->attack_type;
+			return get_item_from_id(
+				data, e->equipment[EQ_WEAPON])->attack_type;
 	else
 		/* Bare hands... that’s impact, right? */
 		return TYPE_IMPACT;

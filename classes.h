@@ -16,7 +16,7 @@ typedef struct Class {
 	int base_attack;
 	int base_defense;
 
-	int type_defense[TYPE_MAX];
+	int type_resistance[TYPE_MAX];
 
 	int mana_regen_on_focus;
 } Class;

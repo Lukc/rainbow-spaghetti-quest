@@ -47,7 +47,7 @@ load_classes(char* dirname)
 }
 
 static int
-check_type_defense(Class* class, char* field, char* value)
+check_type_resistance(Class* class, char* field, char* value)
 {
 	char* type;
 	int i;
@@ -64,7 +64,7 @@ check_type_defense(Class* class, char* field, char* value)
 			field[len] == ' ' &&
 			!strcmp(field + len + 1, "defense"))
 		{
-			class->type_defense[i] = atoi(value);
+			class->type_resistance[i] = atoi(value);
 
 			return 1;
 		}
@@ -120,7 +120,7 @@ load_class (Class* class, char* filename)
 			class->base_defense = atoi(value);
 		else if (!strcmp(field, "caps") || !strcmp(field, "caps on kill"))
 			class->caps_on_kill = atoi(value);
-		else if (check_type_defense(class, field, value)) ;
+		else if (check_type_resistance(class, field, value)) ;
 		else
 			fprintf(stderr, " [%s]> Unknown field: %s\n", filename, field);
 	}
