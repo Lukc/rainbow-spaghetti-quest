@@ -16,16 +16,13 @@ inflict_damage(Battle* data, Entity* attacker, Entity* defender)
 	int damage_inflicted;
 	int type_modifier;
 
-	damage_inflicted = get_attack(data, attacker) - get_defense(data, defender);
+	damage_inflicted =
+		get_attack(data, attacker) - get_defense(data, defender);
 
-	if (attacker->equipment[EQ_WEAPON])
-		type_modifier = get_defense_modifier(data, defender,
-			get_item_from_id(data, attacker->equipment[EQ_WEAPON])->attack_type);
-	else
-		/* Bare hands... that’s impact, right? */
-		type_modifier = get_defense_modifier(data, defender, TYPE_IMPACT);
+	type_modifier =
+		get_type_resistance(data, defender, get_attack_type(data, attacker));
 
-	damage_inflicted += (damage_inflicted * 100 * type_modifier) / 100;
+	damage_inflicted -= (damage_inflicted * 100 * type_modifier) / 100;
 
 	damage_inflicted = damage_inflicted <= 0 ? 1 : damage_inflicted;
 	defender->health -= damage_inflicted;

@@ -12,5 +12,7 @@ enum TYPES {
 	TYPE_MAX
 };
 
+char* type_string(int);
+
 #endif
 
