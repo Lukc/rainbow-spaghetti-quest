@@ -21,6 +21,8 @@ load_items(char* dirname)
 
 	items = malloc(sizeof(Item) * MAX_ITEMS);
 
+	memset(items + n, 0, sizeof(Item) * MAX_ITEMS);
+
 	dir = opendir(dirname);
 
 	while ((entry = readdir(dir)))
@@ -35,7 +37,7 @@ load_items(char* dirname)
 		sprintf(filename, "%s/%s", dirname, entry->d_name);
 
 		printf(" > %s\n", filename);
-		items[n] = load_item(filename);
+		load_item(items + n, filename);
 		n++;
 
 		free(filename);
@@ -48,16 +50,13 @@ load_items(char* dirname)
 	return items;
 }
 
-Item
-load_item (char* filename)
+void
+load_item (Item* item, char* filename)
 {
 	FILE* f = fopen(filename, "r");
 	char* str = NULL;
 	size_t n = 0;
 	int i;
-	Item item;
-
-	memset(&item, 0, sizeof(Item));
 
 	while (getline(&str, &n, f) > 0)
 	{
@@ -82,51 +81,51 @@ load_item (char* filename)
 			field[i] = tolower(field[i]);
 
 		if (!strcmp(field, "name"))
-			item.name = strdup(value);
+			item->name = strdup(value);
 		else if (!strcmp(field, "id"))
-			item.id = atoi(value);
+			item->id = atoi(value);
 		else if (!strcmp(field, "slot"))
 		{
 			for (i = 0; value[i]; i++)
 				value[i] = tolower(value[i]);
 
 			if (!strcmp(value, "weapon"))
-				item.slot = EQ_WEAPON;
+				item->slot = EQ_WEAPON;
 			else if (!strcmp(value, "shield"))
-				item.slot = EQ_SHIELD;
+				item->slot = EQ_SHIELD;
 			else if (!strcmp(value, "armor"))
-				item.slot = EQ_ARMOR;
+				item->slot = EQ_ARMOR;
 			else
 			{
 				fprintf(stderr,
 					" [%s]> Field %s has an unrecognized value of %s\n",
 					filename, field, value);
-				item.slot = atoi(value);
+				item->slot = atoi(value);
 			}
 		}
 		else if (!strcmp(field, "price"))
-			item.price = atoi(value);
+			item->price = atoi(value);
 		else if (!strcmp(field, "attack type"))
 		{
 			if (!strcmp(value, "slashing"))
-				item.attack_type = TYPE_SLASHING;
+				item->attack_type = TYPE_SLASHING;
 			else if (!strcmp(value, "impact"))
-				item.attack_type = TYPE_IMPACT;
+				item->attack_type = TYPE_IMPACT;
 			else if (!strcmp(value, "piercing"))
-				item.attack_type = TYPE_PIERCING;
+				item->attack_type = TYPE_PIERCING;
 			else
 				fprintf(stderr, " [%s]> Unknown attack type.\n", filename);
 		}
 		else if (!strcmp(field, "slashing defense"))
-			item.defense[TYPE_SLASHING] = atoi(value);
+			item->defense[TYPE_SLASHING] = atoi(value);
 		else if (!strcmp(field, "impact defense"))
-			item.defense[TYPE_IMPACT] = atoi(value);
+			item->defense[TYPE_IMPACT] = atoi(value);
 		else if (!strcmp(field, "piercing defense"))
-			item.defense[TYPE_PIERCING] = atoi(value);
+			item->defense[TYPE_PIERCING] = atoi(value);
 		else if (!strcmp(field, "attack bonus"))
-			item.attack_bonus = atoi(value);
+			item->attack_bonus = atoi(value);
 		else if (!strcmp(field, "defense bonus"))
-			item.defense_bonus = atoi(value);
+			item->defense_bonus = atoi(value);
 		else
 			fprintf(stderr, " [%s]> Unknown field: %s\n", filename, field);
 	}
@@ -134,8 +133,6 @@ load_item (char* filename)
 	free(str);
 
 	fclose(f);
-
-	return item;
 }
 
 Item*

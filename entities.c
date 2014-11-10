@@ -64,7 +64,7 @@ get_defense_modifier(Battle* data, Entity* e, int type)
 {
 	Item* equipment;
 	int i;
-	int bonus = 0;
+	int bonus = e->class->type_defense[type];
 
 	for (i = 0; i < EQ_MAX; i++)
 	{

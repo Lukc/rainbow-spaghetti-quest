@@ -19,6 +19,8 @@ load_classes(char* dirname)
 
 	classes = malloc(sizeof(Class) * MAX_CLASSES);
 
+	memset(classes + n, 0, sizeof(Class) * MAX_CLASSES);
+
 	dir = opendir(dirname);
 
 	while ((entry = readdir(dir)))
@@ -33,7 +35,7 @@ load_classes(char* dirname)
 		sprintf(filename, "%s/%s", dirname, entry->d_name);
 
 		printf(" > %s\n", filename);
-		classes[n] = load_class(filename);
+		load_class(classes + n, filename);
 		n++;
 
 		free(filename);
@@ -41,22 +43,19 @@ load_classes(char* dirname)
 
 	closedir(dir);
 
-	memset(classes + n, 0, sizeof(Class));
-
 	return classes;
 }
 
 /**
  * @todo 
  */
-Class
-load_class (char* filename)
+void
+load_class (Class* class, char* filename)
 {
 	FILE* f = fopen(filename, "r");
 	char* str = NULL;
 	size_t n = 0;
 	int i;
-	Class class;
 
 	while (getline(&str, &n, f) > 0)
 	{
@@ -81,19 +80,25 @@ load_class (char* filename)
 			field[i] = tolower(field[i]);
 
 		if (!strcmp(field, "name"))
-			class.name = strdup(value);
+			class->name = strdup(value);
 		else if (!strcmp(field, "id"))
-			class.id = atoi(value);
+			class->id = atoi(value);
 		else if (!strcmp(field, "health"))
-			class.base_health = atoi(value);
+			class->base_health = atoi(value);
 		else if (!strcmp(field, "mana"))
-			class.base_mana = atoi(value);
+			class->base_mana = atoi(value);
 		else if (!strcmp(field, "attack"))
-			class.base_attack = atoi(value);
+			class->base_attack = atoi(value);
 		else if (!strcmp(field, "defense"))
-			class.base_defense = atoi(value);
+			class->base_defense = atoi(value);
 		else if (!strcmp(field, "caps") || !strcmp(field, "caps on kill"))
-			class.caps_on_kill = atoi(value);
+			class->caps_on_kill = atoi(value);
+		else if (!strcmp(field, "slashing defense"))
+			class->type_defense[TYPE_SLASHING] = atoi(value);
+		else if (!strcmp(field, "impact defense"))
+			class->type_defense[TYPE_IMPACT] = atoi(value);
+		else if (!strcmp(field, "piercing defense"))
+			class->type_defense[TYPE_PIERCING] = atoi(value);
 		else
 			fprintf(stderr, " [%s]> Unknown field: %s\n", filename, field);
 	}
@@ -101,8 +106,6 @@ load_class (char* filename)
 	free(str);
 
 	fclose(f);
-
-	return class;
 }
 
 Class*

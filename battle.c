@@ -18,8 +18,12 @@ inflict_damage(Battle* data, Entity* attacker, Entity* defender)
 
 	damage_inflicted = get_attack(data, attacker) - get_defense(data, defender);
 
-	/* FIXME: Get type from attacker’s weapon or impact */
-	type_modifier = get_defense_modifier(data, defender, TYPE_SLASHING);
+	if (attacker->equipment[EQ_WEAPON])
+		type_modifier = get_defense_modifier(data, defender,
+			get_item_from_id(data, attacker->equipment[EQ_WEAPON])->attack_type);
+	else
+		/* Bare hands... that’s impact, right? */
+		type_modifier = get_defense_modifier(data, defender, TYPE_IMPACT);
 
 	damage_inflicted += (damage_inflicted * 100 * type_modifier) / 100;
 
