@@ -251,6 +251,7 @@ Logs*
 enter_battle(void *opt)
 {
 	Battle* battle_data;
+	Class* enemy_class;
 	Entity* player, *enemy;
 	List* classes;
 	int result;
@@ -260,12 +261,21 @@ enter_battle(void *opt)
 	enemy = battle_data->enemy;
 	classes = battle_data->classes;
 
-	/* FIXME: Get only a mob that’s made to spawn in random battles */
-	init_entity_from_class(enemy, get_random_enemy(classes));
+	enemy_class = get_random_enemy(battle_data->location->random_enemies);
 
-	if ((result = battle(battle_data)) == 1)
+	if (enemy_class)
 	{
-		player->kills++;
+		init_entity_from_class(enemy, enemy_class);
+
+		if ((result = battle(battle_data)) == 1)
+		{
+			player->kills++;
+		}
+	}
+	else
+	{
+		printf("There is no-one to fight here!\n");
+		getchar();
 	}
 
 	system("clear");

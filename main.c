@@ -11,6 +11,7 @@
 #include "items.h"
 #include "battle.h"
 #include "shop.h"
+#include "places.h"
 
 int
 main(int argc, char* argv[])
@@ -19,17 +20,25 @@ main(int argc, char* argv[])
 	char* line;
 	Logs* logs;
 	Command commands[] = {
-		{"battle",  "b", enter_battle, "Find a random enemy to beat to death."},
+		{"battle",  "b", enter_battle, "Beat a random enemy to death!"},
 		{"shop",    "s", enter_shop,   "Buy new equipment to improve your stats!"},
+		{"inventory", "i", NULL,       "Craft thingies or sell old equipment!"},
 		{"dungeon", "d", NULL,         "Enter a terrible dungeon and fight hordes of enemies!"},
+		{"travel",  "t", NULL,         "Travel to other places and explore the world!"},
 		{NULL, NULL, NULL, NULL}
 	};
 	List* classes;
 	List* items;
 	Battle battle;
+	List* world;
 
 	classes = load_classes("classes");
 	items = load_items("items");
+
+	battle.classes = classes;
+	battle.items = items;
+
+	world = load_places(&battle, "places");
 
 	/* For now, repeatability would be useful */
 	srand(42);
@@ -44,8 +53,8 @@ main(int argc, char* argv[])
 
 	battle.player = &player;
 	battle.enemy = &enemy;
-	battle.classes = classes;
-	battle.items = items;
+
+	battle.location = world->data;
 
 	line = strdup("");
 	while (line && strcmp(line, "quit"))
@@ -72,6 +81,8 @@ main(int argc, char* argv[])
 			,
 			player.caps
 		);
+
+		printf("Current location: %s\n\n", battle.location->name);
 
 		print_commands(commands);
 

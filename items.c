@@ -69,6 +69,30 @@ check_type_resistance(Item* item, char* field, char* value)
 	return 0;
 }
 
+static int
+check_slot(Item* item, char* field, char* value)
+{
+	char* equipment;
+	int i;
+
+	if (!strcmp(field, "slot"))
+	{
+		for (i = 0; i < EQ_MAX; i++)
+		{
+			equipment = equipment_string(i);
+
+			if (!strcmp(value, equipment))
+			{
+				item->slot = i;
+
+				return 1;
+			}
+		}
+	}
+
+	return 0;
+}
+
 Item*
 load_item (char* filename)
 {
@@ -108,25 +132,6 @@ load_item (char* filename)
 			item->name = strdup(value);
 		else if (!strcmp(field, "id"))
 			item->id = atoi(value);
-		else if (!strcmp(field, "slot"))
-		{
-			for (i = 0; value[i]; i++)
-				value[i] = tolower(value[i]);
-
-			if (!strcmp(value, "weapon"))
-				item->slot = EQ_WEAPON;
-			else if (!strcmp(value, "shield"))
-				item->slot = EQ_SHIELD;
-			else if (!strcmp(value, "armor"))
-				item->slot = EQ_ARMOR;
-			else
-			{
-				fprintf(stderr,
-					" [%s]> Field %s has an unrecognized value of %s\n",
-					filename, field, value);
-				item->slot = atoi(value);
-			}
-		}
 		else if (!strcmp(field, "price"))
 			item->price = atoi(value);
 		else if (!strcmp(field, "attack type"))
@@ -140,6 +145,7 @@ load_item (char* filename)
 			else
 				fprintf(stderr, " [%s]> Unknown attack type.\n", filename);
 		}
+		else if (check_slot(item, field, value)) ;
 		else if (check_type_resistance(item, field, value)) ;
 		else if (!strcmp(field, "attack bonus"))
 			item->attack_bonus = atoi(value);
@@ -171,6 +177,27 @@ get_item_from_id(Battle* battle, int id)
 			return item;
 
 		container = container->next;
+	}
+
+	return NULL;
+}
+
+/**
+ * @param list: List* of Item*
+ */
+Item*
+get_item_by_name(List* list, char* name)
+{
+	Item* item;
+
+	while (list)
+	{
+		item = list->data;
+
+		if (!strcmp((char*) list->data, name))
+			return item;
+
+		list = list->next;
 	}
 
 	return NULL;

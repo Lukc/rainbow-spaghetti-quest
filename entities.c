@@ -97,7 +97,6 @@ init_entity_from_class(Entity* e, Class* c)
 
 	e->class = c;
 
-	e->id = c->id;
 	e->name = strdup(c->name);
 
 	e->mana = get_max_mana(e);
@@ -106,7 +105,7 @@ init_entity_from_class(Entity* e, Class* c)
 	e->kills = 0;
 	e->caps = 0;
 
-	for (i = 0; i < sizeof(enum EQUIPMENT_SLOTS); i++)
+	for (i = 0; i < EQ_MAX; i++)
 		e->equipment[i] = 0;
 
 	for (i = 0; i < INVENTORY_SIZE; i++)

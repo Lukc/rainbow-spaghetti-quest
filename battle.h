@@ -9,6 +9,7 @@ typedef struct Battle {
 	struct Entity* enemy;
 	List* classes;
 	List* items;
+	struct Place* location;
 
 	int flee;
 } Battle;
@@ -16,6 +17,7 @@ typedef struct Battle {
 #include "entities.h"
 #include "items.h"
 #include "commands.h"
+#include "places.h"
 
 struct Logs* enter_battle(void*);
 

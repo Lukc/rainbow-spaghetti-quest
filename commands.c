@@ -46,7 +46,7 @@ execute_commands(char* line, Command *commands, void *opts)
 void
 print_commands(Command *commands)
 {
-	unsigned int i, j;
+	int i, j;
 
 	printf("Options:\n");
 
@@ -62,7 +62,7 @@ print_commands(Command *commands)
 		else
 			printf("  -      %s: ", commands[i].name);
 
-		for (j = 0; j < 8 - strlen(commands[i].name); j++)
+		for (j = 0; j < (int) (10 - strlen(commands[i].name)); j++)
 			printf(" ");
 
 		printf("%s\n" NOCOLOR, commands[i].description);

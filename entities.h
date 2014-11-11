@@ -26,7 +26,6 @@ typedef struct Attack {
 } Attack;
 
 typedef struct Entity {
-	int id; /* @fixme: should be class_id or removed */
 	char *name;
 	int health;
 	int mana;

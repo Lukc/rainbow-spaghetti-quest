@@ -29,33 +29,24 @@ print_item(Item* item)
 	printf(BRIGHT BLUE " > Selected item: %s\n" NOCOLOR, item->name);
 
 	if (item->slot == EQ_WEAPON)
-		printf(WHITE "  is a %s weapon\n" NOCOLOR,
+		printf(WHITE "    is a %s weapon\n" NOCOLOR,
 			type_string(item->attack_type));
 	else
-	{
-		char* string;
-
-		string = strdup(equipment_string(item->slot));
-		string[0] = toupper(string[0]);
-
-		printf(WHITE "  is a %s\n" NOCOLOR, string);
-
-		free(string);
-	}
+		printf(WHITE "    is a %s\n" NOCOLOR, equipment_string(item->slot));
 
 	if (item->attack_bonus)
-		printf("  %s%+i base attack\n" NOCOLOR,
+		printf("    %s%+i base attack\n" NOCOLOR,
 			stat_color(item->attack_bonus), item->attack_bonus);
 
 	if (item->defense_bonus)
-		printf("  %s%+i base defense\n" NOCOLOR,
+		printf("    %s%+i base defense\n" NOCOLOR,
 			stat_color(item->defense_bonus), item->defense_bonus);
 
 	for (i = 0; i < TYPE_MAX; i++)
 	{
 		if (item->type_resistance[i])
 		{
-			printf("  %s%+i%% %s resistance\n" NOCOLOR,
+			printf("    %s%+i%% %s resistance\n" NOCOLOR,
 				stat_color(item->type_resistance[i]),
 				item->type_resistance[i], type_string(i));
 		}
@@ -114,7 +105,33 @@ equip_item(Entity* player, Item* selected_item)
 	}
 	else
 	{
-		return "You cannot equip an item you do not possess";
+		return "You cannot equip an item you do not possess...";
+	}
+
+	return NULL;
+}
+
+static char*
+unequip_item(Entity* player, Item* item)
+{
+	int i;
+
+	if (player->equipment[item->slot] == item->id)
+	{
+		for (i = 0; i < INVENTORY_SIZE && player->inventory[i] != 0; i++)
+			;;
+
+		if (i == INVENTORY_SIZE)
+		{
+			return "No space left in inventory!";
+		}
+
+		player->inventory[i] = player->equipment[item->slot];
+		player->equipment[item->slot] = 0;
+	}
+	else
+	{
+		return "You cannot unequip an item that is not equiped...";
 	}
 
 	return NULL;
@@ -148,6 +165,27 @@ print_equipment(Battle* data, Entity* player)
 	printf("\n");
 }
 
+static char*
+sell_item(Entity* player, Item* item)
+{
+	int i;
+	int count = get_count_from_inventory(player->inventory, item->id);
+
+	if (count < 1)
+	{
+		return "You cannot sell an item you do not possess...";
+	}
+
+	for (i = 0; i < INVENTORY_SIZE && player->inventory[i] != item->id; i++)
+		;;
+
+	player->inventory[i] = 0;
+
+	player->caps += 2 * item->price / 3;
+
+	return NULL;
+}
+
 Logs*
 enter_shop(void* opt)
 {
@@ -177,9 +215,17 @@ enter_shop(void* opt)
 		{
 			err = equip_item(player, selected_item);
 		}
+		else if (!strcmp(line, "unequip") || !strcmp(line, "u"))
+		{
+			err = unequip_item(player, selected_item);
+		}
 		else if (!strcmp(line, "buy") || !strcmp(line, "b"))
 		{
 			err = buy_item(player, selected_item);
+		}
+		else if (!strcmp(line, "sell") || !strcmp(line, "s"))
+		{
+			err = sell_item(player, selected_item);
 		}
 		else
 		{
@@ -209,7 +255,7 @@ enter_shop(void* opt)
 			print_item(selected_item);
 			printf(
 				WHITE " > Already possessed: %i.\n\n" NOCOLOR,
-				get_count_from_inventory(player->inventory, item->id));
+				get_count_from_inventory(player->inventory, selected_item->id));
 		}
 
 		printf(WHITE " > Items sold:\n" NOCOLOR);
@@ -243,6 +289,9 @@ enter_shop(void* opt)
 			"  - (#) (id of item to examine)\n"
 			"  - (b) buy:       Buy the examined item.\n"
 			"  - (e) equip:     Equip the examined item (if possessed).\n"
+			"  - (u) unequip:   "
+				"Remove the examined item from your equipment (if equiped).\n"
+			"  - (s) sell:      Sell the examined item (if possessed).\n"
 			NOCOLOR
 			"\n"
 		);

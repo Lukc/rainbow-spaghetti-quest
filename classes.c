@@ -6,8 +6,6 @@
 
 #include "classes.h"
 
-#define MAX_CLASSES 255
-
 /**
  * @return: List* of Class*
  */
