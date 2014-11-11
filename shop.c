@@ -25,14 +25,19 @@ static void
 print_item(Item* item)
 {
 	int i;
+	List* list;
 
 	printf(BRIGHT BLUE " > Selected item: %s\n" NOCOLOR, item->name);
 
-	if (item->slot == EQ_WEAPON)
-		printf(WHITE "    is a %s weapon\n" NOCOLOR,
-			type_string(item->attack_type));
-	else
-		printf(WHITE "    is a %s\n" NOCOLOR, equipment_string(item->slot));
+	printf(WHITE "    is a %s\n" NOCOLOR, equipment_string(item->slot));
+
+	for (list = item->attacks; list; list = list->next)
+	{
+		Attack* attack = list->data;
+
+		printf(BRIGHT WHITE "    provides a %i-%i %s attack\n" NOCOLOR,
+			attack->damage, attack->strikes, type_string(attack->type));
+	}
 
 	if (item->attack_bonus)
 		printf("    %s%+i base attack\n" NOCOLOR,
@@ -147,7 +152,7 @@ print_equipment(Battle* data, Entity* player)
 
 	for (i = 0; i < EQ_MAX; i++)
 	{
-		item = get_item_from_id(data, player->equipment[i]);
+		item = get_item_by_id(data, player->equipment[i]);
 
 		printf(WHITE);
 		printed = printf("  - %s: ", equipment_string(i));

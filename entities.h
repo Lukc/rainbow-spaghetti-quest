@@ -4,6 +4,7 @@
 
 #include "battle.h"
 #include "classes.h"
+#include "attack.h"
 
 /* Why? Because! */
 #define INVENTORY_SIZE 24
@@ -17,13 +18,6 @@ enum EQUIPMENT_SLOTS {
 
 	EQ_MAX
 };
-
-typedef struct Attack {
-	char *name;
-	int damage;
-	char *type;
-	int mana; /* mana requirement to use */
-} Attack;
 
 typedef struct Entity {
 	char *name;
@@ -40,8 +34,8 @@ typedef struct Entity {
 
 int get_max_mana(Entity*);
 int get_max_health(Entity*);
-int get_attack(Battle*, Entity*);
-int get_defense(Battle*, Entity*);
+int get_attack_bonus(Battle*, Entity*);
+int get_defense_bonus(Battle*, Entity*);
 
 int get_type_resistance(Battle*, Entity*, int);
 int get_attack_type(Battle*, Entity*);
@@ -52,5 +46,7 @@ int init_entity_from_class(Entity*, Class*);
 
 void print_entity_basestats(Battle*, Entity*);
 void print_entity(Battle*, Entity*);
+
+List* get_all_attacks(Battle*, Entity*);
 
 #endif

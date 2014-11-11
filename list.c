@@ -15,3 +15,30 @@ list_add(List** list, void* data)
 	*list = new_list;
 }
 
+void*
+list_nth(List* list, int nth)
+{
+	int i = 0;
+
+	for(; list; list = list->next)
+	{
+		if (i == nth)
+			return list->data;
+
+		i++;
+	}
+
+	return NULL;
+}
+
+int
+list_size(List* list)
+{
+	int i = 0;
+
+	for(; list; list = list->next)
+		i++;
+
+	return i;
+}
+

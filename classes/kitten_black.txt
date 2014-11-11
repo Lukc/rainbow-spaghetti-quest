@@ -2,7 +2,7 @@ Id: 41
 Name: Black Kitten
 Health: 9
 Mana: 9
-Attack: 4
-Defense: 2
-Attack type: slashing
+Attack: 3-1 slashing
+Attack bonus: 4
+Defense bonus: 2
 Caps on kill: 10

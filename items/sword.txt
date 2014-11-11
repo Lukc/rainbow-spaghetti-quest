@@ -1,5 +1,6 @@
 Id: 4
 Name: Sword
-Attack bonus: 20
-Price: 240
+Attack bonus: 4
+Attack: 7-4 slashing
+Price: 160
 Slot: weapon

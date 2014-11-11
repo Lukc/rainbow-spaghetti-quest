@@ -3,6 +3,7 @@
 #define COMMANDS_H
 
 #include "entities.h"
+#include "list.h"
 
 typedef struct Logs* CommandFunction(void*);
 
@@ -13,14 +14,9 @@ typedef struct Command {
 	char *description;
 } Command;
 
-struct logs_list {
-	struct logs_list* next;
-	char* string;
-};
-
 typedef struct Logs {
-	struct logs_list* head;
-	struct logs_list* tail;
+	List* head;
+	List* tail;
 } Logs;
 
 Logs* execute_commands(char*, Command*, void*);

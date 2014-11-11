@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "types.h"
 
@@ -22,5 +23,19 @@ type_string(int type)
 		default:
 			return "unknown";
 	}
+}
+
+int
+type_id(char* string)
+{
+	int i;
+
+	for (i = 0; i < TYPE_MAX; i++)
+	{
+		if (!strcmp(type_string(i), string))
+			return i;
+	}
+
+	return -1;
 }
 

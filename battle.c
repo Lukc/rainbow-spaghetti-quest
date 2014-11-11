@@ -10,29 +10,73 @@
 #include "colors.h"
 #include "entities.h"
 
+/**
+ * @return The amount of net damage inflicted to “defender”.
+ */
 static int
-inflict_damage(Battle* data, Entity* attacker, Entity* defender)
+attack(Battle* data, Entity* attacker, Attack* attack, Entity* defender)
 {
 	int damage_inflicted;
 	int type_modifier;
 
-	type_modifier =
-		get_type_resistance(data, defender, get_attack_type(data, attacker));
+	type_modifier = get_type_resistance(data, defender, attack->type);
 
+	/* Calculating for a single strike */
 	damage_inflicted =
-		(int) ((get_attack(data, attacker) * (100. - type_modifier)) / 100.) -
-		get_defense(data, defender);
+		(int) (((get_attack_bonus(data, attacker) + attack->damage) *
+				(100. - type_modifier)) / 100.) -
+		get_defense_bonus(data, defender);
 
-	damage_inflicted = damage_inflicted <= 0 ? 1 : damage_inflicted;
+	/* Taking care of negative damages... */
+	damage_inflicted = damage_inflicted < 0 ? 0 : damage_inflicted;
+
+	/* Taking the number of strikes into account now */
+	damage_inflicted = damage_inflicted * attack->strikes;
+
 	defender->health -= damage_inflicted;
 
 	return damage_inflicted;
 }
 
-Logs*
-command_flee(void* opt)
+static void
+ai_action(Battle* data, Logs* logs)
 {
-	Battle *battle_data;
+	int damage_received;
+	char* log;
+	Entity* player;
+	Entity* enemy;
+	List* available_attacks;
+
+	player = data->player;
+	enemy = data->enemy;
+
+	available_attacks = get_all_attacks(data, enemy);
+
+	damage_received = attack(
+		data,
+		enemy,
+		(Attack*) list_nth(
+			available_attacks,
+			rand() % list_size(available_attacks)
+		),
+		player
+	);
+
+	log = (char*) malloc(sizeof(char) * 128);
+	snprintf(log, 128,
+		"You received %i points of damage from your enemy!",
+		damage_received);
+	logs_add(logs, log);
+
+	if (player->health <= 0)
+	{
+		logs_add(logs, strdup("You have been defeated..."));
+	}
+}
+
+Logs*
+command_flee(Battle* battle_data)
+{
 	Logs* logs;
 	char* log;
 
@@ -44,30 +88,26 @@ command_flee(void* opt)
 		"You fled from your battle!");
 	logs_add(logs, log);
 
-	battle_data = opt;
-
 	battle_data->flee = 1;
 
 	return NULL;
 }
 
 Logs*
-command_attack(void* opt)
+command_attack(Battle* battle_data, Attack* player_attack)
 {
-	Battle *battle_data;
-	Entity *player;
-	Entity *enemy;
-	int damage_inflicted, damage_received;
+	Entity* player;
+	Entity* enemy;
+	int damage_inflicted;
 	Logs* logs;
 	char* log;
 
 	logs = logs_new();
 
-	battle_data = opt;
 	player = battle_data->player;
 	enemy = battle_data->enemy;
 
-	damage_inflicted = inflict_damage(battle_data, player, enemy);
+	damage_inflicted = attack(battle_data, player, player_attack, enemy);
 
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(
@@ -82,36 +122,22 @@ command_attack(void* opt)
 	}
 	else
 	{
-		damage_received = inflict_damage(battle_data, enemy, player);
-
-		log = (char*) malloc(sizeof(char) * 128);
-		snprintf(
-			log, 128,
-			"You received %i points of damage from your enemy!",
-			damage_received);
-		logs_add(logs, log);
-
-		if (player->health <= 0)
-		{
-			logs_add(logs, strdup("You have been defeated..."));
-		}
+		ai_action(battle_data, logs);
 	}
 
 	return logs;
 }
 
 Logs*
-command_focus(void *opts)
+command_focus(Battle* battle_data)
 {
-	Battle *battle_data;
-	Entity *player;
+	Entity* player;
 	int points_gained;
 	Logs* logs;
 	char* log;
 
 	logs = logs_new();
 
-	battle_data = opts;
 	player = battle_data->player;
 
 	points_gained = player->class->mana_regen_on_focus;
@@ -125,9 +151,7 @@ command_focus(void *opts)
 		points_gained);
 	logs_add(logs, log);
 
-	logs_add(logs, strdup(
-		"Strangely enough, the enemy does nothing to take advantage of your "
-		"temporary weakness."));
+	ai_action(battle_data, logs);
 
 	return logs;
 }
@@ -137,15 +161,11 @@ battle(Battle *battle_data)
 {
 	Logs* logs;
 	char *line;
-	Command commands[] = {
-		{"attack",   "a",   command_attack,   "A weak attack."},
-		{"special",  "s",   NULL,             "A strong attack that consumes mana."},
-		{"focus",    "f",   command_focus,    "A defensive move that restores mana."},
-		{"flee",     "l",   command_flee,     "A desperate move to get out of battle."},
-		{NULL, NULL, NULL, NULL}
-	};
 	Entity *player = battle_data->player;
 	Entity *enemy = battle_data->enemy;
+	List* player_attacks;
+	List* list;
+	int i;
 
 	battle_data->flee = 0;
 
@@ -156,9 +176,30 @@ battle(Battle *battle_data)
 	{
 		if (line)
 		{
+			player_attacks = get_all_attacks(battle_data, player);
+
 			system("clear");
 
-			logs = execute_commands(line, commands, battle_data);
+			logs = NULL;
+
+			if (!strcmp(line, "")) {}
+			else if (!strcmp(line, "f") || !strcmp(line, "focus"))
+				logs = command_focus(battle_data);
+			else if (!strcmp(line, "l") || !strcmp(line, "flee"))
+				logs = command_flee(battle_data);
+			else
+			{
+				if (list_size(player_attacks) > atoi(line))
+				{
+					Attack* attack = list_nth(player_attacks, atoi(line));
+
+					logs = command_attack(battle_data, attack);
+				}
+				else
+				{
+					/* FIXME: Be mean to the player. */
+				}
+			}
 
 			print_entity(battle_data, player);
 			printf(BRIGHT RED "\n -- " WHITE "versus" RED " --\n\n" NOCOLOR);
@@ -171,7 +212,26 @@ battle(Battle *battle_data)
 				logs_free(logs);
 			}
 
-			print_commands(commands);
+			printf("Options:\n");
+
+			i = 0;
+			for (list = player_attacks; list; list = list->next)
+			{
+				Attack* attack = list->data;
+
+				printf(WHITE "  - (%i)%14i-%i %s\n" NOCOLOR, i,
+					attack->damage + get_attack_bonus(battle_data, player),
+					attack->strikes, type_string(attack->type));
+
+				i++;
+			}
+
+			printf(
+				WHITE
+				"  - (f) focus:      A defensive move that restores mana.\n"
+				"  - (l) flee:       A desperate move to get out of battle.\n"
+				NOCOLOR
+			);
 
 			if (battle_data->flee)
 			{

@@ -16,6 +16,7 @@ enum TYPES {
 };
 
 char* type_string(int);
+int type_id(char*);
 
 #endif
 

@@ -134,16 +134,40 @@ load_item (char* filename)
 			item->id = atoi(value);
 		else if (!strcmp(field, "price"))
 			item->price = atoi(value);
-		else if (!strcmp(field, "attack type"))
+		else if (!strcmp(field, "attack"))
 		{
-			if (!strcmp(value, "slashing"))
-				item->attack_type = TYPE_SLASHING;
-			else if (!strcmp(value, "impact"))
-				item->attack_type = TYPE_IMPACT;
-			else if (!strcmp(value, "piercing"))
-				item->attack_type = TYPE_PIERCING;
+			int damage, strikes, i;
+			char* type;
+
+			if (sscanf(value, "%d-%d ", &damage, &strikes) < 2)
+			{
+				fprintf(stderr, " [%s]> Attack could not be parsed: %s.\n", filename, value);
+			}
+
+			for (i = 0; value[i] && value[i] != ' '; i++)
+				;;
+
+			for (; value[i] && value[i] == ' '; i++)
+				;;
+
+			if (value[i])
+			{
+				Attack* attack;
+
+				attack = (Attack*) malloc(sizeof(Attack));
+
+				type = value + i;
+
+				attack->damage = damage;
+				attack->strikes = strikes;
+				attack->type = type_id(type);
+
+				list_add(&item->attacks, (void*) attack);
+			}
 			else
-				fprintf(stderr, " [%s]> Unknown attack type.\n", filename);
+			{
+				fprintf(stderr, " [%s]> No attack type spectified in attack field!\n", filename);
+			}
 		}
 		else if (check_slot(item, field, value)) ;
 		else if (check_type_resistance(item, field, value)) ;
@@ -163,7 +187,7 @@ load_item (char* filename)
 }
 
 Item*
-get_item_from_id(Battle* battle, int id)
+get_item_by_id(Battle* battle, int id)
 {
 	List* container;
 	Item* item;

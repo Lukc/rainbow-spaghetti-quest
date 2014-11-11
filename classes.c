@@ -112,23 +112,41 @@ load_class (char* filename)
 		else if (!strcmp(field, "mana"))
 			class->base_mana = atoi(value);
 		else if (!strcmp(field, "attack"))
-			class->base_attack = atoi(value);
-		else if (!strcmp(field, "attack type"))
 		{
-			for (i = 0; i < TYPE_MAX; i++)
-				if (!strcmp(type_string(i), value))
-				{
-					class->attack_type = i;
+			int damage, strikes, i;
 
-					i = TYPE_MAX + 1;
-				}
+			if (sscanf(value, "%d-%d ", &damage, &strikes) < 2)
+			{
+				fprintf(stderr, " [%s]> Attack could not be parsed: %s.\n", filename, value);
+				getchar();
+			}
 
-			if (i == TYPE_MAX)
-				fprintf(stderr,
-					" [%s]> Unknown attack type: %s\n", filename, field);
+			for (i = 0; value[i] && value[i] != ' '; i++)
+				;;
+
+			for (; value[i] && value[i] == ' '; i++)
+				;;
+
+			if (value[i])
+			{
+				Attack* attack = &class->default_attack;
+
+				attack->damage = damage;
+				attack->strikes = strikes;
+
+				/* Hoping there’s no padding at the end. */
+				attack->type = type_id(value + i);
+			}
+			else
+			{
+				fprintf(stderr, " [%s]> No attack type spectified in attack field!\n", filename);
+				getchar();
+			}
 		}
-		else if (!strcmp(field, "defense"))
-			class->base_defense = atoi(value);
+		else if (!strcmp(field, "attack bonus"))
+			class->attack_bonus = atoi(value);
+		else if (!strcmp(field, "defense bonus"))
+			class->defense_bonus = atoi(value);
 		else if (!strcmp(field, "caps") || !strcmp(field, "caps on kill"))
 			class->caps_on_kill = atoi(value);
 		else if (check_type_resistance(class, field, value)) ;

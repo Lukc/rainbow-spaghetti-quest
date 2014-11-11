@@ -8,6 +8,8 @@ typedef struct List {
 } List;
 
 void list_add(List**, void*);
+void* list_nth(List*, int);
+int list_size(List*);
 
 #endif
 

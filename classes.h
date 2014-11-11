@@ -4,6 +4,7 @@
 
 #include "list.h"
 #include "types.h"
+#include "attack.h"
 
 typedef struct Class {
 	int id;
@@ -14,11 +15,13 @@ typedef struct Class {
 
 	int caps_on_kill;
 
-	int base_attack;
-	int base_defense;
+	int attack_bonus;
+	int defense_bonus;
 
 	int type_resistance[TYPE_MAX];
-	int attack_type; /* In case no weapon is equipped */
+
+	/* Attack to use if no equipment to provide one */
+	struct Attack default_attack;
 
 	int mana_regen_on_focus;
 } Class;

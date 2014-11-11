@@ -71,25 +71,6 @@ print_commands(Command *commands)
 	printf("\n");
 }
 
-void
-print_logs(char **logs)
-{
-	unsigned int i;
-
-	if (logs)
-	{
-		for (i = 0; logs[i] && i < 16; i++)
-		{
-			printf("%s\n", logs[i]);
-			free(logs[i]);
-		}
-
-		free(logs);
-
-		printf("\n");
-	}
-}
-
 Logs*
 logs_new()
 {
@@ -104,11 +85,11 @@ logs_new()
 void
 logs_add(Logs* l, char* string)
 {
-	struct logs_list* link;
+	List* link;
 
-	link = (struct logs_list*) malloc(sizeof(struct logs_list));
+	link = (List*) malloc(sizeof(List));
 
-	link->string = string;
+	link->data = (void*) string;
 	link->next = NULL;
 
 	if (l->tail)
@@ -122,13 +103,13 @@ logs_add(Logs* l, char* string)
 void
 logs_print(Logs* l)
 {
-	struct logs_list* link;
+	List* link;
 
 	link = l->head;
 
 	while (link)
 	{
-		printf("%s\n", link->string);
+		printf("%s\n", link->data);
 
 		link = link->next;
 	}
@@ -139,7 +120,7 @@ logs_print(Logs* l)
 void
 logs_free(Logs* l)
 {
-	struct logs_list* link, * temp;
+	List* link, * temp;
 
 	link = l->head;
 
@@ -147,7 +128,7 @@ logs_free(Logs* l)
 	{
 		temp = link;
 
-		free(temp->string);
+		free(temp->data);
 
 		link = link->next;
 

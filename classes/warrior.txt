@@ -3,6 +3,7 @@ Id: 1
 Name: Warrior
 Health: 30
 Mana: 5
-Attack: 5-2
-Defense: 3
+Attack: 5-2 impact
+Attack bonus: 3
+Defense bonus: 3
 Caps on kill: 35

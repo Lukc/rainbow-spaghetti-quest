@@ -1,0 +1,6 @@
+Id: 5
+Name: Staff
+Attack: 5-2 impact
+Attack: 6-4 fire
+Price: 10
+Slot: weapon

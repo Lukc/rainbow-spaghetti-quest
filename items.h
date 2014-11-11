@@ -3,6 +3,7 @@
 #define ITEMS_H
 
 #include "types.h"
+#include "list.h"
 
 typedef struct Item {
 	int id;
@@ -16,7 +17,7 @@ typedef struct Item {
 
 	int type_resistance[TYPE_MAX];
 
-	int attack_type;
+	List* attacks;
 } Item;
 
 #include "battle.h"
@@ -24,7 +25,7 @@ typedef struct Item {
 Item* load_item(char*);
 List* load_items(char*);
 
-Item* get_item_from_id(Battle*, int);
+Item* get_item_by_id(Battle*, int);
 Item* get_item_by_name(List*, char*);
 int get_count_from_inventory(int*, int);
 

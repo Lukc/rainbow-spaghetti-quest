@@ -20,7 +20,7 @@ get_max_health(Entity* e)
 }
 
 int
-get_attack(Battle* data, Entity* e)
+get_attack_bonus(Battle* data, Entity* e)
 {
 	Item* equipment;
 	int i;
@@ -30,17 +30,17 @@ get_attack(Battle* data, Entity* e)
 	{
 		if (e->equipment[i])
 		{
-			equipment = get_item_from_id(data, e->equipment[i]);
+			equipment = get_item_by_id(data, e->equipment[i]);
 
 			bonus += equipment->attack_bonus;
 		}
 	}
 
-	return e->class->base_attack + bonus;
+	return e->class->attack_bonus + bonus;
 }
 
 int
-get_defense(Battle* data, Entity* e)
+get_defense_bonus(Battle* data, Entity* e)
 {
 	Item* equipment;
 	int i;
@@ -50,14 +50,14 @@ get_defense(Battle* data, Entity* e)
 	{
 		if (e->equipment[i])
 		{
-			equipment = get_item_from_id(data, e->equipment[i]);
+			equipment = get_item_by_id(data, e->equipment[i]);
 
 			bonus += equipment->defense_bonus;
 		}
 	}
 
 
-	return e->class->base_defense + bonus;
+	return e->class->defense_bonus + bonus;
 }
 
 int
@@ -71,23 +71,13 @@ get_type_resistance(Battle* data, Entity* e, int type)
 	{
 		if (e->equipment[i])
 		{
-			equipment = get_item_from_id(data, e->equipment[i]);
+			equipment = get_item_by_id(data, e->equipment[i]);
 
 			bonus += equipment->type_resistance[type];
 		}
 	}
 
 	return bonus;
-}
-
-int
-get_attack_type(Battle* data, Entity* e)
-{
-	if (e->equipment[EQ_WEAPON])
-			return get_item_from_id(
-				data, e->equipment[EQ_WEAPON])->attack_type;
-	else
-		return e->class->attack_type;
 }
 
 int
@@ -167,6 +157,7 @@ print_resistance(Battle* data, Entity* e, int type)
 	string = strdup(type_string(type));
 	string[0] = toupper(string[0]);
 
+	printf(WHITE);
 	printed = printf(" %s: ", string);
 
 	for (i = printed; i < 14; i++)
@@ -203,6 +194,28 @@ print_resistance(Battle* data, Entity* e, int type)
 	printf(YELLOW "]\n" NOCOLOR);
 }
 
+static void
+print_attacks(Battle* data, Entity* e)
+{
+	List* list;
+	Attack* attack;
+	List* attacks;
+	int has_attacks = 0;
+
+	attacks = get_all_attacks(data, e);
+
+	printf(BRIGHT WHITE "  Attacks:\n" NOCOLOR);
+	for (list = attacks; list; list = list->next)
+	{
+		has_attacks = 1;
+		attack = list->data;
+
+		printf(WHITE "    %i - %i  %s\n" NOCOLOR,
+			attack->damage + get_attack_bonus(data, e), attack->strikes,
+			type_string(attack->type));
+	}
+}
+
 void
 print_entity_basestats(Battle* data, Entity* e)
 {
@@ -220,14 +233,13 @@ print_entity_basestats(Battle* data, Entity* e)
 		e->mana, get_max_mana(e), 40, 80
 	);
 
-	/* FIXME: Make colors change depending on HP/mana levels */
 	printf(
-		BRIGHT WHITE "  Attack:   " RED   "%i" NOCOLOR BRIGHT " - %s\n" NOCOLOR
 		BRIGHT WHITE "  Defense:  " BLUE  "%i\n" NOCOLOR
 		,
-		get_attack(data, e), type_string(get_attack_type(data, e)),
-		get_defense(data, e)
+		get_defense_bonus(data, e)
 	);
+
+	print_attacks(data, e);
 }
 
 void
@@ -259,6 +271,35 @@ equipment_string(int id)
 		return "amulet";
 	else
 		return "unknown";
+}
+
+List*
+get_all_attacks(Battle* data, Entity* e)
+{
+	int i;
+	Item* item;
+	List* result = NULL, * list;
+
+	for (i = 0; i < EQ_MAX; i++)
+	{
+		if(e->equipment[i])
+		{
+			item = get_item_by_id(data, e->equipment[i]);
+
+			for (list = item->attacks; list; list = list->next)
+			{
+				list_add(&result, list->data);
+			}
+		}
+	}
+
+	if (result == NULL)
+	{
+		/* Well... we have to begin somewhere, right? */
+		list_add(&result, &(e->class->default_attack));
+	}
+
+	return result;
 }
 
 /* vim: set ts=4 sw=4 cc=80 : */
