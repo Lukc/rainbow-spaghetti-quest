@@ -294,12 +294,7 @@ get_random_enemy(List* list)
 	{
 		class = (Class*) list->data;
 
-		/* FIXME: Doesn’t this feel a bit hacky? We should add a ->spawnable
-		 *        element or make their spawn location-dependant */
-		if (class->id >= 10)
-		{
-			valid_classes[count++] = class;
-		}
+		valid_classes[count++] = class;
 
 		list = list->next;
 	}

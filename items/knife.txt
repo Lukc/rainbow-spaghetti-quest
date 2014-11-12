@@ -1,7 +1,10 @@
 Id: 1
 Name: Knife
 Attack bonus: 4
-Attack type: slashing
-Attack: 4-3 slashing
+Attack: [
+	Damage: 4
+	Strikes: 3
+	Type: slashing
+]
 Price: 10
 Slot: weapon

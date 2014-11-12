@@ -7,7 +7,6 @@
 #include "attack.h"
 
 typedef struct Class {
-	int id;
 	char *name;
 
 	int base_health;
@@ -21,7 +20,7 @@ typedef struct Class {
 	int type_resistance[TYPE_MAX];
 
 	/* Attack to use if no equipment to provide one */
-	struct Attack default_attack;
+	List* attacks;
 
 	int mana_regen_on_focus;
 } Class;

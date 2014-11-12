@@ -8,6 +8,8 @@
 #include "items.h"
 #include "types.h"
 
+#include "parser.h"
+
 #define MAX_ITEMS 255
 
 List*
@@ -43,7 +45,7 @@ load_items(char* dirname)
 }
 
 static int
-check_type_resistance(Item* item, char* field, char* value)
+check_type_resistance(Item* item, ParserElement* element, Logs* logs)
 {
 	char* type;
 	int i;
@@ -56,11 +58,11 @@ check_type_resistance(Item* item, char* field, char* value)
 		len = strlen(type);
 
 		if (
-			!strncmp(field, type, len) &&
-			field[len] == ' ' &&
-			!strcmp(field + len + 1, "defense"))
+			!strncmp(element->name, type, len) &&
+			element->name[len] == ' ' &&
+			!strcmp(element->name + len + 1, "defense"))
 		{
-			item->type_resistance[i] = atoi(value);
+			item->type_resistance[i] = parser_get_integer(element, logs);
 
 			return 1;
 		}
@@ -70,25 +72,47 @@ check_type_resistance(Item* item, char* field, char* value)
 }
 
 static int
-check_slot(Item* item, char* field, char* value)
+get_slot(char* string, Logs* logs)
 {
 	char* equipment;
+	char* log;
 	int i;
 
-	if (!strcmp(field, "slot"))
+	for (i = 0; i < EQ_MAX; i++)
 	{
-		for (i = 0; i < EQ_MAX; i++)
-		{
-			equipment = equipment_string(i);
+		equipment = equipment_string(i);
 
-			if (!strcmp(value, equipment))
-			{
-				item->slot = i;
-
-				return 1;
-			}
-		}
+		if (!strcmp(string, equipment))
+			return i;
 	}
+
+	log = (char*) malloc(sizeof(char) * 128);
+	snprintf(log, 128, "Invalid slot: “%s”.", string);
+
+	logs_add(logs, log);
+
+	return 0;
+}
+
+static int
+get_type(char* string, Logs* logs)
+{
+	char* type;
+	char* log;
+	int i;
+
+	for (i = 0; i < TYPE_MAX; i++)
+	{
+		type = type_string(i);
+
+		if (!strcmp(string, type))
+			return i;
+	}
+
+	log = (char*) malloc(sizeof(char) * 128);
+	snprintf(log, 128, "Invalid type: “%s”.", string);
+
+	logs_add(logs, log);
 
 	return 0;
 }
@@ -96,92 +120,102 @@ check_slot(Item* item, char* field, char* value)
 Item*
 load_item (char* filename)
 {
-	FILE* f = fopen(filename, "r");
-	char* str = NULL;
-	size_t n = 0;
+	List* list = load_file(filename);
+	List* temp;
+	ParserElement* element;
 	Item* item;
-	int i;
+	Logs* logs;
 
 	item = (Item*) malloc(sizeof(Item));
 
 	memset(item, 0, sizeof(Item));
 
-	while (getline(&str, &n, f) > 0)
+	logs = logs_new();
+
+	while (list)
 	{
-		char* line;
 		char* field;
-		char* value;
 
-		if (str[0] != '#')
-			line = strtok(str, "#");
-		else
-			continue;
+		element = list->data;
 
-		field = strtok(line, ":");
-		value = strtok(NULL, ":");
-
-		while (value[0] && value[0] == ' ')
-			value++;
-
-		value[strlen(value)-1] = '\0';
-
-		for (i = 0; field[i]; i++)
-			field[i] = tolower(field[i]);
+		field = element->name;
 
 		if (!strcmp(field, "name"))
-			item->name = strdup(value);
+			item->name = parser_get_string(element, logs);
 		else if (!strcmp(field, "id"))
-			item->id = atoi(value);
+			item->id = parser_get_integer(element, logs);
 		else if (!strcmp(field, "price"))
-			item->price = atoi(value);
+			item->price = parser_get_integer(element, logs);
+		else if (!strcmp(field, "attack bonus"))
+			item->attack_bonus = parser_get_integer(element, logs);
+		else if (!strcmp(field, "defense bonus"))
+			item->defense_bonus = parser_get_integer(element, logs);
+		else if (!strcmp(field, "slot"))
+		{
+			char* slot = parser_get_string(element, logs);
+
+			if (slot)
+				item->slot = get_slot(slot, logs);
+		}
 		else if (!strcmp(field, "attack"))
 		{
-			int damage, strikes, i;
-			char* type;
+			List* sublist;
+			ParserElement* subelement;
+			Attack* attack = (Attack*) malloc(sizeof(Attack));
 
-			if (sscanf(value, "%d-%d ", &damage, &strikes) < 2)
+			if (element->type != PARSER_LIST)
 			{
-				fprintf(stderr, " [%s]> Attack could not be parsed: %s.\n", filename, value);
-			}
-
-			for (i = 0; value[i] && value[i] != ' '; i++)
-				;;
-
-			for (; value[i] && value[i] == ' '; i++)
-				;;
-
-			if (value[i])
-			{
-				Attack* attack;
-
-				attack = (Attack*) malloc(sizeof(Attack));
-
-				type = value + i;
-
-				attack->damage = damage;
-				attack->strikes = strikes;
-				attack->type = type_id(type);
-
-				list_add(&item->attacks, (void*) attack);
+				logs_add(logs,
+					strdup("Trying to add attack improperly defined.\n"));
+				free(attack);
 			}
 			else
-			{
-				fprintf(stderr, " [%s]> No attack type spectified in attack field!\n", filename);
-			}
+				for (sublist = element->value; sublist; sublist = sublist->next)
+				{
+					subelement = sublist->data;
+
+					if (!strcmp(subelement->name, "damage"))
+						attack->damage =
+							parser_get_integer(subelement, logs);
+					else if (!strcmp(subelement->name, "strikes"))
+						attack->strikes =
+							parser_get_integer(subelement, logs);
+					else if (!strcmp(subelement->name, "type"))
+					{
+						char* type = parser_get_string(subelement, logs);
+
+						if (type)
+							attack->type = get_type(type, logs);
+					}
+				}
+
+			list_add(&item->attacks, (void*) attack);
 		}
-		else if (check_slot(item, field, value)) ;
-		else if (check_type_resistance(item, field, value)) ;
-		else if (!strcmp(field, "attack bonus"))
-			item->attack_bonus = atoi(value);
-		else if (!strcmp(field, "defense bonus"))
-			item->defense_bonus = atoi(value);
+		else if (check_type_resistance(item, element, logs))
+			;
 		else
-			fprintf(stderr, " [%s]> Unknown field: %s\n", filename, field);
+		{
+			char* log = (char*) malloc(sizeof(char) * 128);
+			snprintf(log, 128, "Unknown field: “%s”.", element->name);
+			logs_add(logs, log);
+		}
+
+		parser_free(element);
+
+		temp = list;
+		list = list->next;
+
+		free(temp);
 	}
 
-	free(str);
+	if (logs->head)
+	{
+		/* FIXME: stderr */
+		logs_print(logs);
+		logs_free(logs);
 
-	fclose(f);
+		exit(1);
+	}
 
 	return item;
 }

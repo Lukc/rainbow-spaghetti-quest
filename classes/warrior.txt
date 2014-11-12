@@ -1,9 +1,12 @@
 # Comments \o/
-Id: 1
 Name: Warrior
 Health: 30
 Mana: 5
-Attack: 5-2 impact
+Attack: [
+	Damage: 5
+	Strikes: 2
+	Type: impact
+]
 Attack bonus: 3
 Defense bonus: 3
 Caps on kill: 35

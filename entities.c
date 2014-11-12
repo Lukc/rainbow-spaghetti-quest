@@ -158,7 +158,7 @@ print_resistance(Battle* data, Entity* e, int type)
 	string[0] = toupper(string[0]);
 
 	printf(WHITE);
-	printed = printf(" %s: ", string);
+	printed = printf("  %s: ", string);
 
 	for (i = printed; i < 14; i++)
 		printf(" ");
@@ -249,7 +249,7 @@ print_entity(Battle* data, Entity *e)
 
 	printf("\n");
 
-	/* FIXME: Print typed defenses here */
+	printf("Resistances:\n");
 	for (int i = 0; i < TYPE_MAX; i++)
 	{
 		print_resistance(data, e, i);
@@ -296,7 +296,8 @@ get_all_attacks(Battle* data, Entity* e)
 	if (result == NULL)
 	{
 		/* Well... we have to begin somewhere, right? */
-		list_add(&result, &(e->class->default_attack));
+		for (list = e->class->attacks; list; list = list->next)
+			list_add(&result, list->data);
 	}
 
 	return result;

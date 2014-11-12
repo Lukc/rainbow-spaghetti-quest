@@ -1,6 +1,14 @@
 Id: 5
+Attack: [
+	Damage: 5
+	Strikes: 2
+	Type: impact
+]
+Attack: [
+	Damage: 6
+	Strikes: 4
+	Type: fire
+]
 Name: Staff
-Attack: 5-2 impact
-Attack: 6-4 fire
 Price: 10
 Slot: weapon

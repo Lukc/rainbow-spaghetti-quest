@@ -1,8 +1,11 @@
-Id: 42
 Name: Evil Kitten
 Health: 13
 Mana: 6
-Attack: 4-2 fire
+Attack: [
+	Damage: 4
+	Strikes: 2
+	Type: fire
+]
 Attack bonus: 5
 Defense bonus: 5
 Slashing defense: 5
