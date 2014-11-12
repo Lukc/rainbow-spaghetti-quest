@@ -67,11 +67,10 @@ Logs*
 inventory(void* opt)
 {
 	Battle* data = opt;
-	List* list;
 	Entity* player = data->player;
 	int i;
 
-	print_equipment(data, player);
+	print_equipment(player);
 
 	for (i = 0; i < INVENTORY_SIZE; i++)
 	{
@@ -143,7 +142,7 @@ main(int argc, char* argv[])
 		player.health = get_max_health(&player);
 		player.mana = get_max_mana(&player);
 
-		print_entity(&battle, &player);
+		print_entity(&player);
 		printf("\n");
 
 		if (logs)

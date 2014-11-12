@@ -20,7 +20,7 @@ get_max_health(Entity* e)
 }
 
 int
-get_attack_bonus(Battle* data, Entity* e)
+get_attack_bonus(Entity* e)
 {
 	Item* equipment;
 	int i;
@@ -40,7 +40,7 @@ get_attack_bonus(Battle* data, Entity* e)
 }
 
 int
-get_defense_bonus(Battle* data, Entity* e)
+get_defense_bonus(Entity* e)
 {
 	Item* equipment;
 	int i;
@@ -61,7 +61,7 @@ get_defense_bonus(Battle* data, Entity* e)
 }
 
 int
-get_type_resistance(Battle* data, Entity* e, int type)
+get_type_resistance(Entity* e, int type)
 {
 	Item* equipment;
 	int i;
@@ -148,7 +148,7 @@ print_bar(
 }
 
 static void
-print_resistance(Battle* data, Entity* e, int type)
+print_resistance(Entity* e, int type)
 {
 	char* string;
 	int printed, i;
@@ -163,7 +163,7 @@ print_resistance(Battle* data, Entity* e, int type)
 	for (i = printed; i < 14; i++)
 		printf(" ");
 	
-	resistance = get_type_resistance(data, e, type);
+	resistance = get_type_resistance(e, type);
 
 	printed = 14 + printf(BRIGHT "%i%%", resistance);
 
@@ -195,14 +195,14 @@ print_resistance(Battle* data, Entity* e, int type)
 }
 
 static void
-print_attacks(Battle* data, Entity* e)
+print_attacks(Entity* e)
 {
 	List* list;
 	Attack* attack;
 	List* attacks;
 	int has_attacks = 0;
 
-	attacks = get_all_attacks(data, e);
+	attacks = get_all_attacks(e);
 
 	printf(BRIGHT WHITE "  Attacks:\n" NOCOLOR);
 	for (list = attacks; list; list = list->next)
@@ -211,13 +211,13 @@ print_attacks(Battle* data, Entity* e)
 		attack = list->data;
 
 		printf(WHITE "    %i - %i  %s\n" NOCOLOR,
-			attack->damage + get_attack_bonus(data, e), attack->strikes,
+			attack->damage + get_attack_bonus(e), attack->strikes,
 			type_string(attack->type));
 	}
 }
 
 void
-print_entity_basestats(Battle* data, Entity* e)
+print_entity_basestats(Entity* e)
 {
 	printf(BRIGHT BLUE ">> %s\n" NOCOLOR, e->name);
 
@@ -236,23 +236,23 @@ print_entity_basestats(Battle* data, Entity* e)
 	printf(
 		BRIGHT WHITE "  Defense:  " BLUE  "%i\n" NOCOLOR
 		,
-		get_defense_bonus(data, e)
+		get_defense_bonus(e)
 	);
 
-	print_attacks(data, e);
+	print_attacks(e);
 }
 
 void
-print_entity(Battle* data, Entity *e)
+print_entity(Entity *e)
 {
-	print_entity_basestats(data, e);
+	print_entity_basestats(e);
 
 	printf("\n");
 
 	printf("Resistances:\n");
 	for (int i = 0; i < TYPE_MAX; i++)
 	{
-		print_resistance(data, e, i);
+		print_resistance(e, i);
 	}
 }
 
@@ -274,7 +274,7 @@ equipment_string(int id)
 }
 
 List*
-get_all_attacks(Battle* data, Entity* e)
+get_all_attacks(Entity* e)
 {
 	int i;
 	Item* item;

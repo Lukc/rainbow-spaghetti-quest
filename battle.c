@@ -14,18 +14,18 @@
  * @return The amount of net damage inflicted to “defender”.
  */
 static int
-attack(Battle* data, Entity* attacker, Attack* attack, Entity* defender)
+attack(Entity* attacker, Attack* attack, Entity* defender)
 {
 	int damage_inflicted;
 	int type_modifier;
 
-	type_modifier = get_type_resistance(data, defender, attack->type);
+	type_modifier = get_type_resistance(defender, attack->type);
 
 	/* Calculating for a single strike */
 	damage_inflicted =
-		(int) (((get_attack_bonus(data, attacker) + attack->damage) *
+		(int) (((get_attack_bonus(attacker) + attack->damage) *
 				(100. - type_modifier)) / 100.) -
-		get_defense_bonus(data, defender);
+		get_defense_bonus(defender);
 
 	/* Taking care of negative damages... */
 	damage_inflicted = damage_inflicted < 0 ? 0 : damage_inflicted;
@@ -50,10 +50,9 @@ ai_action(Battle* data, Logs* logs)
 	player = data->player;
 	enemy = data->enemy;
 
-	available_attacks = get_all_attacks(data, enemy);
+	available_attacks = get_all_attacks(enemy);
 
 	damage_received = attack(
-		data,
 		enemy,
 		(Attack*) list_nth(
 			available_attacks,
@@ -107,7 +106,7 @@ command_attack(Battle* battle_data, Attack* player_attack)
 	player = battle_data->player;
 	enemy = battle_data->enemy;
 
-	damage_inflicted = attack(battle_data, player, player_attack, enemy);
+	damage_inflicted = attack(player, player_attack, enemy);
 
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(
@@ -176,7 +175,7 @@ battle(Battle *battle_data)
 	{
 		if (line)
 		{
-			player_attacks = get_all_attacks(battle_data, player);
+			player_attacks = get_all_attacks(player);
 
 			system("clear");
 
@@ -201,9 +200,9 @@ battle(Battle *battle_data)
 				}
 			}
 
-			print_entity(battle_data, player);
+			print_entity(player);
 			printf(BRIGHT RED "\n -- " WHITE "versus" RED " --\n\n" NOCOLOR);
-			print_entity_basestats(battle_data, enemy);
+			print_entity_basestats(enemy);
 			printf("\n");
 
 			if (logs)
@@ -220,7 +219,7 @@ battle(Battle *battle_data)
 				Attack* attack = list->data;
 
 				printf(WHITE "  - (%i)%14i-%i %s\n" NOCOLOR, i,
-					attack->damage + get_attack_bonus(battle_data, player),
+					attack->damage + get_attack_bonus(player),
 					attack->strikes, type_string(attack->type));
 
 				i++;

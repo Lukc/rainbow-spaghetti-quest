@@ -35,19 +35,19 @@ typedef struct Entity {
 
 int get_max_mana(Entity*);
 int get_max_health(Entity*);
-int get_attack_bonus(Battle*, Entity*);
-int get_defense_bonus(Battle*, Entity*);
+int get_attack_bonus(Entity*);
+int get_defense_bonus(Entity*);
 
-int get_type_resistance(Battle*, Entity*, int);
+int get_type_resistance(Entity*, int);
 int get_attack_type(Battle*, Entity*);
 
 char* equipment_string(int);
 
 int init_entity_from_class(Entity*, Class*);
 
-void print_entity_basestats(Battle*, Entity*);
-void print_entity(Battle*, Entity*);
+void print_entity_basestats(Entity*);
+void print_entity(Entity*);
 
-List* get_all_attacks(Battle*, Entity*);
+List* get_all_attacks(Entity*);
 
 #endif

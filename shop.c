@@ -152,7 +152,7 @@ unequip_item(Entity* player, Item* item)
 }
 
 void
-print_equipment(Battle* data, Entity* player)
+print_equipment(Entity* player)
 {
 	int i, j, printed;
 	Item* item;
@@ -273,7 +273,7 @@ enter_shop(void* opt)
 
 		system("clear");
 
-		print_equipment(data, player);
+		print_equipment(player);
 
 		if (selected_item)
 		{
