@@ -5,6 +5,7 @@
 #include "battle.h"
 #include "classes.h"
 #include "attack.h"
+#include "items.h"
 
 /* Why? Because! */
 #define INVENTORY_SIZE 24
@@ -28,8 +29,8 @@ typedef struct Entity {
 
 	struct Class *class;
 
-	int equipment[EQ_MAX];
-	int inventory[INVENTORY_SIZE];
+	Item* equipment[EQ_MAX];
+	Item* inventory[INVENTORY_SIZE];
 } Entity;
 
 int get_max_mana(Entity*);

@@ -262,13 +262,13 @@ get_item_by_name(List* list, char* name)
 }
 
 int
-get_count_from_inventory(int inventory[INVENTORY_SIZE], int id)
+get_count_from_inventory(Item* inventory[INVENTORY_SIZE], Item* item)
 {
 	int i;
 	int count = 0;
 
 	for (i = 0; i < INVENTORY_SIZE; i++)
-		if (inventory[i] == id)
+		if (inventory[i] == item)
 			count++;
 
 	return count;

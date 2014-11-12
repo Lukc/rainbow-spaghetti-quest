@@ -27,7 +27,7 @@ List* load_items(char*);
 
 Item* get_item_by_id(Battle*, int);
 Item* get_item_by_name(List*, char*);
-int get_count_from_inventory(int*, int);
+int get_count_from_inventory(Item**, Item*);
 
 #endif
 

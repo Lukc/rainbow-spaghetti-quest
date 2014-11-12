@@ -70,7 +70,7 @@ buy_item(Entity* player, Item* selected_item)
 
 	if (player->caps >= selected_item->price)
 	{
-		for (i = 0; i < INVENTORY_SIZE && player->inventory[i] != -1; i++)
+		for (i = 0; i < INVENTORY_SIZE && player->inventory[i]; i++)
 			;;
 
 		if (i == INVENTORY_SIZE)
@@ -81,7 +81,7 @@ buy_item(Entity* player, Item* selected_item)
 		else
 		{
 			player->caps -= selected_item->price;
-			player->inventory[i] = selected_item->id;
+			player->inventory[i] = selected_item;
 		}
 	}
 	else
@@ -96,23 +96,23 @@ static char*
 equip_item(Entity* player, Item* selected_item)
 {
 	int slot, id;
-	int oldItem;
+	Item* old_item;
 	int i;
 
 	if (!selected_item)
 		return NULL;
 
-	if (get_count_from_inventory(player->inventory, selected_item->id) > 0)
+	if (get_count_from_inventory(player->inventory, selected_item) > 0)
 	{
 		slot = selected_item->slot;
 		id = selected_item->id;
-		oldItem = player->equipment[slot];
+		old_item = player->equipment[slot];
 
-		for (i = 0; player->inventory[i] != id; i++)
+		for (i = 0; player->inventory[i] != selected_item; i++)
 			;;
 
 		player->inventory[i] = player->equipment[slot];
-		player->equipment[slot] = id;
+		player->equipment[slot] = selected_item;
 	}
 	else
 	{
@@ -130,9 +130,9 @@ unequip_item(Entity* player, Item* item)
 	if (!item)
 		return NULL;
 
-	if (player->equipment[item->slot] == item->id)
+	if (player->equipment[item->slot]->id == item->id)
 	{
-		for (i = 0; i < INVENTORY_SIZE && player->inventory[i] != 0; i++)
+		for (i = 0; i < INVENTORY_SIZE && player->inventory[i]; i++)
 			;;
 
 		if (i == INVENTORY_SIZE)
@@ -141,7 +141,7 @@ unequip_item(Entity* player, Item* item)
 		}
 
 		player->inventory[i] = player->equipment[item->slot];
-		player->equipment[item->slot] = 0;
+		player->equipment[item->slot] = NULL;
 	}
 	else
 	{
@@ -161,7 +161,7 @@ print_equipment(Battle* data, Entity* player)
 
 	for (i = 0; i < EQ_MAX; i++)
 	{
-		item = get_item_by_id(data, player->equipment[i]);
+		item = player->equipment[i];
 
 		printf(WHITE);
 		printed = printf("  - %s: ", equipment_string(i));
@@ -188,17 +188,17 @@ sell_item(Entity* player, Item* item)
 	if (!item)
 		return NULL;
 
-	count = get_count_from_inventory(player->inventory, item->id);
+	count = get_count_from_inventory(player->inventory, item);
 
 	if (count < 1)
 	{
 		return "You cannot sell an item you do not possess...";
 	}
 
-	for (i = 0; i < INVENTORY_SIZE && player->inventory[i] != item->id; i++)
+	for (i = 0; i < INVENTORY_SIZE && player->inventory[i] != item; i++)
 		;;
 
-	player->inventory[i] = 0;
+	player->inventory[i] = NULL;
 
 	player->caps += 2 * item->price / 3;
 
@@ -221,6 +221,9 @@ enter_shop(void* opt)
 	data = opt;
 	items = data->location->shop_items;
 	player = data->player;
+
+	if (!items)
+		return NULL;
 
 	line = strdup("");
 	while (line)
@@ -277,7 +280,7 @@ enter_shop(void* opt)
 			print_item(selected_item);
 			printf(
 				WHITE " > Already possessed: %i.\n\n" NOCOLOR,
-				get_count_from_inventory(player->inventory, selected_item->id));
+				get_count_from_inventory(player->inventory, selected_item));
 		}
 
 		if (items)

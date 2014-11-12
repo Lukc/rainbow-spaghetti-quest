@@ -319,20 +319,14 @@ enter_battle(void *opt)
 	if (battle_data->location->random_enemies)
 		enemy_class =
 			get_random_enemy(battle_data->location->random_enemies);
-
-	if (enemy_class)
-	{
-		init_entity_from_class(enemy, enemy_class);
-
-		if ((result = battle(battle_data)) == 1)
-		{
-			player->kills++;
-		}
-	}
 	else
+		return NULL;
+
+	init_entity_from_class(enemy, enemy_class);
+
+	if ((result = battle(battle_data)) == 1)
 	{
-		printf("There is no-one to fight here!\n");
-		getchar();
+		player->kills++;
 	}
 
 	system("clear");

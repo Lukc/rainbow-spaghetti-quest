@@ -30,7 +30,7 @@ get_attack_bonus(Battle* data, Entity* e)
 	{
 		if (e->equipment[i])
 		{
-			equipment = get_item_by_id(data, e->equipment[i]);
+			equipment = e->equipment[i];
 
 			bonus += equipment->attack_bonus;
 		}
@@ -50,7 +50,7 @@ get_defense_bonus(Battle* data, Entity* e)
 	{
 		if (e->equipment[i])
 		{
-			equipment = get_item_by_id(data, e->equipment[i]);
+			equipment = e->equipment[i];
 
 			bonus += equipment->defense_bonus;
 		}
@@ -71,7 +71,7 @@ get_type_resistance(Battle* data, Entity* e, int type)
 	{
 		if (e->equipment[i])
 		{
-			equipment = get_item_by_id(data, e->equipment[i]);
+			equipment = e->equipment[i];
 
 			bonus += equipment->type_resistance[type];
 		}
@@ -96,10 +96,10 @@ init_entity_from_class(Entity* e, Class* c)
 	e->caps = 0;
 
 	for (i = 0; i < EQ_MAX; i++)
-		e->equipment[i] = 0;
+		e->equipment[i] = NULL;
 
 	for (i = 0; i < INVENTORY_SIZE; i++)
-		e->inventory[i] = -1;
+		e->inventory[i] = NULL;
 
 	return 42;
 }
@@ -282,10 +282,8 @@ get_all_attacks(Battle* data, Entity* e)
 
 	for (i = 0; i < EQ_MAX; i++)
 	{
-		if(e->equipment[i])
+		if((item = e->equipment[i]))
 		{
-			item = get_item_by_id(data, e->equipment[i]);
-
 			for (list = item->attacks; list; list = list->next)
 			{
 				list_add(&result, list->data);

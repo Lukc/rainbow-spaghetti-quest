@@ -75,9 +75,9 @@ inventory(void* opt)
 
 	for (i = 0; i < INVENTORY_SIZE; i++)
 	{
-		if (player->inventory[i] != -1)
+		if (player->inventory[i])
 		{
-			Item* item = get_item_by_id(data, player->inventory[i]);
+			Item* item = player->inventory[i];
 
 			printf(" - %2i  %s\n", i, item->name);
 		}
