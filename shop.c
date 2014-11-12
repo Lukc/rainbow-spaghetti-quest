@@ -65,6 +65,9 @@ buy_item(Entity* player, Item* selected_item)
 {
 	int i;
 
+	if (!selected_item)
+		return NULL;
+
 	if (player->caps >= selected_item->price)
 	{
 		for (i = 0; i < INVENTORY_SIZE && player->inventory[i] != -1; i++)
@@ -96,6 +99,9 @@ equip_item(Entity* player, Item* selected_item)
 	int oldItem;
 	int i;
 
+	if (!selected_item)
+		return NULL;
+
 	if (get_count_from_inventory(player->inventory, selected_item->id) > 0)
 	{
 		slot = selected_item->slot;
@@ -121,6 +127,9 @@ unequip_item(Entity* player, Item* item)
 {
 	int i;
 
+	if (!item)
+		return NULL;
+
 	if (player->equipment[item->slot] == item->id)
 	{
 		for (i = 0; i < INVENTORY_SIZE && player->inventory[i] != 0; i++)
@@ -142,7 +151,7 @@ unequip_item(Entity* player, Item* item)
 	return NULL;
 }
 
-static void
+void
 print_equipment(Battle* data, Entity* player)
 {
 	int i, j, printed;
@@ -174,7 +183,12 @@ static char*
 sell_item(Entity* player, Item* item)
 {
 	int i;
-	int count = get_count_from_inventory(player->inventory, item->id);
+	int count;
+
+	if (!item)
+		return NULL;
+
+	count = get_count_from_inventory(player->inventory, item->id);
 
 	if (count < 1)
 	{
@@ -205,7 +219,7 @@ enter_shop(void* opt)
 	Item* item;
 
 	data = opt;
-	items = data->items;
+	items = data->location->shop_items;
 	player = data->player;
 
 	line = strdup("");
@@ -239,16 +253,19 @@ enter_shop(void* opt)
 			if (input < 0)
 				err = "Invalid index!";
 
-			list = items;
-			for (i = 0; i < input && list; i++)
+			if (items)
 			{
-				list = list->next;
-			}
+				list = items;
+				for (i = 0; i < input && list; i++)
+				{
+					list = list->next;
+				}
 
-			if (!list)
-				err = "Invalid index!";
-			else
-				selected_item = (Item*) list->data;
+				if (!list)
+					err = "Invalid index!";
+				else
+					selected_item = (Item*) list->data;
+			}
 		}
 
 		system("clear");
@@ -263,23 +280,30 @@ enter_shop(void* opt)
 				get_count_from_inventory(player->inventory, selected_item->id));
 		}
 
-		printf(WHITE " > Items sold:\n" NOCOLOR);
-		i = 0;
-		for (list = items; list; list = list->next)
+		if (items)
 		{
-			item = (Item*) list->data;
+			printf(WHITE " > Items sold:\n" NOCOLOR);
+			i = 0;
+			for (list = items; list; list = list->next)
+			{
+				item = (Item*) list->data;
 
-			printf(
-				WHITE "  - (%i)" NOCOLOR ":  %s%-30s" NOCOLOR " %s(%i caps)\n" NOCOLOR
-				,
-				i,
-				player->caps >= item->price ? BRIGHT BLUE : RED,
-				item->name,
-				player->caps >= item->price ? BRIGHT GREEN : RED,
-				item->price
-			);
+				printf(
+					WHITE "  - (%i)" NOCOLOR ":  %s%-30s" NOCOLOR " %s(%i caps)\n" NOCOLOR
+					,
+					i,
+					player->caps >= item->price ? BRIGHT BLUE : RED,
+					item->name,
+					player->caps >= item->price ? BRIGHT GREEN : RED,
+					item->price
+				);
 
-			i++;
+				i++;
+			}
+		}
+		else
+		{
+			printf(WHITE " > No item sold here.\n" NOCOLOR);
 		}
 		printf("\n");
 

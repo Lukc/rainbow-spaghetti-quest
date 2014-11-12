@@ -14,7 +14,8 @@
 List*
 load_places(Battle* data, char* dirname)
 {
-	List* placees = NULL;
+	List* places = NULL;
+	List* list, * list2;
 	DIR* dir;
 	struct dirent *entry;
 	char* filename;
@@ -33,17 +34,38 @@ load_places(Battle* data, char* dirname)
 		sprintf(filename, "%s/%s", dirname, entry->d_name);
 
 		printf(" > %s\n", filename);
-		list_add(&placees, load_place(data, filename));
+		list_add(&places, load_place(data, filename));
 
 		free(filename);
 	}
 
-	/* @todo: Should we, at this point, replace all place->destination by
-	 *        pointers to destinations? */
+	for (list = places; list; list = list->next)
+	{
+		Place* place = list->data;
+
+		list2 = place->destinations;
+		while (list2)
+		{
+			char* name = list2->data;
+
+			list2->data = get_place_by_name(places, name);
+
+			if (!list2->data)
+			{
+				fprintf(stderr,
+					"[Places/%s] invalid destination: %s.\n",
+					place->name, name);
+
+				exit(1);
+			}
+
+			list2 = list2->next;
+		}
+	}
 
 	closedir(dir);
 
-	return placees;
+	return places;
 }
 
 static List*
@@ -157,6 +179,11 @@ load_place (Battle* data, char* filename)
 		}
 		else
 			fprintf(stderr, " [%s]> Unknown field: %s\n", filename, field);
+	}
+
+	if (!place->name)
+	{
+		fprintf(stderr, " [%s]> Place has no name.\n", filename);
 	}
 
 	free(str);

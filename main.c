@@ -13,6 +13,82 @@
 #include "shop.h"
 #include "places.h"
 
+Logs*
+travel(void* opt)
+{
+	Battle* data = opt;
+	List* list;
+	char* input;
+	int i;
+
+	printf("\nPlaces you can go to:\n");
+
+	i = 0;
+	for (list = data->location->destinations; list; list = list->next)
+	{
+		printf("  <%i>  %s\n", i, ((Place*) list->data)->name);
+		i++;
+	}
+
+	printf("\nPlease select a destination.\n");
+
+	while ((input = readline(">> ")))
+	{
+		if (isdigit(input[0]))
+		{
+			Place* place;
+
+			if ((place = list_nth(data->location->destinations, atoi(input))))
+			{
+				/* If not, we’ll be damn screwed... */
+				if (place)
+					data->location = place;
+
+				system("clear");
+				return NULL;
+			}
+			else
+			{
+				printf("Hey! Invalid input!\n");
+			}
+		}
+		else
+		{
+			printf("Hey! Invalid input!\n");
+		}
+	}
+
+	system("clear");
+
+	return NULL;
+}
+
+Logs*
+inventory(void* opt)
+{
+	Battle* data = opt;
+	List* list;
+	Entity* player = data->player;
+	int i;
+
+	print_equipment(data, player);
+
+	for (i = 0; i < INVENTORY_SIZE; i++)
+	{
+		if (player->inventory[i] != -1)
+		{
+			Item* item = get_item_by_id(data, player->inventory[i]);
+
+			printf(" - %2i  %s\n", i, item->name);
+		}
+	}
+
+	while (getchar() > 0)
+		;;
+
+	return NULL;
+}
+
 int
 main(int argc, char* argv[])
 {
@@ -22,9 +98,9 @@ main(int argc, char* argv[])
 	Command commands[] = {
 		{"battle",  "b", enter_battle, "Beat a random enemy to death!"},
 		{"shop",    "s", enter_shop,   "Buy new equipment to improve your stats!"},
-		{"inventory", "i", NULL,       "Craft thingies or sell old equipment!"},
+		{"inventory", "i", inventory,  "Craft thingies or sell old equipment!"},
 		{"dungeon", "d", NULL,         "Enter a terrible dungeon and fight hordes of enemies!"},
-		{"travel",  "t", NULL,         "Travel to other places and explore the world!"},
+		{"travel",  "t", travel,       "Travel to other places and explore the world!"},
 		{NULL, NULL, NULL, NULL}
 	};
 	List* classes;
@@ -54,6 +130,7 @@ main(int argc, char* argv[])
 	battle.player = &player;
 	battle.enemy = &enemy;
 
+	/* WHAT? The FIRST place found? :o */
 	battle.location = world->data;
 
 	line = strdup("");

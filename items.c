@@ -252,7 +252,7 @@ get_item_by_name(List* list, char* name)
 	{
 		item = list->data;
 
-		if (!strcmp((char*) list->data, name))
+		if (!strcmp(((Item*) list->data)->name, name))
 			return item;
 
 		list = list->next;

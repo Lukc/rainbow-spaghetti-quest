@@ -13,5 +13,7 @@ typedef struct {
 
 Logs* enter_shop(void*);
 
+void print_equipment(Battle*, Entity*);
+
 #endif
 

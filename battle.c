@@ -306,7 +306,7 @@ Logs*
 enter_battle(void *opt)
 {
 	Battle* battle_data;
-	Class* enemy_class;
+	Class* enemy_class = NULL;
 	Entity* player, *enemy;
 	List* classes;
 	int result;
@@ -316,7 +316,9 @@ enter_battle(void *opt)
 	enemy = battle_data->enemy;
 	classes = battle_data->classes;
 
-	enemy_class = get_random_enemy(battle_data->location->random_enemies);
+	if (battle_data->location->random_enemies)
+		enemy_class =
+			get_random_enemy(battle_data->location->random_enemies);
 
 	if (enemy_class)
 	{
