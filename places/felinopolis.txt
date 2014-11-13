@@ -1,0 +1,4 @@
+# The capital of Cats, near the Electrical Ocean. (makes sense, right?)
+Name: Felinopolis
+Shop Items: Sword, Knife, Wooden Shield, Staff
+Leads to: Electrical Ocean

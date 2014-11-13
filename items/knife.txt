@@ -1,10 +1,10 @@
-Id: 1
 Name: Knife
-Attack bonus: 4
+Attack bonus: 1
 Attack: [
-	Damage: 4
-	Strikes: 3
+	Damage: 3
+	Strikes: 4
 	Type: slashing
+	Name: Slash
 ]
-Price: 10
+Price: 30
 Slot: weapon

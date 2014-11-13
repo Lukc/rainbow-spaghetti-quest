@@ -1,0 +1,3 @@
+Name: Electrical Ocean
+Leads to: Felinopolis
+Random Enemies: Trollfish

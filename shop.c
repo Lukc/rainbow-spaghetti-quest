@@ -1,14 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-#include <readline/readline.h>
+#include <ctype.h>
 
 #include "colors.h"
 #include "items.h"
 #include "commands.h"
 #include "battle.h"
 #include "shop.h"
+#include "term.h"
 
 static char*
 stat_color(int i)
@@ -24,8 +24,16 @@ stat_color(int i)
 static void
 print_item(Item* item)
 {
-	int i;
+	int i, l;
 	List* list;
+
+	for (l = 0; l < 9; l++)
+	{
+		for (i = 0; i < 80; i++)
+			printf(" ");
+		printf("\n");
+	}
+	back(9);
 
 	printf(BRIGHT BLUE " > Selected item: %s\n" NOCOLOR, item->name);
 
@@ -92,10 +100,10 @@ buy_item(Entity* player, Item* selected_item)
 	return NULL;
 }
 
-static char*
+char*
 equip_item(Entity* player, Item* selected_item)
 {
-	int slot, id;
+	int slot;
 	Item* old_item;
 	int i;
 
@@ -105,7 +113,6 @@ equip_item(Entity* player, Item* selected_item)
 	if (get_count_from_inventory(player->inventory, selected_item) > 0)
 	{
 		slot = selected_item->slot;
-		id = selected_item->id;
 		old_item = player->equipment[slot];
 
 		for (i = 0; player->inventory[i] != selected_item; i++)
@@ -122,7 +129,7 @@ equip_item(Entity* player, Item* selected_item)
 	return NULL;
 }
 
-static char*
+char*
 unequip_item(Entity* player, Item* item)
 {
 	int i;
@@ -130,7 +137,7 @@ unequip_item(Entity* player, Item* item)
 	if (!item)
 		return NULL;
 
-	if (player->equipment[item->slot]->id == item->id)
+	if (player->equipment[item->slot] == item)
 	{
 		for (i = 0; i < INVENTORY_SIZE && player->inventory[i]; i++)
 			;;
@@ -163,10 +170,16 @@ print_equipment(Entity* player)
 	{
 		item = player->equipment[i];
 
+		/* Clearing the area we’re gonna (probably) use */
+		for (j = 0; j < 40 - printed; j++)
+			printf(" ");
+		printf("\n");
+		back(1);
+
 		printf(WHITE);
 		printed = printf("  - %s: ", equipment_string(i));
 		printf(NOCOLOR);
-		for (j = 0; j < 20 - printed; j++)
+		for (j = 0; j < 22 - printed; j++)
 			printf("-");
 		printf(" ");
 
@@ -175,11 +188,9 @@ print_equipment(Entity* player)
 		else
 			printf("(nothing)\n");
 	}
-
-	printf("\n");
 }
 
-static char*
+char*
 sell_item(Entity* player, Item* item)
 {
 	int i;
@@ -206,136 +217,161 @@ sell_item(Entity* player, Item* item)
 }
 
 Logs*
-enter_shop(void* opt)
+enter_shop(Battle* data)
 {
-	Battle* data;
 	List* items, * list;
 	Entity* player;
 	char* err = NULL;
-	char* line;
+	char input = -42;
+	int selection = 0;
 	int i;
 
-	Item* selected_item = NULL;
+	Item* selected_item;
 	Item* item;
 
-	data = opt;
+	system("clear");
+
 	items = data->location->shop_items;
 	player = data->player;
 
+	selected_item = items->data;
+
+	/* Shouldn’t happen, making sure anyway. */
 	if (!items)
 		return NULL;
 
-	line = strdup("");
-	while (line)
+	while (input == -42 || !isexit(input))
 	{
-		if (!strcmp(line, "quit"))
+		switch (input)
 		{
-			free(line);
-			exit(0);
-		}
-		else if (!strcmp(line, "equip") || !strcmp(line, "e"))
-		{
-			err = equip_item(player, selected_item);
-		}
-		else if (!strcmp(line, "unequip") || !strcmp(line, "u"))
-		{
-			err = unequip_item(player, selected_item);
-		}
-		else if (!strcmp(line, "buy") || !strcmp(line, "b"))
-		{
-			err = buy_item(player, selected_item);
-		}
-		else if (!strcmp(line, "sell") || !strcmp(line, "s"))
-		{
-			err = sell_item(player, selected_item);
-		}
-		else
-		{
-			int input = atoi(line);
-
-			if (input < 0)
-				err = "Invalid index!";
-
-			if (items)
-			{
-				list = items;
-				for (i = 0; i < input && list; i++)
+			case 'e':
+				err = equip_item(player, selected_item);
+				break;
+			/*
+			 * WHO’d want to do that? :ooo
+			case 'u':
+				err = unequip_item(player, selected_item);
+				break;
+			*/
+			case 'b':
+				err = buy_item(player, selected_item);
+				break;
+			case 's':
+				err = sell_item(player, selected_item);
+				break;
+			case KEY_DOWN:
+				selection = selection >= list_size(items) - 1 ?
+					selection : selection + 1;
+				selected_item = list_nth(items, selection);
+				break;
+			case KEY_UP:
+				selection = selection <= 0 ?
+					selection : selection - 1;
+				selected_item = list_nth(items, selection);
+				break;
+			case -42:
+				break;
+			default:
+				if (isdigit(input))
 				{
-					list = list->next;
+					input = input - '0';
+
+					if (input < 0)
+						err = "Invalid index!";
+					else if (input >= list_size(items))
+							err = "Invalid index!";
+					else
+					{
+						selection = input;
+						selected_item = list_nth(items, input);
+					}
 				}
-
-				if (!list)
-					err = "Invalid index!";
 				else
-					selected_item = (Item*) list->data;
-			}
+				{
+					err = "Unrecognized key.";
+				}
 		}
 
-		system("clear");
+		back_to_top();
 
-		print_equipment(player);
+		print_item(selected_item);
 
-		if (selected_item)
+		back_to_top();
+
+		for (i = 0; i < 10; i++)
+			printf("\n");
+
+		menu_separator();
+
+		i = 0;
+		for (list = items; list; list = list->next)
 		{
-			print_item(selected_item);
-			printf(
-				WHITE " > Already possessed: %i.\n\n" NOCOLOR,
-				get_count_from_inventory(player->inventory, selected_item));
-		}
+			int printed, j;
 
-		if (items)
-		{
-			printf(WHITE " > Items sold:\n" NOCOLOR);
-			i = 0;
-			for (list = items; list; list = list->next)
+			if (selection >= 7 ?
+				i > selection - 7 && i <= selection : i < 7)
 			{
 				item = (Item*) list->data;
 
-				printf(
-					WHITE "  - (%i)" NOCOLOR ":  %s%-30s" NOCOLOR " %s(%i caps)\n" NOCOLOR
-					,
-					i,
-					player->caps >= item->price ? BRIGHT BLUE : RED,
-					item->name,
-					player->caps >= item->price ? BRIGHT GREEN : RED,
-					item->price
-				);
+				if (i == selection)
+					printf("\033[47m");
 
-				i++;
+				if (item->price <= player->caps)
+					printf(GREEN);
+				else
+					printf(BLACK);
+
+				printed = printf("  - %s", item->name);
+
+				for (j = 0; j < 60 - printed; j++)
+					printf(" ");
+
+				printed = printf("%i",
+					get_count_from_inventory(player->inventory, item));
+
+				for (j = 0; j < 8 - printed; j++)
+					printf(" ");
+
+				printed = printf("(%ic)", item->price);
+
+				for (j = 0; j < 12 - printed; j++)
+					printf(" ");
+
+				printf("\n" NOCOLOR);
 			}
+
+			i++;
 		}
-		else
-		{
-			printf(WHITE " > No item sold here.\n" NOCOLOR);
-		}
-		printf("\n");
+
+		for (; i < 7; i++)
+			printf("\n");
+
+		menu_separator();
+
+		move(40);
+		printf(WHITE " (b)  Buy\n" NOCOLOR);
+		move(40);
+		printf(WHITE
+			" (e)  Equip\n" NOCOLOR);
+		move(40);
+		printf(WHITE
+			" (s)  Sell\n" NOCOLOR);
+
+		menu_separator();
 
 		if (err)
 		{
-			printf("%s\n\n", err);
+			printf("%s", err);
+			back(1);
+			printf("\n");
 		}
 
-		printf(
-			"Options:\n"
-			WHITE
-			"  - (#) (id of item to examine)\n"
-			"  - (b) buy:       Buy the examined item.\n"
-			"  - (e) equip:     Equip the examined item (if possessed).\n"
-			"  - (u) unequip:   "
-				"Remove the examined item from your equipment (if equiped).\n"
-			"  - (s) sell:      Sell the examined item (if possessed).\n"
-			NOCOLOR
-			"\n"
-		);
-
 		err = NULL;
-		free(line);
 
-		line = readline(" >> ");
+		input = getch();
 	}
 
 	system("clear");
-	free(line);
 
 	return NULL;
 }

@@ -130,6 +130,9 @@ load_item (char* filename)
 
 	memset(item, 0, sizeof(Item));
 
+	/* Can’t be equipped by default */
+	item->slot = -1;
+
 	logs = logs_new();
 
 	while (list)
@@ -142,8 +145,6 @@ load_item (char* filename)
 
 		if (!strcmp(field, "name"))
 			item->name = parser_get_string(element, logs);
-		else if (!strcmp(field, "id"))
-			item->id = parser_get_integer(element, logs);
 		else if (!strcmp(field, "price"))
 			item->price = parser_get_integer(element, logs);
 		else if (!strcmp(field, "attack bonus"))
@@ -163,6 +164,8 @@ load_item (char* filename)
 			ParserElement* subelement;
 			Attack* attack = (Attack*) malloc(sizeof(Attack));
 
+			memset(attack, 0, sizeof(Attack));
+
 			if (element->type != PARSER_LIST)
 			{
 				logs_add(logs,
@@ -180,6 +183,12 @@ load_item (char* filename)
 					else if (!strcmp(subelement->name, "strikes"))
 						attack->strikes =
 							parser_get_integer(subelement, logs);
+					else if (!strcmp(subelement->name, "mana"))
+						attack->mana_cost =
+							parser_get_integer(subelement, logs);
+					else if (!strcmp(subelement->name, "name"))
+						attack->name =
+							parser_get_string(subelement, logs);
 					else if (!strcmp(subelement->name, "type"))
 					{
 						char* type = parser_get_string(subelement, logs);
@@ -218,26 +227,6 @@ load_item (char* filename)
 	}
 
 	return item;
-}
-
-Item*
-get_item_by_id(Battle* battle, int id)
-{
-	List* container;
-	Item* item;
-
-	container = battle->items;
-	while (container)
-	{
-		item = container->data;
-
-		if (item->id == id)
-			return item;
-
-		container = container->next;
-	}
-
-	return NULL;
 }
 
 /**

@@ -1,14 +1,15 @@
-Id: 5
 Attack: [
-	Damage: 5
+	Damage: 2
 	Strikes: 2
 	Type: impact
+	Name: Staff hit
 ]
 Attack: [
-	Damage: 6
+	Damage: 5
 	Strikes: 4
 	Type: fire
+	Name: Fireball
 ]
 Name: Staff
-Price: 10
+Price: 80
 Slot: weapon

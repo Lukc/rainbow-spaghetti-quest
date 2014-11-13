@@ -3,9 +3,10 @@ Name: Warrior
 Health: 30
 Mana: 5
 Attack: [
-	Damage: 5
+	Damage: 3
 	Strikes: 2
 	Type: impact
+	Name: Hands
 ]
 Attack bonus: 3
 Defense bonus: 3

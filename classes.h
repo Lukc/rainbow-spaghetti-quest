@@ -4,7 +4,6 @@
 
 #include "list.h"
 #include "types.h"
-#include "attack.h"
 
 typedef struct Class {
 	char *name;
@@ -22,11 +21,18 @@ typedef struct Class {
 	/* Attack to use if no equipment to provide one */
 	List* attacks;
 
+	/* Random loot for random mobs. */
+	List* drop;
+
 	int mana_regen_on_focus;
 } Class;
 
-Class* load_class(char*);
-List* load_classes(char*);
+#include "battle.h"
+#include "attack.h"
+#include "drop.h"
+
+Class* load_class(Battle*, char*);
+List* load_classes(Battle*, char*);
 Class* get_class_by_name(List*, char*);
 
 #endif

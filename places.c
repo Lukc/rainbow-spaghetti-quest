@@ -137,7 +137,7 @@ load_place (Battle* data, char* filename)
 
 		if (!strcmp(field, "name"))
 			place->name = strdup(value);
-		else if(!strcmp(field, "shop"))
+		else if(!strcmp(field, "shop") || !strcmp(field, "shop items"))
 		{
 			List* temp;
 			List* list = comas_to_list(value);
@@ -155,7 +155,7 @@ load_place (Battle* data, char* filename)
 			}
 
 		}
-		else if(!strcmp(field, "enemies"))
+		else if(!strcmp(field, "enemies") || !strcmp(field, "random enemies"))
 		{
 			List* temp;
 			List* list = comas_to_list(value);

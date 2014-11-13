@@ -6,6 +6,7 @@ Attack: [
 	Damage: 3
 	Strikes: 1
 	Type: slashing
+	Name: Bite
 ]
 Attack bonus: 3
 Defense bonus: 1

@@ -1,0 +1,17 @@
+Name: Trollfish
+Health: 42
+Mana: 0
+Attack: [
+	Name: Bite
+	Type: slashing
+	Damage: 6
+	Strikes: 3
+]
+Arcane Resistance: -50
+Fire Resistance: 50
+Cold Resistance: 20
+Caps on kill: 8
+Drop: [
+	Item: Sword
+	Rarity: 30
+]

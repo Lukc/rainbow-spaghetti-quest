@@ -1,4 +1,0 @@
-Name: Green Plains
-Shop: Knife, Wooden Shield
-Enemies: Kitten, Black Kitten, Evil Kitten
-Leads to: Eastern Forest

@@ -6,7 +6,6 @@
 #include "list.h"
 
 typedef struct Item {
-	int id;
 	char* name;
 
 	int slot; /* values <0 for non-equipment? */
@@ -25,7 +24,6 @@ typedef struct Item {
 Item* load_item(char*);
 List* load_items(char*);
 
-Item* get_item_by_id(Battle*, int);
 Item* get_item_by_name(List*, char*);
 int get_count_from_inventory(Item**, Item*);
 

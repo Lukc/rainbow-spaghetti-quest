@@ -1,14 +1,24 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-
-#include <readline/readline.h>
+#include <string.h>
+#include <ctype.h>
 
 #include "battle.h"
 #include "types.h"
 #include "commands.h"
 #include "colors.h"
+#include "term.h"
 #include "entities.h"
+
+/**
+ * Checks whether someone has enough mana to use an attack or not.
+ */
+static int
+can_use_attack(Entity* attacker, Attack* attack)
+{
+	return attacker->mana >= attack->mana_cost;
+}
 
 /**
  * @return The amount of net damage inflicted to “defender”.
@@ -33,6 +43,7 @@ attack(Entity* attacker, Attack* attack, Entity* defender)
 	/* Taking the number of strikes into account now */
 	damage_inflicted = damage_inflicted * attack->strikes;
 
+	attacker->mana -= attack->mana_cost;
 	defender->health -= damage_inflicted;
 
 	return damage_inflicted;
@@ -106,6 +117,13 @@ command_attack(Battle* battle_data, Attack* player_attack)
 	player = battle_data->player;
 	enemy = battle_data->enemy;
 
+	if (!can_use_attack(player, player_attack))
+	{
+		logs_add(logs, strdup("Not enough mana!"));
+
+		return logs;
+	}
+
 	damage_inflicted = attack(player, player_attack, enemy);
 
 	log = (char*) malloc(sizeof(char) * 128);
@@ -159,7 +177,7 @@ int
 battle(Battle *battle_data)
 {
 	Logs* logs;
-	char *line;
+	char input = -42;
 	Entity *player = battle_data->player;
 	Entity *enemy = battle_data->enemy;
 	List* player_attacks;
@@ -170,67 +188,113 @@ battle(Battle *battle_data)
 
 	system("clear");
 
-	line = strdup("");
-	while (!line || (line && strcmp(line, "quit")))
+	while (1)
 	{
-		if (line)
+		if (!isexit(input))
 		{
 			player_attacks = get_all_attacks(player);
 
-			system("clear");
+			back_to_top();
 
 			logs = NULL;
 
-			if (!strcmp(line, "")) {}
-			else if (!strcmp(line, "f") || !strcmp(line, "focus"))
-				logs = command_focus(battle_data);
-			else if (!strcmp(line, "l") || !strcmp(line, "flee"))
-				logs = command_flee(battle_data);
-			else
+			switch (input)
 			{
-				if (list_size(player_attacks) > atoi(line))
-				{
-					Attack* attack = list_nth(player_attacks, atoi(line));
+				case 'f':
+					logs = command_focus(battle_data);
+					break;
+				case 'l':
+					logs = command_flee(battle_data);
+					break;
+				default:
+					if (isdigit(input))
+					{
+						input = input - '0';
+						if (list_size(player_attacks) > input)
+						{
+							Attack* attack =
+								list_nth(player_attacks, input);
 
-					logs = command_attack(battle_data, attack);
-				}
-				else
-				{
-					/* FIXME: Be mean to the player. */
-				}
+							logs = command_attack(battle_data, attack);
+						}
+						else
+						{
+							/* FIXME: Be mean to the player. */
+						}
+					}
+					else
+						; /* FIXME: Be mean. */
 			}
 
-			print_entity(player);
+			print_entity_basestats(player);
 			printf(BRIGHT RED "\n -- " WHITE "versus" RED " --\n\n" NOCOLOR);
 			print_entity_basestats(enemy);
 			printf("\n");
 
 			if (logs)
+				list = logs->head;
+			else
+				list = NULL;
+
+			for (i = 0; i < 6; i++)
 			{
-				logs_print(logs);
-				logs_free(logs);
+				int j;
+
+				/* Clearing logs area, line by line. */
+				for (j = 0; j < 80; j++)
+					printf(" ");
+				printf("\n");
+
+				if (list)
+				{
+					back(1);
+
+					printf("%s\n", list->data);
+
+					list = list->next;
+				}
 			}
 
-			printf("Options:\n");
+			if (logs)
+				logs_free(logs);
+
+			menu_separator();
 
 			i = 0;
-			for (list = player_attacks; list; list = list->next)
+			list = player_attacks;
+			for (i = 0; i < 5; i++)
 			{
-				Attack* attack = list->data;
+				Attack* attack = NULL;
+				
+				if(list)
+				{
+					attack = list->data;
 
-				printf(WHITE "  - (%i)%14i-%i %s\n" NOCOLOR, i,
-					attack->damage + get_attack_bonus(player),
-					attack->strikes, type_string(attack->type));
+					printf(WHITE "  (%i) %-9s %3i-%i %s\n" NOCOLOR, i,
+						attack->name,
+						attack->damage + get_attack_bonus(player),
+						attack->strikes, type_string(attack->type));
 
-				i++;
+					list = list->next;
+				}
+				else
+				{
+					printf(
+						BLACK "  (%i) --------- \n" NOCOLOR, i);
+				}
 			}
 
-			printf(
-				WHITE
-				"  - (f) focus:      A defensive move that restores mana.\n"
-				"  - (l) flee:       A desperate move to get out of battle.\n"
-				NOCOLOR
-			);
+			back(5);
+			move(40);
+			printf(WHITE "  (f) focus\n" NOCOLOR);
+			move(40);
+			printf(WHITE "  (l) flee\n" NOCOLOR);
+			move(40);
+			printf(YELLOW "  (i) use item\n" NOCOLOR);
+
+			printf("\n\n");
+
+			menu_separator();
 
 			if (battle_data->flee)
 			{
@@ -238,8 +302,7 @@ battle(Battle *battle_data)
 				printf("\nYou manage to get out of the battle without being "
 						"hurt too badly.\n");
 				printf("\nPress any key to continue...\n\n");
-				getchar();
-				free(line);
+				getch();
 				return 0;
 			}
 			else if (player->health <= 0)
@@ -250,33 +313,38 @@ battle(Battle *battle_data)
 				printf("\nYou are DEAD.\n");
 				printf("\nYou lost half your bottle caps.\n");
 				printf("\nPress any key to continue...\n\n");
-				getchar();
-				free(line);
+				getch();
 				return -1;
 			}
 			else if (enemy->health <= 0)
 			{
 				player->caps += enemy->class->caps_on_kill;
 
+				list = give_drop(player, enemy);
+
 				system("clear");
 				printf("\nYou are VICTORIOUS.\n");
-				printf("\nYou gain %d bottle caps!\n", enemy->class->caps_on_kill);
+				printf("\nYou gain %d bottle caps!\n",
+					enemy->class->caps_on_kill);
+				if (list)
+				{
+					printf("\nObtained loot:\n");
+
+					for (; list; list = list->next)
+						printf("  - %s\n", ((Item*) list->data)->name);
+				}
+
 				printf("\nPress any key to continue...\n\n");
-				free(line);
-				getchar();
+				getch();
 				return 1;
 			}
 
-			free(line);
-			line = readline(">> ");
+			input = getch();
 		}
 		else
-			line = readline("");
+			input = getch();
 	}
 
-	/* ^D or "quit" entered */
-	if (line)
-		free(line);
 	exit(0);
 
 	return 0;

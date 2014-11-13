@@ -136,15 +136,15 @@ print_bar(
 
 	size = size - text_size;
 
-	printf(BRIGHT "[");
+	printf(BRIGHT "<");
 	for (i = 0; i < size; i++)
 	{
 		if (current != 0 && ((float) i) / size <= ((float) current) / max)
-			printf("|");
+			printf("=");
 		else
 			printf(" ");
 	}
-	printf("]\n" NOCOLOR);
+	printf(">\n" NOCOLOR);
 }
 
 static void
@@ -224,28 +224,33 @@ print_entity_basestats(Entity* e)
 	print_bar(
 		BRIGHT WHITE "  Health:   ",
 		health_color(e),
-		e->health, get_max_health(e), 40, 80
+		e->health, get_max_health(e), 40, 80 + 5 * 2
 	);
 
 	print_bar(
 		BRIGHT WHITE "  Mana:     ",
 		BLUE,
-		e->mana, get_max_mana(e), 40, 80
+		e->mana, get_max_mana(e), 40, 80 + 5 * 2
 	);
-
-	printf(
-		BRIGHT WHITE "  Defense:  " BLUE  "%i\n" NOCOLOR
-		,
-		get_defense_bonus(e)
-	);
-
-	print_attacks(e);
 }
 
 void
 print_entity(Entity *e)
 {
 	print_entity_basestats(e);
+
+	/* FIXME: That’s ugly. Not just the code, the output as well! */
+	printf(
+		BRIGHT WHITE "  [Def. " BLUE  "%i"
+		BRIGHT WHITE "] - [Att. "
+		BRIGHT RED "%i" BRIGHT WHITE "]" NOCOLOR
+		"\n"
+		,
+		get_defense_bonus(e),
+		get_attack_bonus(e)
+	);
+
+	print_attacks(e);
 
 	printf("\n");
 
@@ -259,7 +264,10 @@ print_entity(Entity *e)
 char*
 equipment_string(int id)
 {
-	if (id == EQ_WEAPON)
+	if (id == -1)
+		/* Not an equipment, but whatever… */
+		return "item";
+	else if (id == EQ_WEAPON)
 		return "weapon";
 	else if (id == EQ_SHIELD)
 		return "shield";

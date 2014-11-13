@@ -11,7 +11,7 @@
  * @return: List* of Class*
  */
 List*
-load_classes(char* dirname)
+load_classes(Battle* data, char* dirname)
 {
 	List* classes = NULL;
 	DIR* dir;
@@ -32,7 +32,7 @@ load_classes(char* dirname)
 		sprintf(filename, "%s/%s", dirname, entry->d_name);
 
 		printf(" > %s\n", filename);
-		list_add(&classes, load_class(filename));
+		list_add(&classes, load_class(data, filename));
 
 		free(filename);
 	}
@@ -57,8 +57,10 @@ check_type_resistance(Class* class, ParserElement* element, Logs* logs)
 
 		if (
 			!strncmp(element->name, type, len) &&
-			element->name[len] == ' ' &&
-			!strcmp(element->name + len + 1, "defense"))
+			element->name[len] == ' ' && (
+				!strcmp(element->name + len + 1, "defense") ||
+				!strcmp(element->name + len + 1, "resistance")
+			))
 		{
 			class->type_resistance[i] = parser_get_integer(element, logs);
 
@@ -93,7 +95,7 @@ get_type(char* string, Logs* logs)
 }
 
 Class*
-load_class (char* filename)
+load_class (Battle* data, char* filename)
 {
 	List* list = load_file(filename);
 	List* temp;
@@ -140,6 +142,8 @@ load_class (char* filename)
 				free(attack);
 			}
 			else
+				memset(attack, 0, sizeof(Attack));
+
 				for (sublist = element->value; sublist; sublist = sublist->next)
 				{
 					subelement = sublist->data;
@@ -150,6 +154,12 @@ load_class (char* filename)
 					else if (!strcmp(subelement->name, "strikes"))
 						attack->strikes =
 							parser_get_integer(subelement, logs);
+					else if (!strcmp(subelement->name, "mana"))
+						attack->mana_cost =
+							parser_get_integer(subelement, logs);
+					else if (!strcmp(subelement->name, "name"))
+						attack->name =
+							parser_get_string(subelement, logs);
 					else if (!strcmp(subelement->name, "type"))
 					{
 						char* type = parser_get_string(subelement, logs);
@@ -160,6 +170,40 @@ load_class (char* filename)
 				}
 
 			list_add(&class->attacks, (void*) attack);
+		}
+		else if (!strcmp(field, "drop"))
+		{
+			List* sublist;
+			ParserElement* subelement;
+			Drop* drop = (Drop*) malloc(sizeof(Drop));
+
+			if (element->type != PARSER_LIST)
+			{
+				logs_add(logs,
+					strdup("Trying to add drop improperly defined.\n"));
+				free(drop);
+			}
+			else
+			{
+				memset(drop, 0, sizeof(Drop));
+
+				for (sublist = element->value; sublist; sublist = sublist->next)
+				{
+					subelement = sublist->data;
+
+					if (!strcmp(subelement->name, "item"))
+					{
+						char* name = parser_get_string(subelement, logs);
+						drop->item = get_item_by_name(data->items, name);
+					}
+					else if (!strcmp(subelement->name, "rarity"))
+						drop->rarity =
+							parser_get_integer(subelement, logs);
+				}
+
+				list_add(&class->drop, drop);
+
+			}
 		}
 		else if (check_type_resistance(class, element, logs))
 			;

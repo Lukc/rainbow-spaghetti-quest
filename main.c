@@ -1,8 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-
-#include <readline/readline.h>
+#include <ctype.h>
 
 #include "types.h"
 #include "commands.h"
@@ -12,33 +11,43 @@
 #include "battle.h"
 #include "shop.h"
 #include "places.h"
+#include "term.h"
+#include "inventory.h"
 
 Logs*
 travel(void* opt)
 {
 	Battle* data = opt;
 	List* list;
-	char* input;
+	char input = -42;
 	int i;
 
-	printf("\nPlaces you can go to:\n");
+	system("clear");
 
-	i = 0;
-	for (list = data->location->destinations; list; list = list->next)
+	while (!isexit(input))
 	{
-		printf("  <%i>  %s\n", i, ((Place*) list->data)->name);
-		i++;
-	}
+		printf("\nPlaces you can go to:\n");
 
-	printf("\nPlease select a destination.\n");
+		i = 0;
+		for (list = data->location->destinations; list; list = list->next)
+		{
+			printf(WHITE " (%i)  %s\n" NOCOLOR,
+				i, ((Place*) list->data)->name);
 
-	while ((input = readline(">> ")))
-	{
-		if (isdigit(input[0]))
+			i++;
+		}
+
+		printf("\nPlease select a destination.\n");
+
+		if (input == -42)
+			;
+		else if (isdigit(input))
 		{
 			Place* place;
 
-			if ((place = list_nth(data->location->destinations, atoi(input))))
+			input = input - '0';
+
+			if ((place = list_nth(data->location->destinations, input)))
 			{
 				/* If not, we’ll be damn screwed... */
 				if (place)
@@ -56,6 +65,9 @@ travel(void* opt)
 		{
 			printf("Hey! Invalid input!\n");
 		}
+
+		input = getch();
+		system("clear");
 	}
 
 	system("clear");
@@ -63,55 +75,48 @@ travel(void* opt)
 	return NULL;
 }
 
-Logs*
-inventory(void* opt)
+static void
+print_menu(Battle* data)
 {
-	Battle* data = opt;
-	Entity* player = data->player;
-	int i;
+	Place* location = data->location;
 
-	print_equipment(player);
+	menu_separator();
 
-	for (i = 0; i < INVENTORY_SIZE; i++)
-	{
-		if (player->inventory[i])
-		{
-			Item* item = player->inventory[i];
+	printf(
+		WHITE
+		"%s  (b)  Find someone to beat to death!\n" NOCOLOR
+		"%s  (s)  Buy new equipment to improve your stats!\n" NOCOLOR
+		WHITE "  (i)  Choose your katanas and golden armors!\n"
+		YELLOW
+			"  (d)  Enter a terrible dungeon and fight hordes of enemies!\n"
+		WHITE
+		"  (t)  Travel to far far away places and explore the world!\n"
+		NOCOLOR,
+		location->random_enemies ? WHITE : BLACK,
+		location->shop_items ? WHITE : BLACK
+	);
 
-			printf(" - %2i  %s\n", i, item->name);
-		}
-	}
-
-	while (getchar() > 0)
-		;;
-
-	return NULL;
+	menu_separator();
 }
 
 int
 main(int argc, char* argv[])
 {
 	Entity player, enemy;
-	char* line;
+	char* error;
+	int input;
+	int i;
 	Logs* logs;
-	Command commands[] = {
-		{"battle",  "b", enter_battle, "Beat a random enemy to death!"},
-		{"shop",    "s", enter_shop,   "Buy new equipment to improve your stats!"},
-		{"inventory", "i", inventory,  "Craft thingies or sell old equipment!"},
-		{"dungeon", "d", NULL,         "Enter a terrible dungeon and fight hordes of enemies!"},
-		{"travel",  "t", travel,       "Travel to other places and explore the world!"},
-		{NULL, NULL, NULL, NULL}
-	};
 	List* classes;
 	List* items;
 	Battle battle;
 	List* world;
-
-	classes = load_classes("classes");
+	
 	items = load_items("items");
-
-	battle.classes = classes;
 	battle.items = items;
+
+	classes = load_classes(&battle, "classes");
+	battle.classes = classes;
 
 	world = load_places(&battle, "places");
 
@@ -129,20 +134,50 @@ main(int argc, char* argv[])
 	battle.player = &player;
 	battle.enemy = &enemy;
 
-	/* WHAT? The FIRST place found? :o */
-	battle.location = world->data;
+	battle.location = get_place_by_name(world, "Felinopolis");
 
-	line = strdup("");
-	while (line && strcmp(line, "quit"))
+	system("clear");
+	input = -42;
+	while (input == -42 || !isexit(input))
 	{
-		system("clear");
+		error = NULL;
 
-		logs = execute_commands(line, commands, &battle);
+		back_to_top();
+
+		switch(input)
+		{
+			case 'b':
+				logs = enter_battle((void*) &battle);
+				break;
+			case 's':
+				if (battle.location->shop_items)
+					logs = enter_shop(&battle);
+				else
+					error = "There is no shop at your current location!";
+				break;
+			case 'i':
+				logs = NULL;
+				inventory(&battle);
+				break;
+			case 'd':
+				logs = NULL;
+				break;
+			case 't':
+				logs = travel((void*) &battle);
+				break;
+			case -42:
+				break;
+			default:
+				error = "Unrecognized key.";
+		}
+
+		/*logs = execute_commands(line, commands, &battle);*/
+		logs = NULL;
 
 		player.health = get_max_health(&player);
 		player.mana = get_max_mana(&player);
 
-		print_entity(&player);
+		print_entity_basestats(&player);
 		printf("\n");
 
 		if (logs)
@@ -160,13 +195,22 @@ main(int argc, char* argv[])
 
 		printf("Current location: %s\n\n", battle.location->name);
 
-		print_commands(commands);
+		for (i = 0; i < 8; i++)
+			printf("\n");
 
-		free(line);
-		line = readline(">> ");
+		print_menu(&battle);
+
+		if (error)
+		{
+			printf("%s", error);
+			back(1);
+			printf("\n");
+		}
+
+		input = getch();
 	}
 
-	free(line);
+	system("stty sane");
 
 	return 0;
 }
