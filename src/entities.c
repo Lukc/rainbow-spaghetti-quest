@@ -151,28 +151,53 @@ health_color(Entity* e)
 
 static void
 print_bar(
-	const char* statstring, const char* color,
+	const char* statstring, const char* colorset,
 	int current, int max, int text_size, int size)
 {
 	int i;
 	int printed;
+	int r, g, b;
 
-	printed = printf("%s%s%i/%i  ", statstring, color, current, max);
+	printed = printf("%s", statstring);
+
+	printf("%s", colorset);
+
+	printed += printf("%i/%i  ", current, max);
 
 	for (i = printed; i < text_size; i++)
 		printf(" ");
 
 	size = size - text_size;
 
+	r = 0;
+	g = 0;
+	b = 0;
+
 	printf(BRIGHT "<");
 	for (i = 0; i < size; i++)
 	{
+		/* Feel free to change some of those values. I just thought
+		 * they were kinda sweet compared to what I had before and left
+		 * them there. */
+		if (colorset == GREEN)
+			fg(3 - i * 3 / size, 5, 0);
+		else if (colorset == YELLOW)
+			fg(3 - i * 2 / size, 1 + i * 4 / size, 0);
+		else if (colorset == RED)
+			/* Assuming it won’t be a lot of chars, here... */
+			fg(2 + i * 20 / size, i * 5 / size, i * 5 / size);
+		else if (colorset == BLUE)
+			fg(2 - i * 3 / size, 2, 3 + i * 2 / size);
+		else
+			fg(1 + i * 4 / size, 1 + i * 4 / size, 1 + i * 4 / size);
+
 		if (current != 0 && ((float) i) / size <= ((float) current) / max)
 			printf("=");
 		else
 			printf(" ");
 	}
-	printf(">\n" NOCOLOR);
+
+	printf("%s>\n" NOCOLOR, colorset);
 }
 
 static void
@@ -252,13 +277,13 @@ print_entity_basestats(Entity* e)
 	print_bar(
 		BRIGHT WHITE "  Health:   ",
 		health_color(e),
-		e->health, get_max_health(e), 40, 80 + 5 * 2
+		e->health, get_max_health(e), 40, 80
 	);
 
 	print_bar(
 		BRIGHT WHITE "  Mana:     ",
 		BLUE,
-		e->mana, get_max_mana(e), 40, 80 + 5 * 2
+		e->mana, get_max_mana(e), 40, 80
 	);
 }
 
