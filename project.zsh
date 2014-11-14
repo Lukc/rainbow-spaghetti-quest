@@ -1,10 +1,10 @@
 
-package=rpq
+package=rsq
 version=0.0.2
 
-targets=(rpq)
-type[rpq]=binary
-sources[rpq]="$(echo src/*.c)"
+targets=(rsq)
+type[rsq]=binary
+sources[rsq]="$(echo src/*.c)"
 
 dist=(
 	items/*.txt classes/*.txt places/*.txt images/*
