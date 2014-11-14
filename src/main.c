@@ -68,8 +68,8 @@ main(int argc, char* argv[])
 
 	player.name = (char*) malloc(sizeof(char) * 80);
 	snprintf(
-		player.name, 80, "%s the %s",
-		argc > 1 ? argv[1] : "Kaleth", player.class->name
+		player.name, 14, "%s the Cat",
+		argc > 1 ? argv[1] : "Joe"
 	);
 
 	battle.player = &player;

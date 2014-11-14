@@ -15,3 +15,7 @@ Drop: [
 	Item: Sword
 	Rarity: 30
 ]
+Drop: [
+	Item: Trollfish Meat
+	Rarity: 6
+]

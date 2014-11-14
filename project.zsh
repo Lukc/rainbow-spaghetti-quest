@@ -1,25 +1,15 @@
 
 package=rpq
-version=0.0.1
+version=0.0.2
 
 targets=(rpq)
 type[rpq]=binary
-sources[rpq]="$(echo *.c)"
+sources[rpq]="$(echo src/*.c)"
 
-dist=(items/*.txt classes/*.txt)
-
-# FIXME: This ought to be cleaner and in build/* (or build.zsh, at the
-#        very least…)
-for c in *.c; do
-	t=()
-	for h in *.h; do
-		if grep -q "#include \"$h\"" $c; then
-			t[$(($#t+1))]=$h
-		fi
-	done
-
-	depends[${c%.c}.o]="${t[@]}"
-done
+dist=(
+	items/*.txt classes/*.txt places/*.txt images/*
+	build.zsh build/*.zsh project.zsh
+)
 
 # Notes:
 #   - We’re using -D_BSD_SOURCE because we don’t want to rewrite common stuff

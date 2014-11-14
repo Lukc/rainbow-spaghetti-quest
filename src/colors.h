@@ -11,5 +11,7 @@
 #define BLACK    "\033[30m"
 #define NOCOLOR  "\033[00m"
 
+void fg(int, int, int);
+
 #endif
 

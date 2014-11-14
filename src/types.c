@@ -14,12 +14,16 @@ type_string(int type)
 			return "impact";
 		case TYPE_PIERCING:
 			return "piercing";
+		case TYPE_POISON:
+			return "poison";
 		case TYPE_ARCANE:
 			return "arcane";
 		case TYPE_FIRE:
 			return "fire";
 		case TYPE_COLD:
 			return "cold";
+		case TYPE_ELECTRIC:
+			return "electric";
 		default:
 			return "unknown";
 	}
@@ -36,12 +40,16 @@ type_to_damage_string(int type)
 			return "impaled";
 		case TYPE_IMPACT:
 			return "pounded";
+		case TYPE_POISON:
+			return "poisoned";
 		case TYPE_FIRE:
 			return "burned";
 		case TYPE_COLD:
 			return "froze";
 		case TYPE_ARCANE:
 			return "exorcized";
+		case TYPE_ELECTRIC:
+			return "electrified";
 		default:
 			return "hurt";
 	}

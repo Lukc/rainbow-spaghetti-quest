@@ -305,6 +305,8 @@ equipment_string(int id)
 		return "ranged weapon";
 	else if (id == EQ_AMULET)
 		return "amulet";
+	else if (id == EQ_EARS)
+		return "ears";
 	else
 		return "unknown";
 }

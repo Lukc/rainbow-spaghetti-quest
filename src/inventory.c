@@ -77,7 +77,7 @@ inventory(Battle* data)
 		printf("\n");
 
 		back_to_top();
-		for (i = 0; i < 6; i++)
+		for (i = 0; i < 7; i++)
 		{
 			move(40);
 			printf("│");
@@ -92,8 +92,8 @@ inventory(Battle* data)
 					get_max_health(player), get_max_mana(player));
 			else
 				printf("  %-10s: %-4i   %-10s: %-4i",
-					type_string(i - 3), get_type_resistance(player, i-3),
-					type_string(i), get_type_resistance(player, i));
+					type_string(i - 3), get_type_resistance(player, i - 3),
+					type_string(i + 1), get_type_resistance(player, i + 1));
 
 			printf("\n");
 		}

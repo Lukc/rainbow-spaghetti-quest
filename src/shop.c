@@ -253,6 +253,8 @@ enter_shop(Battle* data)
 
 	while (input == -42 || !isexit(input))
 	{
+		err = NULL;
+
 		switch (input)
 		{
 			case 'e':
@@ -328,9 +330,9 @@ enter_shop(Battle* data)
 					printf("\033[47m");
 
 				if (item->price <= player->caps)
-					printf(GREEN);
+					fg(1, 5, 0);
 				else
-					printf(BLACK);
+					fg(1, 1, 1);
 
 				printed = printf("  - %s", item->name);
 

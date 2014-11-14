@@ -12,7 +12,7 @@ function binary.build {
 	for i in ${src[@]}; do
 		write -n "${i%.c}.o: ${i}"
 
-		for h in *.h; do
+		for h in $(dirname $i)/*.h; do
 			if grep -q "#include \"$h\"" $i; then
 				write -n " $h"
 			fi
@@ -20,7 +20,7 @@ function binary.build {
 		write
 
 		write "\t@echo '$(CC ${i%.c}.o)'"
-		write "\t$Q\$(CC) \$(CFLAGS) ${cflags[$target]} -c ${i}"
+		write "\t$Q\$(CC) \$(CFLAGS) ${cflags[$target]} -c ${i} -o ${i%.c}.o"
 		write
 	done
 }
