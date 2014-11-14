@@ -60,10 +60,12 @@ inventory(Battle* data)
 				error = "Can’t sell in places where there’s no shop!";
 		}
 		else if (input == KEY_DOWN)
-			selection = selection >= INVENTORY_SIZE - 1 ?
+			selection =
+				selection % (INVENTORY_SIZE / 3) == INVENTORY_SIZE / 3 - 1 ?
 				selection : selection + 1;
 		else if (input == KEY_UP)
-			selection = selection == 0 ? 0 : selection - 1;
+			selection = selection % (INVENTORY_SIZE / 3) == 0 ?
+				selection : selection - 1;
 		else if (input == KEY_RIGHT)
 			selection = selection < INVENTORY_SIZE - 8 ?
 				selection + 8 : selection;

@@ -9,13 +9,18 @@ typedef struct Place {
 	char* name;
 	List* shop_items;      /* List* of Item* */
 	List* random_enemies;  /* List* of Class* */
-	List* destinations;    /* List* of Place* */
+	List* destinations;    /* List* of Destination* */
+	char** image;
+
+	List* on_first_visit;  /* List* of char** (images) */
 } Place;
 
 List* load_places(Battle*, char*);
 Place* load_place(Battle*, char*);
 
 Place* get_place_by_name(List*, char*);
+
+int has_visited(Battle*, Place*);
 
 #endif
 

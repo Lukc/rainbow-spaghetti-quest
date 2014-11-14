@@ -57,25 +57,26 @@ ai_action(Battle* data, Logs* logs)
 	Entity* player;
 	Entity* enemy;
 	List* available_attacks;
+	Attack* selected_attack;
 
 	player = data->player;
 	enemy = data->enemy;
 
 	available_attacks = get_all_attacks(enemy);
+	selected_attack = list_nth(
+		available_attacks,
+		rand() % list_size(available_attacks));
 
 	damage_received = attack(
 		enemy,
-		(Attack*) list_nth(
-			available_attacks,
-			rand() % list_size(available_attacks)
-		),
+		selected_attack,
 		player
 	);
 
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(log, 128,
-		"You received %i points of damage from your enemy!",
-		damage_received);
+		"You have been %s for %iHP!",
+		type_to_damage_string(selected_attack->type), damage_received);
 	logs_add(logs, log);
 
 	if (player->health <= 0)
@@ -129,8 +130,8 @@ command_attack(Battle* battle_data, Attack* player_attack)
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(
 		log, 128,
-		"You inflicted %i points of damage to your enemy!",
-		damage_inflicted);
+		"You %s your enemy for %iHP!",
+		type_to_damage_string(player_attack->type), damage_inflicted);
 	logs_add(logs, log);
 
 	if (enemy->health <= 0)

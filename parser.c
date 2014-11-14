@@ -31,6 +31,9 @@ load_file(char* filename)
 
 		field = strtok(line, ":\n");
 
+		if (!field)
+			continue;
+
 		/* Ignoring leading whitespace? */
 		for (i = 0; field[i] && isblank(field[i]); i++)
 			;;

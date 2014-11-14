@@ -4,9 +4,11 @@
 #include <ctype.h>
 #include <dirent.h>
 
+#include "images.h"
 #include "places.h"
 #include "items.h"
 #include "classes.h"
+#include "parser.h"
 
 /**
  * @return: List* of Place*
@@ -103,92 +105,127 @@ comas_to_list(char* input)
 Place*
 load_place (Battle* data, char* filename)
 {
-	FILE* f = fopen(filename, "r");
-	char* str = NULL;
-	size_t n = 0;
+	List* list = load_file(filename);
+	List* temp;
+	List* helper;
+	ParserElement* element;
 	Place* place;
-	int i;
+	Logs* logs;
 
 	place = (Place*) malloc(sizeof(Place));
 
 	memset(place, 0, sizeof(Place));
 
-	while (getline(&str, &n, f) > 0)
+	logs = logs_new();
+
+	while (list)
 	{
-		char* line;
 		char* field;
-		char* value;
 
-		if (str[0] != '#')
-			line = strtok(str, "#");
-		else
-			continue;
+		element = list->data;
 
-		field = strtok(line, ":");
-		value = strtok(NULL, ":");
-
-		while (value[0] && value[0] == ' ')
-			value++;
-
-		value[strlen(value)-1] = '\0';
-
-		for (i = 0; field[i]; i++)
-			field[i] = tolower(field[i]);
+		field = element->name;
 
 		if (!strcmp(field, "name"))
-			place->name = strdup(value);
-		else if(!strcmp(field, "shop") || !strcmp(field, "shop items"))
+			place->name = parser_get_string(element, logs);
+		else if (!strcmp(field, "shop item"))
 		{
-			List* temp;
-			List* list = comas_to_list(value);
+			Item* item;
+			char* string = parser_get_string(element, logs);
 
-			while (list)
+			if (string)
 			{
-				list_add(&place->shop_items,
-					(void*) get_item_by_name(data->items, (char*) list->data));
+				temp = comas_to_list(string);
 
-				temp = list;
-				list = list->next;
+				for (helper = temp; helper; helper = helper->next)
+				{
+					item =
+						get_item_by_name(data->items, (char*) helper->data);
 
-				free(temp->data);
-				free(temp);
+					if (item)
+						list_add(&place->shop_items, item);
+				}
+			}
+		}
+		else if (!strcmp(field, "leads to"))
+			list_add(&place->destinations,
+				parser_get_string(element, logs));
+		else if (!strcmp(field, "random enemies"))
+		{
+			char* string = parser_get_string(element, logs);
+
+			if (string)
+			{
+				Class* class;
+
+				temp = comas_to_list(string);
+
+				for (helper = temp; helper; helper = helper->next)
+				{
+					class = get_class_by_name(data->classes, helper->data);
+
+					if (class)
+						list_add(&place->random_enemies, class);
+				}
+			}
+		}
+		else if (!strcmp(field, "image"))
+		{
+			char* name = parser_get_string(element, logs);
+
+			if (name)
+			{
+				/* Note: Too lazy to put the exact value needed.
+				 *       Besides, it’s bound to change. */
+				char* filename = (char*) malloc(42 + strlen(name));
+
+				snprintf(filename, 42 + strlen(name), "images/%s", name);
+
+				place->image = load_image(filename);
+			}
+		}
+		else if (!strcmp(field, "on first visit"))
+		{
+			List* helper;
+			List* names = comas_to_list(parser_get_string(element, logs));
+
+			for (helper = names; helper; helper = helper->next)
+			{
+				char* name = helper->data;
+				char* filename = (char*) malloc(42 + strlen(name));
+
+				snprintf(filename, 42 + strlen(name), "images/%s", name);
+
+				helper->data = load_image(filename);
+
+				free(name);
 			}
 
-		}
-		else if(!strcmp(field, "enemies") || !strcmp(field, "random enemies"))
-		{
-			List* temp;
-			List* list = comas_to_list(value);
-
-			while (list)
-			{
-				list_add(&place->random_enemies,
-					(void*) get_class_by_name(data->classes, (char*) list->data));
-
-				temp = list;
-				list = list->next;
-
-				free(temp->data);
-				free(temp);
-			}
-
-		}
-		else if(!strcmp(field, "destinations") || !strcmp(field, "leads to"))
-		{
-			place->destinations = comas_to_list(value);
+			place->on_first_visit = list_rev_and_free(names);
 		}
 		else
-			fprintf(stderr, " [%s]> Unknown field: %s\n", filename, field);
+		{
+			char* log = (char*) malloc(sizeof(char) * 128);
+			snprintf(log, 128, "Unknown field: “%s”.", element->name);
+			logs_add(logs, log);
+		}
+
+		parser_free(element);
+
+		temp = list;
+		list = list->next;
+
+		free(temp);
 	}
 
-	if (!place->name)
+	if (logs->head)
 	{
-		fprintf(stderr, " [%s]> Place has no name.\n", filename);
+		/* FIXME: stderr */
+		logs_print(logs);
+		logs_free(logs);
+
+		exit(1);
 	}
-
-	free(str);
-
-	fclose(f);
 
 	return place;
 }
@@ -212,6 +249,20 @@ get_place_by_name(List* list, char* name)
 	}
 
 	return NULL;
+}
+
+int
+has_visited(Battle* data, Place* place)
+{
+	List* list;
+
+	for (list = data->visited; list; list = list->next)
+	{
+		if (list->data == place)
+			return 1;
+	}
+
+	return 0;
 }
 
 /* vim: set ts=4 sw=4 cc=80 : */

@@ -1,3 +1,4 @@
+Mana bonus: 15
 Attack: [
 	Damage: 2
 	Strikes: 2

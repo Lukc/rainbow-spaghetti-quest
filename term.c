@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "term.h"
+#include "colors.h"
 
 int
 isexit(int c)
@@ -44,9 +45,10 @@ menu_separator()
 {
 	int i;
 
+	printf(NOCOLOR);
 	for (i = 0; i < 80; i++)
 		printf("─");
-	printf("\n");
+	printf("\n" NOCOLOR);
 }
 
 /**

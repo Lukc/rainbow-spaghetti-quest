@@ -10,6 +10,9 @@ typedef struct Battle {
 	List* classes;
 	List* items;
 	struct Place* location;
+	List* images; /* List* of char* */
+
+	List* visited; /* List* of Place* */
 
 	int flee;
 } Battle;

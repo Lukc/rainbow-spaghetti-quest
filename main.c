@@ -13,67 +13,8 @@
 #include "places.h"
 #include "term.h"
 #include "inventory.h"
-
-Logs*
-travel(void* opt)
-{
-	Battle* data = opt;
-	List* list;
-	char input = -42;
-	int i;
-
-	system("clear");
-
-	while (!isexit(input))
-	{
-		printf("\nPlaces you can go to:\n");
-
-		i = 0;
-		for (list = data->location->destinations; list; list = list->next)
-		{
-			printf(WHITE " (%i)  %s\n" NOCOLOR,
-				i, ((Place*) list->data)->name);
-
-			i++;
-		}
-
-		printf("\nPlease select a destination.\n");
-
-		if (input == -42)
-			;
-		else if (isdigit(input))
-		{
-			Place* place;
-
-			input = input - '0';
-
-			if ((place = list_nth(data->location->destinations, input)))
-			{
-				/* If not, we’ll be damn screwed... */
-				if (place)
-					data->location = place;
-
-				system("clear");
-				return NULL;
-			}
-			else
-			{
-				printf("Hey! Invalid input!\n");
-			}
-		}
-		else
-		{
-			printf("Hey! Invalid input!\n");
-		}
-
-		input = getch();
-		system("clear");
-	}
-
-	system("clear");
-
-	return NULL;
-}
+#include "travel.h"
+#include "images.h"
 
 static void
 print_menu(Battle* data)
@@ -135,12 +76,15 @@ main(int argc, char* argv[])
 	battle.enemy = &enemy;
 
 	battle.location = get_place_by_name(world, "Felinopolis");
+	battle.visited = NULL;
 
 	system("clear");
 	input = -42;
 	while (input == -42 || !isexit(input))
 	{
 		error = NULL;
+
+		check_first_visit(&battle);
 
 		back_to_top();
 
@@ -163,7 +107,8 @@ main(int argc, char* argv[])
 				logs = NULL;
 				break;
 			case 't':
-				logs = travel((void*) &battle);
+				logs = NULL;
+				travel(&battle);
 				break;
 			case -42:
 				break;
@@ -177,26 +122,44 @@ main(int argc, char* argv[])
 		player.health = get_max_health(&player);
 		player.mana = get_max_mana(&player);
 
-		print_entity_basestats(&player);
-		printf("\n");
-
-		if (logs)
+		if (battle.location->image)
 		{
-			logs_print(logs);
-			logs_free(logs);
+			int out_of_boundaries = 0;
+			char** image = battle.location->image;
+
+			for (i = 0; i < 16; i++)
+				if (!out_of_boundaries && image[i])
+					printf("%s\n", image[i]);
+				else
+				{
+					out_of_boundaries = 1;
+
+					printf("\n");
+				}
 		}
-
-		printf(
-			"Bottle caps: %i\n"
-			"\n"
-			,
-			player.caps
-		);
-
-		printf("Current location: %s\n\n", battle.location->name);
-
-		for (i = 0; i < 8; i++)
+		else
+		{
+			print_entity_basestats(&player);
 			printf("\n");
+
+			if (logs)
+			{
+				logs_print(logs);
+				logs_free(logs);
+			}
+
+			printf(
+				"Bottle caps: %i\n"
+				"\n"
+				,
+				player.caps
+			);
+
+			printf("Current location: %s\n\n", battle.location->name);
+
+			for (i = 0; i < 8; i++)
+				printf("\n");
+		}
 
 		print_menu(&battle);
 

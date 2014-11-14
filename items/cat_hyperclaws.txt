@@ -1,0 +1,10 @@
+Name: Cat Hyper-Claws
+Attack bonus: 3
+Attack: [
+	Damage: 4
+	Strikes: 5
+	Type: slashing
+	Name: Slash
+]
+Price: 700
+Slot: weapon

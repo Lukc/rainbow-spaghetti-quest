@@ -1,0 +1,3 @@
+Name: Status of Maru
+Leads to: Boxes Factory
+image: status_of_maru

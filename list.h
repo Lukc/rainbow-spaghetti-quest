@@ -11,5 +11,7 @@ void list_add(List**, void*);
 void* list_nth(List*, int);
 int list_size(List*);
 
+List* list_rev_and_free(List*);
+
 #endif
 

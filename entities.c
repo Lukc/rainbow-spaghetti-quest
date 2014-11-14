@@ -10,13 +10,41 @@
 int
 get_max_mana(Entity* e)
 {
-	return e->class->base_mana;
+	Item* equipment;
+	int i;
+	int bonus = 0;
+
+	for (i = 0; i < EQ_MAX; i++)
+	{
+		if (e->equipment[i])
+		{
+			equipment = e->equipment[i];
+
+			bonus += equipment->mana_bonus;
+		}
+	}
+
+	return e->class->base_mana + bonus;
 }
 
 int
 get_max_health(Entity* e)
 {
-	return e->class->base_health;
+	Item* equipment;
+	int i;
+	int bonus = 0;
+
+	for (i = 0; i < EQ_MAX; i++)
+	{
+		if (e->equipment[i])
+		{
+			equipment = e->equipment[i];
+
+			bonus += equipment->health_bonus;
+		}
+	}
+
+	return e->class->base_health + bonus;
 }
 
 int
@@ -89,14 +117,14 @@ init_entity_from_class(Entity* e, Class* c)
 
 	e->name = strdup(c->name);
 
+	for (i = 0; i < EQ_MAX; i++)
+		e->equipment[i] = NULL;
+
 	e->mana = get_max_mana(e);
 	e->health = get_max_health(e);
 
 	e->kills = 0;
 	e->caps = 0;
-
-	for (i = 0; i < EQ_MAX; i++)
-		e->equipment[i] = NULL;
 
 	for (i = 0; i < INVENTORY_SIZE; i++)
 		e->inventory[i] = NULL;

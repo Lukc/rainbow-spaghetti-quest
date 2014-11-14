@@ -1,4 +1,17 @@
 # The capital of Cats, near the Electrical Ocean. (makes sense, right?)
 Name: Felinopolis
-Shop Items: Sword, Knife, Wooden Shield, Staff
+
+Shop Item: Sword
+Shop Item: Knife
+Shop Item: Tiger Cloak
+Shop Item: Light Cat Armor
+Shop Item: Cat Claws
+Shop Item: Cat Hyper-Claws
+
 Leads to: Electrical Ocean
+Leads to: Kawai Plains
+Leads to: Forest of Possibilities
+Image: felinopolis
+
+# Yeay, events. o////
+On First Visit: intro, intro2, intro3, intro4

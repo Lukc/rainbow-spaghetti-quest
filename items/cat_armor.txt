@@ -1,0 +1,5 @@
+Name: Light Cat Armor
+Health bonus: 8
+Defense bonus: 1
+Price: 360
+Slot: armor

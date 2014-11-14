@@ -118,7 +118,7 @@ get_type(char* string, Logs* logs)
 }
 
 Item*
-load_item (char* filename)
+load_item(char* filename)
 {
 	List* list = load_file(filename);
 	List* temp;
@@ -151,6 +151,10 @@ load_item (char* filename)
 			item->attack_bonus = parser_get_integer(element, logs);
 		else if (!strcmp(field, "defense bonus"))
 			item->defense_bonus = parser_get_integer(element, logs);
+		else if (!strcmp(field, "health bonus"))
+			item->health_bonus = parser_get_integer(element, logs);
+		else if (!strcmp(field, "mana bonus"))
+			item->mana_bonus = parser_get_integer(element, logs);
 		else if (!strcmp(field, "slot"))
 		{
 			char* slot = parser_get_string(element, logs);

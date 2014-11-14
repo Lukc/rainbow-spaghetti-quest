@@ -27,15 +27,18 @@ print_item(Item* item)
 	int i, l;
 	List* list;
 
-	for (l = 0; l < 9; l++)
+	for (l = 0; l < 10; l++)
 	{
 		for (i = 0; i < 80; i++)
 			printf(" ");
 		printf("\n");
 	}
-	back(9);
+	back(10);
 
 	printf(BRIGHT BLUE " > Selected item: %s\n" NOCOLOR, item->name);
+
+	/* FIXME: Too many stats means stats are not displayed.
+	 *        Also, try to display everything in a much nicer fashion */
 
 	printf(WHITE "    is a %s\n" NOCOLOR, equipment_string(item->slot));
 
@@ -46,6 +49,14 @@ print_item(Item* item)
 		printf(BRIGHT WHITE "    provides a %i-%i %s attack\n" NOCOLOR,
 			attack->damage, attack->strikes, type_string(attack->type));
 	}
+
+	if (item->health_bonus)
+		printf("    %s%+i max health\n" NOCOLOR,
+			stat_color(item->health_bonus), item->health_bonus);
+
+	if (item->mana_bonus)
+		printf("    %s%+i max mana\n" NOCOLOR,
+			stat_color(item->mana_bonus), item->mana_bonus);
 
 	if (item->attack_bonus)
 		printf("    %s%+i base attack\n" NOCOLOR,
@@ -348,6 +359,7 @@ enter_shop(Battle* data)
 
 		menu_separator();
 
+		printf(WHITE " Money: %i" NOCOLOR, player->caps);
 		move(40);
 		printf(WHITE " (b)  Buy\n" NOCOLOR);
 		move(40);

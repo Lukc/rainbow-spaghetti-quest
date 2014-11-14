@@ -1,0 +1,10 @@
+Name: Cat Claws
+Attack bonus: 2
+Attack: [
+	Damage: 4
+	Strikes: 4
+	Type: slashing
+	Name: Slash
+]
+Price: 160
+Slot: weapon

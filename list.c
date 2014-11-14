@@ -42,3 +42,21 @@ list_size(List* list)
 	return i;
 }
 
+List*
+list_rev_and_free(List* list)
+{
+	List* new_list = NULL;
+	List* temp = NULL;
+
+	while (list)
+	{
+		list_add(&new_list, list->data);
+
+		temp = list;
+		list = temp->next;
+		free(temp);
+	}
+
+	return new_list;
+}
+

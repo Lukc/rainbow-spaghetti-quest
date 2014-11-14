@@ -1,0 +1,4 @@
+Name: Boxes Factory
+Leads to: Kawai Plains
+Leads to: Status of Maru
+Image: fixme

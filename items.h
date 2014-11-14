@@ -11,6 +11,9 @@ typedef struct Item {
 	int slot; /* values <0 for non-equipment? */
 	int price;
 
+	int health_bonus;
+	int mana_bonus;
+
 	int attack_bonus;
 	int defense_bonus;
 

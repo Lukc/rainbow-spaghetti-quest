@@ -1,10 +1,10 @@
 
-package=rpg
+package=rpq
 version=0.0.1
 
-targets=(main)
-type[main]=binary
-sources[main]="$(echo *.c)"
+targets=(rpq)
+type[rpq]=binary
+sources[rpq]="$(echo *.c)"
 
 dist=(items/*.txt classes/*.txt)
 
@@ -26,6 +26,6 @@ done
 #     that’s present on most OSes such games could be played on (GNU/*, *BSD)
 
 CC=clang
-LDFLAGS="-lreadline"
+LDFLAGS=""
 CFLAGS="-Wall -Wextra -pedantic -D_BSD_SOURCE -g"
 

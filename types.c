@@ -25,6 +25,28 @@ type_string(int type)
 	}
 }
 
+char*
+type_to_damage_string(int type)
+{
+	switch(type)
+	{
+		case TYPE_SLASHING:
+			return "slashed";
+		case TYPE_PIERCING:
+			return "impaled";
+		case TYPE_IMPACT:
+			return "pounded";
+		case TYPE_FIRE:
+			return "burned";
+		case TYPE_COLD:
+			return "froze";
+		case TYPE_ARCANE:
+			return "exorcized";
+		default:
+			return "hurt";
+	}
+}
+
 int
 type_id(char* string)
 {
