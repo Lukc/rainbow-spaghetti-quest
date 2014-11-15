@@ -1,4 +1,4 @@
 Name: Boxes Factory
-Leads to: Kawai Plains
-Leads to: Status of Maru
-Image: fixme
+Leads to: Western Kawai Plains
+Leads to: Statue of Maru
+Image: boxes_factory

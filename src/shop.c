@@ -40,8 +40,6 @@ print_item(Item* item)
 	/* FIXME: Too many stats means stats are not displayed.
 	 *        Also, try to display everything in a much nicer fashion */
 
-	printf(WHITE "    is a %s\n" NOCOLOR, equipment_string(item->slot));
-
 	for (list = item->attacks; list; list = list->next)
 	{
 		Attack* attack = list->data;
@@ -49,6 +47,14 @@ print_item(Item* item)
 		printf(BRIGHT WHITE "    provides a %i-%i %s attack\n" NOCOLOR,
 			attack->damage, attack->strikes, type_string(attack->type));
 	}
+
+	if (item->health_on_use)
+		printf("    %s%+i HP\n" NOCOLOR,
+			stat_color(item->health_on_use), item->health_on_use);
+
+	if (item->mana_on_use)
+		printf("    %s%+i MP\n" NOCOLOR,
+			stat_color(item->mana_on_use), item->mana_on_use);
 
 	if (item->health_bonus)
 		printf("    %s%+i max health\n" NOCOLOR,
@@ -327,22 +333,15 @@ enter_shop(Battle* data)
 				item = (Item*) list->data;
 
 				if (i == selection)
-					printf("\033[47m");
+					printf(NOCOLOR "\033[47m");
 
 				if (item->price <= player->caps)
-					fg(1, 5, 0);
-				else
-					fg(1, 1, 1);
+					printf(GREEN);
 
-				printed = printf("  - %s", item->name);
+				printed = printf("  - %-48s (%s)",
+					item->name, equipment_string(item->slot));
 
-				for (j = 0; j < 60 - printed; j++)
-					printf(" ");
-
-				printed = printf("%i",
-					get_count_from_inventory(player->inventory, item));
-
-				for (j = 0; j < 8 - printed; j++)
+				for (j = 0; j < 68 - printed; j++)
 					printf(" ");
 
 				printed = printf("(%ic)", item->price);
@@ -364,6 +363,9 @@ enter_shop(Battle* data)
 		printf(WHITE " Money: %i" NOCOLOR, player->caps);
 		move(40);
 		printf(WHITE " (b)  Buy\n" NOCOLOR);
+		if (selected_item)
+			printf(WHITE " In inventory: %i" NOCOLOR,
+				get_count_from_inventory(player->inventory, selected_item));
 		move(40);
 		printf(WHITE
 			" (e)  Equip\n" NOCOLOR);

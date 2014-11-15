@@ -1,6 +1,6 @@
 Name: Wooden Shield
 Defense bonus: 3
-Price: 48
+Price: 120
 Slot: shield
 Slashing defense: 10
 Piercing defense: 14

@@ -1,0 +1,7 @@
+Name: Eastern Kawai Plains
+Leads to: Felinopolis
+Leads to: Western Kawai Plains
+Random Enemy: Evil Kitten
+Random Enemy: Black Kitten
+Image: kawai_plains
+On first visit: kawai_plains_first

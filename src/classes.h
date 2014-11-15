@@ -24,6 +24,7 @@ typedef struct Class {
 	/* Random loot for random mobs. */
 	List* drop;
 
+	int health_regen_on_focus;
 	int mana_regen_on_focus;
 } Class;
 

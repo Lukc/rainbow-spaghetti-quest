@@ -12,7 +12,7 @@ Fire Resistance: 50
 Cold Resistance: 20
 Caps on kill: 8
 Drop: [
-	Item: Sword
+	Item: Troll Staff
 	Rarity: 30
 ]
 Drop: [

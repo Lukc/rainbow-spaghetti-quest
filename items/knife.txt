@@ -1,7 +1,7 @@
 Name: Knife
 Attack bonus: 1
 Attack: [
-	Damage: 3
+	Damage: 4
 	Strikes: 4
 	Type: slashing
 	Name: Slash

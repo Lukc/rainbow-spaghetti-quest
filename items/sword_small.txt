@@ -1,4 +1,4 @@
-Name: Sword
+Name: Small Sword
 Attack bonus: 1
 Attack: [
 	Damage: 6

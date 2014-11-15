@@ -55,6 +55,32 @@ type_to_damage_string(int type)
 	}
 }
 
+char*
+type_to_attack_name(int type)
+{
+	switch(type)
+	{
+		case TYPE_SLASHING:
+			return "Slash";
+		case TYPE_PIERCING:
+			return "Impale";
+		case TYPE_IMPACT:
+			return "Pound";
+		case TYPE_POISON:
+			return "Poison";
+		case TYPE_FIRE:
+			return "Burn";
+		case TYPE_COLD:
+			return "Freeze";
+		case TYPE_ARCANE:
+			return "Exorcize";
+		case TYPE_ELECTRIC:
+			return "Electrify";
+		default:
+			return "Beat";
+	}
+}
+
 int
 type_id(char* string)
 {

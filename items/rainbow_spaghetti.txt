@@ -1,0 +1,18 @@
+Name: Rainbow Spaghetti
+Attack: [
+	Name: Hit
+	Type: impact
+	Damage: 30
+	Strikes: 1
+]
+Attack: [
+	Name: Rainbow
+	Type: arcane
+	Damage: 100
+	Strikes: 1
+	Mana: 5
+]
+Mana on focus: 30
+Health on focus: 30
+Max mana: 15
+Slot: ranged weapon

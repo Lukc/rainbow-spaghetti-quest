@@ -1,4 +1,0 @@
-Name: Kawai Plains
-Leads to: Felinopolis
-Leads to: Boxes Factory
-Image: fixme

@@ -145,15 +145,28 @@ load_item(char* filename)
 
 		if (!strcmp(field, "name"))
 			item->name = parser_get_string(element, logs);
+		else if (!strcmp(field, "unique"))
+			/* FIXME: Maybe we gotta have a boolean type here… */
+			item->unique = parser_get_integer(element, logs);
+		else if (!strcmp(field, "consumable"))
+			item->consumable = parser_get_integer(element, logs);
+		else if (!strcmp(field, "health on use"))
+			item->health_on_use = parser_get_integer(element, logs);
+		else if (!strcmp(field, "mana on use"))
+			item->mana_on_use = parser_get_integer(element, logs);
+		else if (!strcmp(field, "health on focus"))
+			item->health_on_focus = parser_get_integer(element, logs);
+		else if (!strcmp(field, "mana on focus"))
+			item->mana_on_focus = parser_get_integer(element, logs);
 		else if (!strcmp(field, "price"))
 			item->price = parser_get_integer(element, logs);
 		else if (!strcmp(field, "attack bonus"))
 			item->attack_bonus = parser_get_integer(element, logs);
 		else if (!strcmp(field, "defense bonus"))
 			item->defense_bonus = parser_get_integer(element, logs);
-		else if (!strcmp(field, "health bonus"))
+		else if (!strcmp(field, "max health"))
 			item->health_bonus = parser_get_integer(element, logs);
-		else if (!strcmp(field, "mana bonus"))
+		else if (!strcmp(field, "max mana"))
 			item->mana_bonus = parser_get_integer(element, logs);
 		else if (!strcmp(field, "slot"))
 		{
@@ -265,6 +278,12 @@ get_count_from_inventory(Item* inventory[INVENTORY_SIZE], Item* item)
 			count++;
 
 	return count;
+}
+
+int
+is_item_usable(Item* item)
+{
+	return item->health_on_use || item->mana_on_use;
 }
 
 /* vim: set ts=4 sw=4 cc=80 : */

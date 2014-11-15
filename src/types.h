@@ -19,6 +19,7 @@ enum TYPES {
 
 char* type_string(int);
 char* type_to_damage_string(int);
+char* type_to_attack_name(int);
 int type_id(char*);
 
 #endif

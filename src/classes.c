@@ -123,6 +123,10 @@ load_class (Battle* data, char* filename)
 			class->base_mana = parser_get_integer(element, logs);
 		else if (!strcmp(field, "health"))
 			class->base_health = parser_get_integer(element, logs);
+		else if (!strcmp(field, "mana on focus"))
+			class->mana_regen_on_focus = parser_get_integer(element, logs);
+		else if (!strcmp(field, "health on focus"))
+			class->health_regen_on_focus = parser_get_integer(element, logs);
 		else if (!strcmp(field, "attack bonus"))
 			class->attack_bonus = parser_get_integer(element, logs);
 		else if (!strcmp(field, "defense bonus"))
@@ -201,7 +205,15 @@ load_class (Battle* data, char* filename)
 							parser_get_integer(subelement, logs);
 				}
 
-				list_add(&class->drop, drop);
+				if (!drop->item)
+				{
+					char* log = (char*) malloc(sizeof(char) * 128);
+					snprintf(log, 128,
+						"Drop item with no valid “item” field!");
+					logs_add(logs, log);
+				}
+				else
+					list_add(&class->drop, drop);
 
 			}
 		}

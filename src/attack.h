@@ -3,7 +3,7 @@
 #define ATTACK_H
 
 typedef struct Attack {
-	char *name; /* FIXME: Necessary? */
+	char *name;
 	int mana_cost;
 	int type;
 	int damage;

@@ -140,11 +140,29 @@ inventory(Battle* data)
 		printf(WHITE);
 		printf("  (e)  Equip stuff.\n");
 
+		back(1);
+		move(40);
+		printf(WHITE " Money:     %-8i\n" NOCOLOR, player->caps);
+
 		if (!data->location->shop_items)
 			printf(BLACK);
 		else
 			printf(WHITE);
 		printf("  (s)  Sell stuff.\n");
+
+		back(1);
+		move(40);
+		if (data->location->shop_items && player->inventory[selection])
+		{
+			printf(WHITE " Sell price %-8i\n" NOCOLOR,
+				player->inventory[selection]->price / 2);
+		}
+		else
+		{
+			for (i = 0; i < 40; i++)
+				printf(" ");
+			printf("\n");
+		}
 
 		printf(YELLOW "  (v)  View item.\n" NOCOLOR);
 

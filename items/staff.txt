@@ -1,4 +1,4 @@
-Mana bonus: 15
+Max mana: 10
 Attack: [
 	Damage: 2
 	Strikes: 2
@@ -10,6 +10,7 @@ Attack: [
 	Strikes: 4
 	Type: fire
 	Name: Fireball
+	Mana: 3
 ]
 Name: Staff
 Price: 80

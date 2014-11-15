@@ -10,4 +10,5 @@ Attack: [
 ]
 Attack bonus: 3
 Defense bonus: 3
+Mana on focus: 4
 Caps on kill: 35

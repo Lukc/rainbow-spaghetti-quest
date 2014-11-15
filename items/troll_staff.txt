@@ -1,0 +1,18 @@
+Name: Troll Staff
+Attack bonus: 1
+Attack: [
+	Damage: 5
+	Strikes: 3
+	Type: arcane
+	Name: Troll
+	Mana: 2
+]
+Attack: [
+	Damage: 3
+	Strikes: 4
+	Type: fire
+	Name: Flame
+	Mana: 2
+]
+Price: 320
+Slot: weapon

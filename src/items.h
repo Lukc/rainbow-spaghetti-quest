@@ -19,6 +19,15 @@ typedef struct Item {
 
 	int type_resistance[TYPE_MAX];
 
+	int unique;
+	int consumable;
+
+	int health_on_use;
+	int mana_on_use;
+
+	int health_on_focus;
+	int mana_on_focus;
+
 	List* attacks;
 } Item;
 
@@ -29,6 +38,8 @@ List* load_items(char*);
 
 Item* get_item_by_name(List*, char*);
 int get_count_from_inventory(Item**, Item*);
+
+int is_item_usable(Item*);
 
 #endif
 
