@@ -3,7 +3,7 @@
 #define PLACES_H
 
 #include "list.h"
-#include "battle.h"
+#include "game.h"
 
 typedef struct Place {
 	char* name;
@@ -15,12 +15,12 @@ typedef struct Place {
 	List* on_first_visit;  /* List* of char** (images) */
 } Place;
 
-List* load_places(Battle*, char*);
-Place* load_place(Battle*, char*);
+List* load_places(Game*, char*);
+Place* load_place(Game*, char*);
 
 Place* get_place_by_name(List*, char*);
 
-int has_visited(Battle*, Place*);
+int has_visited(Game*, Place*);
 
 #endif
 

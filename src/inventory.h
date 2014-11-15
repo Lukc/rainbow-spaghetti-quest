@@ -4,7 +4,7 @@
 
 #include "entities.h"
 
-void inventory(Battle*);
+void inventory(Game*);
 
 #endif
 

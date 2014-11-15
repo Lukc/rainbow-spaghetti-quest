@@ -7,12 +7,12 @@
 #include "colors.h"
 
 static void
-first_visit(Battle* data)
+first_visit(Game* game)
 {
 	List* list;
 	int i;
 
-	for (list = data->location->on_first_visit; list; list = list->next)
+	for (list = game->location->on_first_visit; list; list = list->next)
 	{
 		char** image = list->data;
 
@@ -43,19 +43,19 @@ first_visit(Battle* data)
  * Fires the first_visit events if needed.
  */
 void
-check_first_visit(Battle* data)
+check_first_visit(Game* game)
 {
-	if (!has_visited(data, data->location) &&
-		data->location->on_first_visit)
+	if (!has_visited(game, game->location) &&
+		game->location->on_first_visit)
 	{
-		first_visit(data);
+		first_visit(game);
 
-		list_add(&data->visited, data->location);
+		list_add(&game->visited, game->location);
 	}
 }
 
 void
-travel(Battle* data)
+travel(Game* game)
 {
 	List* list;
 	char* info = NULL;
@@ -74,14 +74,14 @@ travel(Battle* data)
 
 			input = input - '0';
 
-			if ((place = list_nth(data->location->destinations, input)))
+			if ((place = list_nth(game->location->destinations, input)))
 			{
 				/* If not, we’ll be damn screwed... */
 				if (place)
 				{
-					data->location = place;
+					game->location = place;
 
-					check_first_visit(data);
+					check_first_visit(game);
 				}
 
 				system("clear");
@@ -100,7 +100,7 @@ travel(Battle* data)
 		printf(BRIGHT BLUE "\n >> Places you can go to:\n\n" NOCOLOR);
 
 		i = 0;
-		for (list = data->location->destinations; list; list = list->next)
+		for (list = game->location->destinations; list; list = list->next)
 		{
 			printf(WHITE "  (%i)  %s\n" NOCOLOR,
 				i, ((Place*) list->data)->name);

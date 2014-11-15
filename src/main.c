@@ -9,6 +9,7 @@
 #include "entities.h"
 #include "items.h"
 #include "battle.h"
+#include "game.h"
 #include "shop.h"
 #include "places.h"
 #include "term.h"
@@ -17,9 +18,9 @@
 #include "images.h"
 
 static void
-print_menu(Battle* data)
+print_menu(Game* game)
 {
-	Place* location = data->location;
+	Place* location = game->location;
 
 	menu_separator();
 
@@ -28,7 +29,7 @@ print_menu(Battle* data)
 		"%s  (b)  Find someone to beat to death!\n" NOCOLOR
 		"%s  (s)  Buy new equipment to improve your stats!\n" NOCOLOR
 		WHITE "  (i)  Choose your katanas and golden armors!\n"
-		YELLOW
+		BLACK
 			"  (d)  Enter a terrible dungeon and fight hordes of enemies!\n"
 		WHITE
 		"  (t)  Travel to far far away places and explore the world!\n"
@@ -50,16 +51,16 @@ main(int argc, char* argv[])
 	Logs* logs;
 	List* classes;
 	List* items;
-	Battle battle;
+	Game game;
 	List* world;
 	
 	items = load_items("items");
-	battle.items = items;
+	game.items = items;
 
-	classes = load_classes(&battle, "classes");
-	battle.classes = classes;
+	classes = load_classes(&game, "classes");
+	game.classes = classes;
 
-	world = load_places(&battle, "places");
+	world = load_places(&game, "places");
 
 	/* For now, repeatability would be useful */
 	srand(42);
@@ -72,11 +73,11 @@ main(int argc, char* argv[])
 		argc > 1 ? argv[1] : "Joe"
 	);
 
-	battle.player = &player;
-	battle.enemy = &enemy;
+	game.player = &player;
+	game.enemy = &enemy;
 
-	battle.location = get_place_by_name(world, "Felinopolis");
-	battle.visited = NULL;
+	game.location = get_place_by_name(world, "Felinopolis");
+	game.visited = NULL;
 
 	system("clear");
 	input = -42;
@@ -84,31 +85,31 @@ main(int argc, char* argv[])
 	{
 		error = NULL;
 
-		check_first_visit(&battle);
+		check_first_visit(&game);
 
 		back_to_top();
 
 		switch(input)
 		{
 			case 'b':
-				logs = enter_battle((void*) &battle);
+				logs = enter_battle(&game);
 				break;
 			case 's':
-				if (battle.location->shop_items)
-					logs = enter_shop(&battle);
+				if (game.location->shop_items)
+					logs = enter_shop(&game);
 				else
 					error = "There is no shop at your current location!";
 				break;
 			case 'i':
 				logs = NULL;
-				inventory(&battle);
+				inventory(&game);
 				break;
 			case 'd':
 				logs = NULL;
 				break;
 			case 't':
 				logs = NULL;
-				travel(&battle);
+				travel(&game);
 				break;
 			case -42:
 				break;
@@ -116,16 +117,16 @@ main(int argc, char* argv[])
 				error = "Unrecognized key.";
 		}
 
-		/*logs = execute_commands(line, commands, &battle);*/
+		/*logs = execute_commands(line, commands, &game);*/
 		logs = NULL;
 
 		player.health = get_max_health(&player);
 		player.mana = get_max_mana(&player);
 
-		if (battle.location->image)
+		if (game.location->image)
 		{
 			int out_of_boundaries = 0;
-			char** image = battle.location->image;
+			char** image = game.location->image;
 
 			for (i = 0; i < 16; i++)
 				if (!out_of_boundaries && image[i])
@@ -155,13 +156,13 @@ main(int argc, char* argv[])
 				player.caps
 			);
 
-			printf("Current location: %s\n\n", battle.location->name);
+			printf("Current location: %s\n\n", game.location->name);
 
 			for (i = 0; i < 8; i++)
 				printf("\n");
 		}
 
-		print_menu(&battle);
+		print_menu(&game);
 
 		if (error)
 		{

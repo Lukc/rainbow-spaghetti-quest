@@ -1,4 +1,4 @@
-Name: Forest of Possibilities
+Name: Forest of Realities
 Leads to: Felinopolis
 Random Enemies: Evil Kitten, Black Kitten
-image: forest_of_possibilities
+image: forest_of_realities

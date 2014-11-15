@@ -11,7 +11,7 @@
  * @return: List* of Class*
  */
 List*
-load_classes(Battle* data, char* dirname)
+load_classes(Game* game, char* dirname)
 {
 	List* classes = NULL;
 	DIR* dir;
@@ -32,7 +32,7 @@ load_classes(Battle* data, char* dirname)
 		sprintf(filename, "%s/%s", dirname, entry->d_name);
 
 		printf(" > %s\n", filename);
-		list_add(&classes, load_class(data, filename));
+		list_add(&classes, load_class(game, filename));
 
 		free(filename);
 	}
@@ -51,7 +51,7 @@ check_type_resistance(Class* class, ParserElement* element, Logs* logs)
 
 	for (i = 0; i < TYPE_MAX; i++)
 	{
-		type = type_string(i);
+		type = type_to_string(i);
 
 		len = strlen(type);
 
@@ -80,7 +80,7 @@ get_type(char* string, Logs* logs)
 
 	for (i = 0; i < TYPE_MAX; i++)
 	{
-		type = type_string(i);
+		type = type_to_string(i);
 
 		if (!strcmp(string, type))
 			return i;
@@ -95,7 +95,7 @@ get_type(char* string, Logs* logs)
 }
 
 Class*
-load_class (Battle* data, char* filename)
+load_class (Game* game, char* filename)
 {
 	List* list = load_file(filename);
 	List* temp;
@@ -198,7 +198,7 @@ load_class (Battle* data, char* filename)
 					if (!strcmp(subelement->name, "item"))
 					{
 						char* name = parser_get_string(subelement, logs);
-						drop->item = get_item_by_name(data->items, name);
+						drop->item = get_item_by_name(game->items, name);
 					}
 					else if (!strcmp(subelement->name, "rarity"))
 						drop->rarity =

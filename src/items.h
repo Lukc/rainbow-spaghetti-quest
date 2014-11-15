@@ -31,7 +31,7 @@ typedef struct Item {
 	List* attacks;
 } Item;
 
-#include "battle.h"
+#include "game.h"
 
 Item* load_item(char*);
 List* load_items(char*);

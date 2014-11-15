@@ -28,12 +28,12 @@ typedef struct Class {
 	int mana_regen_on_focus;
 } Class;
 
-#include "battle.h"
+#include "game.h"
 #include "attack.h"
 #include "drop.h"
 
-Class* load_class(Battle*, char*);
-List* load_classes(Battle*, char*);
+Class* load_class(Game*, char*);
+List* load_classes(Game*, char*);
 Class* get_class_by_name(List*, char*);
 
 #endif

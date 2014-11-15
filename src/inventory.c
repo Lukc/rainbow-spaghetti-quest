@@ -8,9 +8,9 @@
 #include "term.h"
 
 void
-inventory(Battle* data)
+inventory(Game* game)
 {
-	Entity* player = data->player;
+	Entity* player = game->player;
 	char* error;
 	int input = -42;
 	int selection = 0;
@@ -49,7 +49,7 @@ inventory(Battle* data)
 		}
 		else if (input == 's')
 		{
-			if (data->location->shop_items)
+			if (game->location->shop_items)
 			{
 				if (player->inventory[selection])
 					sell_item(player, player->inventory[selection]);
@@ -92,8 +92,8 @@ inventory(Battle* data)
 					get_max_health(player), get_max_mana(player));
 			else
 				printf("  %-10s: %-4i   %-10s: %-4i",
-					type_string(i - 3), get_type_resistance(player, i - 3),
-					type_string(i + 1), get_type_resistance(player, i + 1));
+					type_to_string(i - 3), get_type_resistance(player, i - 3),
+					type_to_string(i + 1), get_type_resistance(player, i + 1));
 
 			printf("\n");
 		}
@@ -144,7 +144,7 @@ inventory(Battle* data)
 		move(40);
 		printf(WHITE " Money:     %-8i\n" NOCOLOR, player->caps);
 
-		if (!data->location->shop_items)
+		if (!game->location->shop_items)
 			printf(BLACK);
 		else
 			printf(WHITE);
@@ -152,10 +152,10 @@ inventory(Battle* data)
 
 		back(1);
 		move(40);
-		if (data->location->shop_items && player->inventory[selection])
+		if (game->location->shop_items && player->inventory[selection])
 		{
 			printf(WHITE " Sell price %-8i\n" NOCOLOR,
-				player->inventory[selection]->price / 2);
+				player->inventory[selection]->price * 2 / 3);
 		}
 		else
 		{

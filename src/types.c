@@ -4,7 +4,7 @@
 #include "types.h"
 
 char*
-type_string(int type)
+type_to_string(int type)
 {
 	switch (type)
 	{
@@ -88,7 +88,7 @@ type_id(char* string)
 
 	for (i = 0; i < TYPE_MAX; i++)
 	{
-		if (!strcmp(type_string(i), string))
+		if (!strcmp(type_to_string(i), string))
 			return i;
 	}
 

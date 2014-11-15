@@ -3,13 +3,13 @@
 #include "list.h"
 
 void
-list_add(List** list, void* data)
+list_add(List** list, void* game)
 {
 	List* new_list;
 
 	new_list = (List*) malloc(sizeof(List));
 
-	new_list->data = data;
+	new_list->data = game;
 	new_list->next = *list;
 
 	*list = new_list;

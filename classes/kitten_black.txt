@@ -8,4 +8,4 @@ Attack: [
 ]
 Attack bonus: 4
 Defense bonus: 2
-Caps on kill: 10
+Caps on kill: 5

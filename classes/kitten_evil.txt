@@ -10,8 +10,4 @@ Attack bonus: 5
 Defense bonus: 5
 Slashing defense: 5
 Piercing defense: 5
-Caps on kill: 25
-Drop: [
-	Item: Cat Fur
-	Rarity: 3 # Inversely proportional!
-]
+Caps on kill: 10

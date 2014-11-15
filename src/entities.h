@@ -2,7 +2,7 @@
 #ifndef ENTITIES_H
 #define ENTITIES_H
 
-#include "battle.h"
+#include "game.h"
 #include "classes.h"
 #include "attack.h"
 #include "items.h"
@@ -40,7 +40,7 @@ int get_attack_bonus(Entity*);
 int get_defense_bonus(Entity*);
 
 int get_type_resistance(Entity*, int);
-int get_attack_type(Battle*, Entity*);
+int get_attack_type(Game*, Entity*);
 
 char* equipment_string(int);
 

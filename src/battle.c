@@ -4,12 +4,101 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "game.h"
 #include "battle.h"
 #include "types.h"
 #include "commands.h"
 #include "colors.h"
 #include "term.h"
 #include "entities.h"
+
+/**
+ * Prints the attacks’ selection menu of the battle interface.
+ * @param list: The List* of Attack* to display.
+ */
+static void
+print_attacks(Entity* player, List* list)
+{
+	int i;
+
+	for (i = 0; i < 5; i++)
+	{
+		Attack* attack = NULL;
+		
+		if (list)
+		{
+			attack = list->data;
+
+			char* name = attack->name;
+			char* color = WHITE;
+
+			if (!name)
+				name = type_to_attack_name(attack->type);
+
+			if (attack->mana_cost > player->mana)
+				color = BLACK;
+
+			printf("%s", color);
+
+			printf("  (%i) %-9s %3i-%i %-10s -%iMP\n" NOCOLOR, i,
+				name,
+				attack->damage + get_attack_bonus(player),
+				attack->strikes, type_to_string(attack->type),
+				attack->mana_cost);
+
+			list = list->next;
+		}
+		else
+		{
+			printf(
+				BLACK "  (%i) --------- \n" NOCOLOR, i);
+		}
+	}
+}
+
+/**
+ * Prints the items’ selection menu of the battle interface.
+ * @param page: Integer representing the “page” of the inventory to display.
+ *  Each “page” is a group of 5 successive entries from the inventory.
+ *
+ * @todo: Print the Health/Mana bonuses of using the item.
+ */
+static void
+print_items(Entity* player, int page)
+{
+	int i;
+
+	for (i = 0; i < 5; i++)
+	{
+		int index = i + page * 5;
+
+		if (index < INVENTORY_SIZE)
+		{
+			Item* item;
+
+			if ((item = player->inventory[index]))
+			{
+				if (is_item_usable(item))
+				{
+					if (item->consumable)
+						printf(GREEN);
+					else
+						printf(WHITE);
+				}
+				else
+					printf(BLACK);
+
+				printf("  (%i) %-9s\n" NOCOLOR,
+					i, item->name);
+			}
+			else
+				printf(
+					BLACK "  (%i) --------- \n" NOCOLOR, i);
+		}
+		else
+			printf("\n");
+	}
+}
 
 /**
  * Checks whether someone has enough mana to use an attack or not.
@@ -21,13 +110,15 @@ can_use_attack(Entity* attacker, Attack* attack)
 }
 
 /**
- * @return The amount of net damage inflicted to “defender”.
+ * Takes care of A attacking B with a specified attack.
+ * Adds a corresponding log entry in “logs”.
  */
-static int
-attack(Entity* attacker, Attack* attack, Entity* defender)
+static void
+attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 {
 	int damage_inflicted;
 	int type_modifier;
+	char* log;
 
 	type_modifier = get_type_resistance(defender, attack->type);
 
@@ -46,58 +137,89 @@ attack(Entity* attacker, Attack* attack, Entity* defender)
 	attacker->mana -= attack->mana_cost;
 	defender->health -= damage_inflicted;
 
-	return damage_inflicted;
+	log = (char*) malloc(sizeof(char) * 128);
+	snprintf(log, 128,
+		BRIGHT WHITE "%s " RED ">>>"
+		WHITE " %s (%i-%i %s):  " RED "%iHP",
+		attacker->name, defender->name,
+		attack->damage, attack->strikes, type_to_string(attack->type),
+		damage_inflicted);
+	logs_add(logs, log);
 }
 
 /**
- * Grants back mana (and possibly health or other stats).
- *
- * FIXME: Grooming. Also, be carefull for stuff not to go over max values.
- * FIXME: Fully rewrite.
+ * Gives back mana (and possibly health or other stats).
  */
 static void
 focus(Entity* entity, Logs* logs)
 {
-	int mana_gained;
+	int mana_gained, health_gained;
+	int i;
 	char* log;
 
-	/* FIXME: Items’ ->health/mana_on_focus are ignored. */
-	mana_gained = entity->class->mana_regen_on_focus;
-	mana_gained = entity->mana + mana_gained > get_max_mana(entity) ?
-		get_max_mana(entity) - entity->mana : mana_gained;
+	health_gained = entity->class->health_regen_on_focus;
 
-	entity->health += entity->class->health_regen_on_focus;
-	entity->mana += mana_gained;
+	for (i = 0; i < EQ_MAX; i++)
+		if (entity->equipment[i])
+			health_gained += entity->equipment[i]->health_on_focus;
+
+	health_gained =
+		entity->health + health_gained > get_max_health(entity) ?
+			get_max_health(entity) : health_gained;
+
+	mana_gained = entity->class->mana_regen_on_focus;
+
+	for (i = 0; i < EQ_MAX; i++)
+		if (entity->equipment[i])
+			mana_gained += entity->equipment[i]->mana_on_focus;
+
+	mana_gained =
+		entity->mana + mana_gained > get_max_mana(entity) ?
+			get_max_mana(entity) : mana_gained;
 
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(
 		log, 128,
-		"%s regenerated %i points of mana.",
-		entity->name,
-		mana_gained);
+		BRIGHT WHITE "%s focused >> " GREEN "%+-3iHP  " BLUE "%+-3iMP"
+		NOCOLOR,
+		entity->name, health_gained, mana_gained);
 	logs_add(logs, log);
 }
 
 static void
 use_item(Entity* entity, Item* item, Logs* logs)
 {
-	/* FIXME: Hum… make sure it doesn’t go too far out of boundaries. */
+	char* log;
+
 	entity->health += item->health_on_use;
 	entity->mana += item->mana_on_use;
+
+	if (entity->health > get_max_health(entity))
+		entity->health = get_max_health(entity);
+
+	if (entity->mana > get_max_mana(entity))
+		entity->mana = get_max_mana(entity);
+
+	log = (char*) malloc(sizeof(char) * 128);
+	snprintf(
+		log, 128,
+		BRIGHT WHITE "%s used a %s >> " GREEN "%+-3iHP  " BLUE "%+-3iMP"
+		NOCOLOR,
+		entity->name, item->name,
+		item->health_on_use, item->mana_on_use);
+	logs_add(logs, log);
 }
 
 static void
-ai_action(Battle* data, Logs* logs)
+ai_action(Game* game, Logs* logs)
 {
-	int damage_received;
-	char* log;
 	Entity* player;
 	Entity* enemy;
 	List* available_attacks;
 	Attack* selected_attack;
 
-	player = data->player;
-	enemy = data->enemy;
+	player = game->player;
+	enemy = game->enemy;
 
 	available_attacks = get_all_attacks(enemy);
 	selected_attack = list_nth(
@@ -105,30 +227,18 @@ ai_action(Battle* data, Logs* logs)
 		rand() % list_size(available_attacks));
 
 	if (can_use_attack(enemy, selected_attack))
-	{
-		damage_received = attack(
+		attack(
 			enemy,
 			selected_attack,
-			player
+			player,
+			logs
 		);
-
-		log = (char*) malloc(sizeof(char) * 128);
-		snprintf(log, 128,
-			"You have been %s for %iHP!",
-			type_to_damage_string(selected_attack->type), damage_received);
-		logs_add(logs, log);
-	}
 	else
 		focus(enemy, logs);
-
-	if (player->health <= 0)
-	{
-		logs_add(logs, strdup("You have been defeated..."));
-	}
 }
 
 Logs*
-command_use_item(Battle* data, Entity* player, Item* item)
+command_use_item(Game* game, Entity* player, Item* item)
 {
 	Logs* logs;
 
@@ -136,13 +246,13 @@ command_use_item(Battle* data, Entity* player, Item* item)
 
 	use_item(player, item, logs);
 
-	ai_action(data, logs);
+	ai_action(game, logs);
 
 	return logs;
 }
 
 Logs*
-command_flee(Battle* battle_data)
+command_flee(Game* game)
 {
 	Logs* logs;
 	char* log;
@@ -152,27 +262,25 @@ command_flee(Battle* battle_data)
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(
 		log, 128,
-		"You fled from your battle!");
+		"You fled from battle!");
 	logs_add(logs, log);
 
-	battle_data->flee = 1;
+	game->flee = 1;
 
 	return NULL;
 }
 
 Logs*
-command_attack(Battle* battle_data, Attack* player_attack)
+command_attack(Game* game, Attack* player_attack)
 {
 	Entity* player;
 	Entity* enemy;
-	int damage_inflicted;
 	Logs* logs;
-	char* log;
 
 	logs = logs_new();
 
-	player = battle_data->player;
-	enemy = battle_data->enemy;
+	player = game->player;
+	enemy = game->enemy;
 
 	if (!can_use_attack(player, player_attack))
 	{
@@ -181,14 +289,7 @@ command_attack(Battle* battle_data, Attack* player_attack)
 		return logs;
 	}
 
-	damage_inflicted = attack(player, player_attack, enemy);
-
-	log = (char*) malloc(sizeof(char) * 128);
-	snprintf(
-		log, 128,
-		"You %s your enemy for %iHP!",
-		type_to_damage_string(player_attack->type), damage_inflicted);
-	logs_add(logs, log);
+	attack(player, player_attack, enemy, logs);
 
 	if (enemy->health <= 0)
 	{
@@ -196,22 +297,22 @@ command_attack(Battle* battle_data, Attack* player_attack)
 	}
 	else
 	{
-		ai_action(battle_data, logs);
+		ai_action(game, logs);
 	}
 
 	return logs;
 }
 
 Logs*
-command_focus(Battle* battle_data)
+command_focus(Game* game)
 {
 	Logs* logs;
 
 	logs = logs_new();
 
-	focus(battle_data->player, logs);
+	focus(game->player, logs);
 
-	ai_action(battle_data, logs);
+	ai_action(game, logs);
 
 	return logs;
 }
@@ -220,19 +321,19 @@ command_focus(Battle* battle_data)
 #define ITEMS 1
 
 int
-battle(Battle *battle_data)
+battle(Game *game)
 {
 	Logs* logs;
 	char input = -42;
-	Entity *player = battle_data->player;
-	Entity *enemy = battle_data->enemy;
+	Entity *player = game->player;
+	Entity *enemy = game->enemy;
 	List* player_attacks;
 	List* list;
 	int view = ATTACKS;
 	int page = 0; /* Related to view. */
 	int i;
 
-	battle_data->flee = 0;
+	game->flee = 0;
 
 	system("clear");
 
@@ -249,10 +350,10 @@ battle(Battle *battle_data)
 			switch (input)
 			{
 				case 'f':
-					logs = command_focus(battle_data);
+					logs = command_focus(game);
 					break;
 				case 'l':
-					logs = command_flee(battle_data);
+					logs = command_flee(game);
 					break;
 				case 'i':
 					view = !view;
@@ -276,7 +377,7 @@ battle(Battle *battle_data)
 								Attack* attack =
 									list_nth(player_attacks, input);
 
-								logs = command_attack(battle_data, attack);
+								logs = command_attack(game, attack);
 							}
 							else
 							{
@@ -291,7 +392,7 @@ battle(Battle *battle_data)
 								(item = player->inventory[index]))
 							{
 								logs = command_use_item(
-									battle_data, player, item);
+									game, player, item);
 
 								if (item->consumable)
 									player->inventory[index] = NULL;
@@ -353,66 +454,11 @@ battle(Battle *battle_data)
 
 			if (view == ATTACKS)
 			{
-				list = player_attacks;
-				for (i = 0; i < 5; i++)
-				{
-					Attack* attack = NULL;
-					
-					if (list)
-					{
-						attack = list->data;
-
-						char* name = attack->name;
-
-						if (!name)
-							name = type_to_attack_name(attack->type);
-
-						printf(WHITE "  (%i) %-9s %3i-%i %s\n" NOCOLOR, i,
-							name,
-							attack->damage + get_attack_bonus(player),
-							attack->strikes, type_string(attack->type));
-
-						list = list->next;
-					}
-					else
-					{
-						printf(
-							BLACK "  (%i) --------- \n" NOCOLOR, i);
-					}
-				}
+				print_attacks(player, player_attacks);
 			}
 			else if (view == ITEMS)
 			{
-				for (i = 0; i < 5; i++)
-				{
-					int index = i + page * 5;
-
-					if (index < INVENTORY_SIZE)
-					{
-						Item* item;
-
-						if ((item = player->inventory[index]))
-						{
-							if (is_item_usable(item))
-							{
-								if (item->consumable)
-									printf(GREEN);
-								else
-									printf(WHITE);
-							}
-							else
-								printf(BLACK);
-
-							printf("  (%i) %-9s\n" NOCOLOR,
-								i, item->name);
-						}
-						else
-							printf(
-								BLACK "  (%i) --------- \n" NOCOLOR, i);
-					}
-					else
-						printf("\n");
-				}
+				print_items(player, page);
 			}
 
 			back(5);
@@ -435,11 +481,11 @@ battle(Battle *battle_data)
 
 			menu_separator();
 
-			if (battle_data->flee)
+			if (game->flee)
 			{
 				system("clear");
 				printf("\nYou manage to get out of the battle without being "
-						"hurt too badly.\n");
+					"hurt too badly.\n");
 				printf("\nPress any key to continue...\n\n");
 				getch();
 				return 0;
@@ -467,7 +513,7 @@ battle(Battle *battle_data)
 					enemy->class->caps_on_kill);
 				if (list)
 				{
-					printf("\nObtained loot:\n");
+					printf("\nYou were able to loot the following items:\n");
 
 					for (; list; list = list->next)
 						printf("  - %s\n", ((Item*) list->data)->name);
@@ -512,28 +558,26 @@ get_random_enemy(List* list)
 }
 
 Logs*
-enter_battle(void *opt)
+enter_battle(Game* game)
 {
-	Battle* battle_data;
 	Class* enemy_class = NULL;
 	Entity* player, *enemy;
 	List* classes;
 	int result;
 
-	battle_data = opt;
-	player = battle_data->player;
-	enemy = battle_data->enemy;
-	classes = battle_data->classes;
+	player = game->player;
+	enemy = game->enemy;
+	classes = game->classes;
 
-	if (battle_data->location->random_enemies)
+	if (game->location->random_enemies)
 		enemy_class =
-			get_random_enemy(battle_data->location->random_enemies);
+			get_random_enemy(game->location->random_enemies);
 	else
 		return NULL;
 
 	init_entity_from_class(enemy, enemy_class);
 
-	if ((result = battle(battle_data)) == 1)
+	if ((result = battle(game)) == 1)
 	{
 		player->kills++;
 	}

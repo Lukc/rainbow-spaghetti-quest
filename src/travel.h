@@ -2,10 +2,10 @@
 #ifndef TRAVEL_H
 #define TRAVEL_H
 
-#include "battle.h"
+#include "game.h"
 
-void travel(Battle*);
-void check_first_visit(Battle*);
+void travel(Game*);
+void check_first_visit(Game*);
 
 #endif
 

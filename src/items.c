@@ -53,7 +53,7 @@ check_type_resistance(Item* item, ParserElement* element, Logs* logs)
 
 	for (i = 0; i < TYPE_MAX; i++)
 	{
-		type = type_string(i);
+		type = type_to_string(i);
 
 		len = strlen(type);
 
@@ -103,7 +103,7 @@ get_type(char* string, Logs* logs)
 
 	for (i = 0; i < TYPE_MAX; i++)
 	{
-		type = type_string(i);
+		type = type_to_string(i);
 
 		if (!strcmp(string, type))
 			return i;

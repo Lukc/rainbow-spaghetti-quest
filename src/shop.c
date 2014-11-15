@@ -3,12 +3,9 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "colors.h"
-#include "items.h"
-#include "commands.h"
-#include "battle.h"
 #include "shop.h"
 #include "term.h"
+#include "colors.h"
 
 static char*
 stat_color(int i)
@@ -45,7 +42,7 @@ print_item(Item* item)
 		Attack* attack = list->data;
 
 		printf(BRIGHT WHITE "    provides a %i-%i %s attack\n" NOCOLOR,
-			attack->damage, attack->strikes, type_string(attack->type));
+			attack->damage, attack->strikes, type_to_string(attack->type));
 	}
 
 	if (item->health_on_use)
@@ -78,7 +75,7 @@ print_item(Item* item)
 		{
 			printf("    %s%+i%% %s resistance\n" NOCOLOR,
 				stat_color(item->type_resistance[i]),
-				item->type_resistance[i], type_string(i));
+				item->type_resistance[i], type_to_string(i));
 		}
 	}
 
@@ -234,7 +231,7 @@ sell_item(Entity* player, Item* item)
 }
 
 Logs*
-enter_shop(Battle* data)
+enter_shop(Game* game)
 {
 	List* items, * list;
 	Entity* player;
@@ -248,8 +245,8 @@ enter_shop(Battle* data)
 
 	system("clear");
 
-	items = data->location->shop_items;
-	player = data->player;
+	items = game->location->shop_items;
+	player = game->player;
 
 	selected_item = items->data;
 
@@ -336,7 +333,9 @@ enter_shop(Battle* data)
 					printf(NOCOLOR "\033[47m");
 
 				if (item->price <= player->caps)
-					printf(GREEN);
+					printf(BRIGHT GREEN);
+				else
+					printf(BLACK);
 
 				printed = printf("  - %-48s (%s)",
 					item->name, equipment_string(item->slot));

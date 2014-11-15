@@ -14,7 +14,7 @@
  * @return: List* of Place*
  */
 List*
-load_places(Battle* data, char* dirname)
+load_places(Game* game, char* dirname)
 {
 	List* places = NULL;
 	List* list, * list2;
@@ -36,7 +36,7 @@ load_places(Battle* data, char* dirname)
 		sprintf(filename, "%s/%s", dirname, entry->d_name);
 
 		printf(" > %s\n", filename);
-		list_add(&places, load_place(data, filename));
+		list_add(&places, load_place(game, filename));
 
 		free(filename);
 	}
@@ -103,7 +103,7 @@ comas_to_list(char* input)
 }
 
 Place*
-load_place (Battle* data, char* filename)
+load_place (Game* game, char* filename)
 {
 	List* list = load_file(filename);
 	List* temp;
@@ -140,7 +140,7 @@ load_place (Battle* data, char* filename)
 				for (helper = temp; helper; helper = helper->next)
 				{
 					item =
-						get_item_by_name(data->items, (char*) helper->data);
+						get_item_by_name(game->items, (char*) helper->data);
 
 					if (item)
 						list_add(&place->shop_items, item);
@@ -162,7 +162,7 @@ load_place (Battle* data, char* filename)
 
 				for (helper = temp; helper; helper = helper->next)
 				{
-					class = get_class_by_name(data->classes, helper->data);
+					class = get_class_by_name(game->classes, helper->data);
 
 					if (class)
 						list_add(&place->random_enemies, class);
@@ -252,11 +252,11 @@ get_place_by_name(List* list, char* name)
 }
 
 int
-has_visited(Battle* data, Place* place)
+has_visited(Game* game, Place* place)
 {
 	List* list;
 
-	for (list = data->visited; list; list = list->next)
+	for (list = game->visited; list; list = list->next)
 	{
 		if (list->data == place)
 			return 1;

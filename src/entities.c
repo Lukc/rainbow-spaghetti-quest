@@ -207,7 +207,7 @@ print_resistance(Entity* e, int type)
 	int printed, i;
 	int resistance;
 
-	string = strdup(type_string(type));
+	string = strdup(type_to_string(type));
 	string[0] = toupper(string[0]);
 
 	printf(WHITE);
@@ -265,7 +265,7 @@ print_attacks(Entity* e)
 
 		printf(WHITE "    %i - %i  %s\n" NOCOLOR,
 			attack->damage + get_attack_bonus(e), attack->strikes,
-			type_string(attack->type));
+			type_to_string(attack->type));
 	}
 }
 
