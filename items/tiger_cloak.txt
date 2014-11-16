@@ -1,10 +1,10 @@
 Name: Tiger Cloak
 Defense bonus: 1
 Attack bonus: 1
-Price: 400
+Price: 2000
 Slot: armor
-Slashing defense: 10
-Piercing defense: 10
-Impact defense: 10
-Fire defense: 10
-Arcane defense: -20
+Slashing resistance: 10
+Piercing resistance: 10
+Impact resistance: 10
+Fire resistance: 10
+Arcane resistance: -20

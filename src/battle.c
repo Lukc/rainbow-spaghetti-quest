@@ -177,6 +177,9 @@ focus(Entity* entity, Logs* logs)
 		entity->mana + mana_gained > get_max_mana(entity) ?
 			get_max_mana(entity) : mana_gained;
 
+	entity->mana += mana_gained;
+	entity->health += health_gained;
+
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(
 		log, 128,

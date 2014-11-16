@@ -9,6 +9,7 @@
 #include "items.h"
 #include "classes.h"
 #include "parser.h"
+#include "destinations.h"
 
 /**
  * @return: List* of Place*
@@ -48,15 +49,15 @@ load_places(Game* game, char* dirname)
 		list2 = place->destinations;
 		while (list2)
 		{
-			char* name = list2->data;
+			Destination* dest = list2->data;
 
-			list2->data = get_place_by_name(places, name);
+			dest->place = get_place_by_name(places, dest->name);
 
-			if (!list2->data)
+			if (!dest->place)
 			{
 				fprintf(stderr,
 					"[Places/%s] invalid destination: %s.\n",
-					place->name, name);
+					place->name, dest->name);
 
 				exit(1);
 			}
@@ -100,6 +101,42 @@ comas_to_list(char* input)
 	}
 
 	return list;
+}
+
+Destination*
+parse_destination(Game* game, List* elements, Logs* logs)
+{
+	ParserElement* element;
+	Destination* destination;
+	char* field;
+
+	destination = (Destination*) malloc(sizeof(Destination));
+	memset(destination, 0, sizeof(Destination));
+
+	for (; elements; elements = elements->next)
+	{
+		element = elements->data;
+		field = element->name;
+
+		if (!strcmp(field, "name"))
+		{
+			destination->name = parser_get_string(element, logs);
+		}
+		else if (!strcmp(field, "needs item"))
+		{
+			/* FIXME: Check type == string and corresponding item exist... */
+			list_add(&destination->needed_items,
+				get_item_by_name(game->items, element->value));
+		}
+		else
+		{
+			char* log = (char*) malloc(sizeof(char) * 128);
+			snprintf(log, 128, "Unknown field: “%s”.", element->name);
+			logs_add(logs, log);
+		}
+	}
+
+	return destination;
 }
 
 Place*
@@ -148,8 +185,24 @@ load_place (Game* game, char* filename)
 			}
 		}
 		else if (!strcmp(field, "leads to"))
-			list_add(&place->destinations,
-				parser_get_string(element, logs));
+		{
+			Destination* dest;
+
+			if (element->type == PARSER_STRING)
+			{
+				dest = (Destination*) malloc(sizeof(Destination));
+				memset(dest, 0, sizeof(Destination));
+
+				dest->name = parser_get_string(element, logs);
+
+				list_add(&place->destinations, dest);
+			}
+			else if (element->type == PARSER_LIST)
+			{
+				list_add(&place->destinations,
+					parse_destination(game, element->value, logs));
+			}
+		}
 		else if (!strcmp(field, "random enemies"))
 		{
 			char* string = parser_get_string(element, logs);

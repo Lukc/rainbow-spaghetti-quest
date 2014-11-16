@@ -1,13 +1,27 @@
 Name: Evil Kitten
-Health: 13
-Mana: 6
+Health: 42
+Mana: 9
 Attack: [
-	Damage: 4
-	Strikes: 2
+	Damage: 8
+	Strikes: 4
 	Type: fire
+	Mana: 3
 ]
-Attack bonus: 5
+Attack: [
+	Damage: 9
+	Strikes: 2
+	Type: slashing
+	Mana: 0
+]
+Mana on Focus: 6
 Defense bonus: 5
-Slashing defense: 5
-Piercing defense: 5
+Slashing resistance: 15
+Piercing resistance: 15
+Impact resistance: 5
+Fire resistance: 80
+Arcane resistance: -25
 Caps on kill: 10
+Drop: [
+	Item: Nightmare Fuel
+	Rarity: 60
+]

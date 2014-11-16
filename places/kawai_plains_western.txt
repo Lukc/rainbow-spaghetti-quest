@@ -1,6 +1,11 @@
 Name: Western Kawai Plains
 Leads to: Eastern Kawai Plains
 Leads to: Boxes Factory
-Random Enemies: Evil Kitten
 Random Enemies: Black Kitten
+Random Enemies: Black Kitten
+Random Enemies: Black Kitten
+Random Enemies: Black Kitten
+Random Enemies: Evil Kitten
+Random Enemies: Evil Kitten
+Random Enemies: Wild Rainbow
 Image: kawai_plains

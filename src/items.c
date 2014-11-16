@@ -60,7 +60,7 @@ check_type_resistance(Item* item, ParserElement* element, Logs* logs)
 		if (
 			!strncmp(element->name, type, len) &&
 			element->name[len] == ' ' &&
-			!strcmp(element->name + len + 1, "defense"))
+			!strcmp(element->name + len + 1, "resistance"))
 		{
 			item->type_resistance[i] = parser_get_integer(element, logs);
 

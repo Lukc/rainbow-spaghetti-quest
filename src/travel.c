@@ -3,6 +3,7 @@
 #include <ctype.h>
 
 #include "travel.h"
+#include "destinations.h"
 #include "term.h"
 #include "colors.h"
 
@@ -54,10 +55,28 @@ check_first_visit(Game* game)
 	}
 }
 
+int
+can_travel_to(Game* game, Destination* destination)
+{
+	List* list;
+	Item* item;
+
+	for (list = destination->needed_items; list; list = list->next)
+	{
+		item = list->data;
+
+		if (!get_count_from_inventory(game->player->inventory, item))
+			return 0;
+	}
+
+	return 1;
+}
+
 void
 travel(Game* game)
 {
 	List* list;
+	Destination* destination;
 	char* info = NULL;
 	char input = -42;
 	int i;
@@ -70,22 +89,23 @@ travel(Game* game)
 			;
 		else if (isdigit(input))
 		{
-			Place* place;
-
 			input = input - '0';
 
-			if ((place = list_nth(game->location->destinations, input)))
+			if ((destination = list_nth(game->location->destinations, input)))
 			{
-				/* If not, we’ll be damn screwed... */
-				if (place)
+				if (can_travel_to(game, destination))
 				{
-					game->location = place;
+					game->location = destination->place;
 
 					check_first_visit(game);
-				}
 
-				system("clear");
-				return;
+					system("clear");
+					return;
+				}
+				else
+				{
+					info = "You can't go there... yet!";
+				}
 			}
 			else
 			{
@@ -102,8 +122,14 @@ travel(Game* game)
 		i = 0;
 		for (list = game->location->destinations; list; list = list->next)
 		{
-			printf(WHITE "  (%i)  %s\n" NOCOLOR,
-				i, ((Place*) list->data)->name);
+			destination = list->data;
+
+			if (can_travel_to(game, destination))
+				printf(WHITE "  (%i)  %s\n" NOCOLOR,
+					i, destination->name);
+			else
+				printf(BLACK "  (%i)  %s\n" NOCOLOR,
+					i, destination->name);
 
 			i++;
 		}
@@ -130,4 +156,6 @@ travel(Game* game)
 
 	return;
 }
+
+/* vim: set ts=4 sw=4 cc=80 : */
 

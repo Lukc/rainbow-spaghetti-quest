@@ -359,7 +359,7 @@ enter_shop(Game* game)
 
 		menu_separator();
 
-		printf(WHITE " Money: %i" NOCOLOR, player->caps);
+		printf(WHITE " Money: %-5i" NOCOLOR, player->caps);
 		move(40);
 		printf(WHITE " (b)  Buy\n" NOCOLOR);
 		if (selected_item)

@@ -6,5 +6,5 @@ Attack: [
 	Type: slashing
 	Name: Slash
 ]
-Price: 700
+Price: 3000
 Slot: weapon

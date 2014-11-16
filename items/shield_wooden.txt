@@ -2,7 +2,7 @@ Name: Wooden Shield
 Defense bonus: 3
 Price: 120
 Slot: shield
-Slashing defense: 10
-Piercing defense: 14
-Impact defense: 8
-Fire defense: -20
+Slashing resistance: 10
+Piercing resistance: 14
+Impact resistance: 8
+Fire resistance: -20

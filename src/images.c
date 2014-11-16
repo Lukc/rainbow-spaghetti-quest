@@ -52,6 +52,13 @@ load_image(char* filename)
 
 	f = fopen(filename, "r");
 
+	if (!f)
+	{
+		fprintf(stderr, "Could not open %s!\n", filename);
+
+		exit(1);
+	}
+
 	while (getline(&line_buffer, &line_size, f) > 0)
 	{
 		image = (char**) realloc(image, sizeof(char*) * (size + 1));

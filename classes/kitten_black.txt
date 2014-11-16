@@ -1,11 +1,22 @@
 Name: Black Kitten
-Health: 9
-Mana: 9
+Health: 32
+Mana: 3
 Attack: [
-	Damage: 3
-	Strikes: 1
+	Damage: 5
+	Strikes: 2
 	Type: slashing
+	Mana: 0
 ]
-Attack bonus: 4
-Defense bonus: 2
+Attack: [
+	Damage: 8
+	Strikes: 1
+	Type: arcane
+	Mana: 2
+]
+Mana on Focus: 3
+Defense bonus: 3
 Caps on kill: 5
+Drop: [
+	Item: Nightmare Fuel
+	Rarity: 100
+]

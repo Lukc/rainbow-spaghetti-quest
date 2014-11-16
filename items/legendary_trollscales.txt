@@ -1,0 +1,11 @@
+Name: Legendary Trollscales
+Slot: armor
+Unique: 1
+Max mana: 2
+Mana on focus: 2
+Attack bonus: 1
+Defense bonus: 1
+Arcane Resistance: 30
+Fire Resistance: 30
+Cold Resistance: 10
+Poison Resistance: -40
