@@ -51,8 +51,13 @@ inventory(Game* game)
 		{
 			if (game->location->shop_items)
 			{
-				if (player->inventory[selection])
-					sell_item(player, player->inventory[selection]);
+				Item* item;
+
+				if ((item = player->inventory[selection]))
+					if (!item->unique)
+						sell_item(player, item);
+					else
+						error = "Cannot sell unique items!";
 				else
 					error = "Nothing to sell...";
 			}
