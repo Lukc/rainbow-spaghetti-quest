@@ -17,5 +17,5 @@ dist=(
 
 CC=clang
 LDFLAGS=""
-CFLAGS="-Wall -Wextra -pedantic -D_BSD_SOURCE -g"
+CFLAGS="-Wall -Wextra -pedantic -g"
 

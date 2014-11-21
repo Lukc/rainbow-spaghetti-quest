@@ -40,11 +40,17 @@ print_attacks(Entity* player, List* list)
 
 			printf("%s", color);
 
-			printf("  (%i) %-9s %3i-%i %-10s -%iMP\n" NOCOLOR, i,
+			printf("  (%i) %-9s %3i-%i %-10s" NOCOLOR, i,
 				name,
 				attack->damage + get_attack_bonus(player),
-				attack->strikes, type_to_string(attack->type),
-				attack->mana_cost);
+				attack->strikes, type_to_string(attack->type));
+
+			if (attack->mana_cost)
+				printf(" %+3iMP", -attack->mana_cost);
+			else
+				printf("      ");
+
+			printf("\n");
 
 			list = list->next;
 		}

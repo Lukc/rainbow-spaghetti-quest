@@ -3,6 +3,8 @@ Health: 80
 Mana: 6
 Defense Bonus: 7
 Attack Bonus: 3
+Mana on focus: 6
+Health on focus: 10
 Attack: [
 	Damage: 4
 	Strikes: 4

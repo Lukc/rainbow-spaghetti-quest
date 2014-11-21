@@ -277,13 +277,13 @@ print_entity_basestats(Entity* e)
 	print_bar(
 		BRIGHT WHITE "  Health:   ",
 		health_color(e),
-		e->health, get_max_health(e), 40, 80
+		e->health, get_max_health(e), 34, 80
 	);
 
 	print_bar(
 		BRIGHT WHITE "  Mana:     ",
 		BLUE,
-		e->mana, get_max_mana(e), 40, 80
+		e->mana, get_max_mana(e), 34, 80
 	);
 }
 
