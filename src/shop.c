@@ -85,25 +85,17 @@ print_item(Item* item)
 static char*
 buy_item(Entity* player, Item* selected_item)
 {
-	int i;
-
 	if (!selected_item)
 		return NULL;
 
 	if (player->gold >= selected_item->price)
 	{
-		for (i = 0; i < INVENTORY_SIZE && player->inventory[i]; i++)
-			;;
-
-		if (i == INVENTORY_SIZE)
+		switch (give_item(player, selected_item))
 		{
-			/* FIXME: This sucks... */
-			return "No space left in inventory.";
-		}
-		else
-		{
-			player->gold -= selected_item->price;
-			player->inventory[i] = selected_item;
+			case -1:
+				return "No space for item in inventory!";
+			default:
+				player->gold -= selected_item->price;
 		}
 	}
 	else
@@ -129,10 +121,10 @@ equip_item(Entity* player, Item* selected_item)
 		slot = selected_item->slot;
 		old_item = player->equipment[slot];
 
-		for (i = 0; player->inventory[i] != selected_item; i++)
+		for (i = 0; player->inventory[i].item != selected_item; i++)
 			;;
 
-		player->inventory[i] = player->equipment[slot];
+		player->inventory[i].item = player->equipment[slot];
 		player->equipment[slot] = selected_item;
 	}
 	else
@@ -153,21 +145,45 @@ unequip_item(Entity* player, Item* item)
 
 	if (player->equipment[item->slot] == item)
 	{
-		for (i = 0; i < INVENTORY_SIZE && player->inventory[i]; i++)
-			;;
+		for (i = 0; i < INVENTORY_SIZE && player->inventory[i].item; i++)
+			;
 
 		if (i == INVENTORY_SIZE)
 		{
 			return "No space left in inventory!";
 		}
 
-		player->inventory[i] = player->equipment[item->slot];
+		player->inventory[i].item = player->equipment[item->slot];
+		player->inventory[i].quantity = 1;
 		player->equipment[item->slot] = NULL;
 	}
 	else
 	{
 		return "You cannot unequip an item that is not equiped...";
 	}
+
+	return NULL;
+}
+
+char*
+sell_item(Entity* player, Item* item)
+{
+	int i;
+
+	if (!item)
+		return NULL;
+
+	for (i = 0; i < INVENTORY_SIZE && player->inventory[i].item != item; i++)
+		;
+
+	if (i == INVENTORY_SIZE)
+		return "You cannot sell an item you do not possess...";
+
+	player->inventory[i].quantity -= 1;
+	if (player->inventory[i].quantity <= 0)
+		player->inventory[i].item = NULL;
+
+	player->gold += 2 * item->price / 3;
 
 	return NULL;
 }
@@ -202,32 +218,6 @@ print_equipment(Entity* player)
 		else
 			printf("(nothing)\n");
 	}
-}
-
-char*
-sell_item(Entity* player, Item* item)
-{
-	int i;
-	int count;
-
-	if (!item)
-		return NULL;
-
-	count = get_count_from_inventory(player->inventory, item);
-
-	if (count < 1)
-	{
-		return "You cannot sell an item you do not possess...";
-	}
-
-	for (i = 0; i < INVENTORY_SIZE && player->inventory[i] != item; i++)
-		;;
-
-	player->inventory[i] = NULL;
-
-	player->gold += 2 * item->price / 3;
-
-	return NULL;
 }
 
 Logs*

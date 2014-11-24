@@ -31,13 +31,21 @@ typedef struct Item {
 	List* attacks;
 } Item;
 
+typedef struct ItemStack {
+	int quantity;
+	Item* item;
+} ItemStack;
+
 #include "game.h"
+#include "entities.h"
 
 Item* load_item(char*);
 List* load_items(char*);
 
 Item* get_item_by_name(List*, char*);
-int get_count_from_inventory(Item**, Item*);
+int get_count_from_inventory(ItemStack*, Item*);
+
+int give_item(struct Entity*, Item*);
 
 int is_item_usable(Item*);
 

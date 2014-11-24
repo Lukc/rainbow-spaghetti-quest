@@ -25,7 +25,7 @@ inventory(Game* game)
 
 		if (input == 'e')
 		{
-			Item* item = player->inventory[selection];
+			Item* item = player->inventory[selection].item;
 
 			if (item)
 			{
@@ -35,7 +35,7 @@ inventory(Game* game)
 					 *        the screen. */
 					system("clear");
 
-					equip_item(player, player->inventory[selection]);
+					equip_item(player, player->inventory[selection].item);
 				}
 				else
 				{
@@ -53,7 +53,7 @@ inventory(Game* game)
 			{
 				Item* item;
 
-				if ((item = player->inventory[selection]))
+				if ((item = player->inventory[selection].item))
 					if (!item->unique)
 						sell_item(player, item);
 					else
@@ -119,12 +119,16 @@ inventory(Game* game)
 				if (selection == i + k * 8)
 					printf("\033[47m");
 
-				if (player->inventory[i + k * 8])
+				if (player->inventory[i + k * 8].item)
 				{
-					Item* item = player->inventory[i + k * 8];
+					Item* item = player->inventory[i + k * 8].item;
+					int quantity = player->inventory[i + k * 8].quantity;
 
 					/* FIXME: Make sure item’s name isn’t too long. */
-					printed = printf("  %s", item->name);
+					if (item->slot >= 0)
+						printed = printf("  %s", item->name);
+					else
+						printed = printf("  %ix %s", quantity, item->name);
 				}
 				else
 					printed = printf("  (empty)");
@@ -157,10 +161,10 @@ inventory(Game* game)
 
 		back(1);
 		move(40);
-		if (game->location->shop_items && player->inventory[selection])
+		if (game->location->shop_items && player->inventory[selection].item)
 		{
 			printf(WHITE " Sell price %-8i\n" NOCOLOR,
-				player->inventory[selection]->price * 2 / 3);
+				player->inventory[selection].item->price * 2 / 3);
 		}
 		else
 		{

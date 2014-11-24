@@ -164,7 +164,7 @@ main(int argc, char* argv[])
 			}
 
 			printf(
-				"Bottle gold: %i\n"
+				"Gold: %i\n"
 				"\n"
 				,
 				player.gold

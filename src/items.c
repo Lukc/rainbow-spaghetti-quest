@@ -94,6 +94,10 @@ get_slot(char* string, Logs* logs)
 	return 0;
 }
 
+/**
+ * Returns the numeric id of a damage type corresponding to a given string,
+ * or -1 if none.
+ */
 static int
 get_type(char* string, Logs* logs)
 {
@@ -114,7 +118,7 @@ get_type(char* string, Logs* logs)
 
 	logs_add(logs, log);
 
-	return 0;
+	return -1;
 }
 
 Item*
@@ -267,23 +271,71 @@ get_item_by_name(List* list, char* name)
 	return NULL;
 }
 
+/**
+ * Counts how many times a given Item* is present in an inventory.
+ * It counts the items in stacks and not just the number of stacks of the
+ * given item.
+ */
 int
-get_count_from_inventory(Item* inventory[INVENTORY_SIZE], Item* item)
+get_count_from_inventory(ItemStack inventory[INVENTORY_SIZE], Item* item)
 {
 	int i;
 	int count = 0;
 
 	for (i = 0; i < INVENTORY_SIZE; i++)
-		if (inventory[i] == item)
-			count++;
+		if (inventory[i].item == item)
+			count += inventory[i].quantity;
 
 	return count;
 }
 
+/**
+ * Checks whether or not an item can has effects during a battle.
+ */
 int
 is_item_usable(Item* item)
 {
 	return item->health_on_use || item->mana_on_use;
+}
+
+/**
+ * Adds an item to the inventory of an Entity*.
+ * It tries to stack non-equipment whenever possible.
+ * Unique items already in the player’s inventory are not added.
+ *
+ * @return -1: No space left in which to add the item.
+ * @return -2: Item is unique and already in the player’s inventory.
+ * @return (int) >= 0: The ItemStack index in which the given item was put.
+ */
+int
+give_item(Entity* player, Item* item)
+{
+	int i;
+
+	if (item->slot >= 0)
+		for (i = 0; i < INVENTORY_SIZE && player->inventory[i].item; i++)
+
+			;
+	else
+		/* Non-equipment is stackable */
+		for (i = 0;
+				i < INVENTORY_SIZE && (
+					player->inventory[i].item == item &&
+					player->inventory[i].quantity >= 99
+				);
+				i++)
+			;
+
+	if (i == INVENTORY_SIZE)
+		return -1; /* No space left in inventory */
+
+	if (item->unique && player->inventory[i].item == item)
+		return -2; /* Unique item already possessed */
+
+	player->inventory[i].item = item;
+	player->inventory[i].quantity += 1;
+
+	return i;
 }
 
 /* vim: set ts=4 sw=4 cc=80 : */

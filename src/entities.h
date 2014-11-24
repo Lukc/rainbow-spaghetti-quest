@@ -26,12 +26,12 @@ typedef struct Entity {
 	int health;
 	int mana;
 	unsigned int kills;
-	int gold; /* Bottle Gold */
+	int gold;
 
 	struct Class *class;
 
 	Item* equipment[EQ_MAX];
-	Item* inventory[INVENTORY_SIZE];
+	ItemStack inventory[INVENTORY_SIZE];
 } Entity;
 
 int get_max_mana(Entity*);

@@ -127,7 +127,10 @@ init_entity_from_class(Entity* e, Class* c)
 	e->gold = 0;
 
 	for (i = 0; i < INVENTORY_SIZE; i++)
-		e->inventory[i] = NULL;
+	{
+		e->inventory[i].quantity = 0;
+		e->inventory[i].item = NULL;
+	}
 
 	return 42;
 }

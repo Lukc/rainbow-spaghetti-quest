@@ -19,29 +19,19 @@ give_drop(Entity* to, Entity* of)
 	List* list;
 	Drop* drop;
 	Item* item;
-	int i;
-	int count;
 
 	for (list = of->class->drop; list; list = list->next)
 	{
 		drop = list->data;
 		item = drop->item;
 
-		count = get_count_from_inventory(to->inventory, item);
-
-		if (item->slot != -1 && to->equipment[item->slot] == item)
-			count += 1;
-
-		if (!item->unique || !count)
-			if (rand() % drop->rarity == 0)
-				for (i = 0; i < INVENTORY_SIZE; i++)
-					if (!to->inventory[i])
-					{
-						to->inventory[i] = drop->item;
-						list_add(&out, (void*) drop->item);
-
-						i = INVENTORY_SIZE;
-					}
+		if (rand() % drop->rarity == 0)
+		{
+			if (give_item(to, drop->item) < 0)
+				return out;
+			else
+				list_add(&out, (void*) drop->item);
+		}
 	}
 
 	return out;

@@ -67,7 +67,7 @@ print_attacks(Entity* player, List* list)
  * @param page: Integer representing the “page” of the inventory to display.
  *  Each “page” is a group of 5 successive entries from the inventory.
  *
- * @todo: Print the Health/Mana bonuses of using the item.
+ * @todo: Print the effects of using the item somewhere...
  */
 static void
 print_items(Entity* player, int page)
@@ -82,7 +82,7 @@ print_items(Entity* player, int page)
 		{
 			Item* item;
 
-			if ((item = player->inventory[index]))
+			if ((item = player->inventory[index].item))
 			{
 				if (is_item_usable(item))
 				{
@@ -94,8 +94,11 @@ print_items(Entity* player, int page)
 				else
 					printf(BLACK);
 
-				printf("  (%i) %-9s\n" NOCOLOR,
-					i, item->name);
+				if (player->inventory[index].quantity > 1)
+					printf("  (%i) %ix %-9s\n" NOCOLOR, i,
+						player->inventory[index].quantity, item->name);
+				else
+					printf("  (%i) %-9s\n" NOCOLOR, i, item->name);
 			}
 			else
 				printf(
@@ -398,13 +401,20 @@ battle(Game *game)
 							int index = input + page * 5;
 
 							if (index < INVENTORY_SIZE &&
-								(item = player->inventory[index]))
+								(item = player->inventory[index].item))
 							{
 								logs = command_use_item(
 									game, player, item);
 
 								if (item->consumable)
-									player->inventory[index] = NULL;
+								{
+									player->inventory[index].quantity -= 1;
+
+									/* FIXME: Okay, make a separate function
+									 * for items’ use. */
+									if (player->inventory[index].quantity <= 0)
+								   		player->inventory[index].item = NULL;
+								}
 							}
 							else
 							{
@@ -505,7 +515,7 @@ battle(Game *game)
 
 				system("clear");
 				printf("\nYou are DEAD.\n");
-				printf("\nYou lost half your bottle gold.\n");
+				printf("\nYou lost half your gold.\n");
 				printf("\nPress any key to continue...\n\n");
 				getch();
 				return -1;
@@ -518,7 +528,7 @@ battle(Game *game)
 
 				system("clear");
 				printf("\nYou are VICTORIOUS.\n");
-				printf("\nYou gain %d bottle gold!\n",
+				printf("\nYou gain %dgp!\n",
 					enemy->class->gold_on_kill);
 				if (list)
 				{
