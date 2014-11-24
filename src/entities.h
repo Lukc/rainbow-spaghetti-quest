@@ -26,7 +26,7 @@ typedef struct Entity {
 	int health;
 	int mana;
 	unsigned int kills;
-	int caps; /* Bottle Caps */
+	int gold; /* Bottle Gold */
 
 	struct Class *class;
 

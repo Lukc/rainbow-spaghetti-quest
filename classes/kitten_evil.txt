@@ -20,7 +20,7 @@ Piercing resistance: 15
 Impact resistance: 5
 Fire resistance: 80
 Arcane resistance: -25
-Caps on kill: 10
+Gold on kill: 10
 Drop: [
 	Item: Nightmare Fuel
 	Rarity: 60

@@ -27,4 +27,4 @@ Slashing resistance: -50
 Piercing resistance: 15
 Poison resistance: 80
 Electric resistance: 80
-Caps on kill: 100
+Gold on kill: 100

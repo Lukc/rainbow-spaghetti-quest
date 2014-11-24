@@ -164,10 +164,10 @@ main(int argc, char* argv[])
 			}
 
 			printf(
-				"Bottle caps: %i\n"
+				"Bottle gold: %i\n"
 				"\n"
 				,
-				player.caps
+				player.gold
 			);
 
 			printf("Current location: %s\n\n", game.location->name);

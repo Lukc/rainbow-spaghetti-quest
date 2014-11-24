@@ -124,7 +124,7 @@ init_entity_from_class(Entity* e, Class* c)
 	e->health = get_max_health(e);
 
 	e->kills = 0;
-	e->caps = 0;
+	e->gold = 0;
 
 	for (i = 0; i < INVENTORY_SIZE; i++)
 		e->inventory[i] = NULL;

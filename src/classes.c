@@ -131,8 +131,8 @@ load_class (Game* game, char* filename)
 			class->attack_bonus = parser_get_integer(element, logs);
 		else if (!strcmp(field, "defense bonus"))
 			class->defense_bonus = parser_get_integer(element, logs);
-		else if (!strcmp(field, "caps on kill"))
-			class->caps_on_kill = parser_get_integer(element, logs);
+		else if (!strcmp(field, "gold on kill"))
+			class->gold_on_kill = parser_get_integer(element, logs);
 		else if (!strcmp(field, "attack"))
 		{
 			List* sublist;

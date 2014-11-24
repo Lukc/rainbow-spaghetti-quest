@@ -11,7 +11,7 @@ typedef struct Class {
 	int base_health;
 	int base_mana;
 
-	int caps_on_kill;
+	int gold_on_kill;
 
 	int attack_bonus;
 	int defense_bonus;

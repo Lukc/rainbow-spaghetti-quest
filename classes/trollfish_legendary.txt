@@ -29,7 +29,7 @@ Fire Resistance: 50
 Cold Resistance: 20
 # Well... they gotta have some weakness, right?
 Poison Resistance: -80
-Caps on kill: 200
+Gold on kill: 200
 Drop: [
 	Item: Legendary Trollscales
 	Rarity: 1

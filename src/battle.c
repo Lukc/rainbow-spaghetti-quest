@@ -501,25 +501,25 @@ battle(Game *game)
 			}
 			else if (player->health <= 0)
 			{
-				player->caps /= 2;
+				player->gold /= 2;
 
 				system("clear");
 				printf("\nYou are DEAD.\n");
-				printf("\nYou lost half your bottle caps.\n");
+				printf("\nYou lost half your bottle gold.\n");
 				printf("\nPress any key to continue...\n\n");
 				getch();
 				return -1;
 			}
 			else if (enemy->health <= 0)
 			{
-				player->caps += enemy->class->caps_on_kill;
+				player->gold += enemy->class->gold_on_kill;
 
 				list = give_drop(player, enemy);
 
 				system("clear");
 				printf("\nYou are VICTORIOUS.\n");
-				printf("\nYou gain %d bottle caps!\n",
-					enemy->class->caps_on_kill);
+				printf("\nYou gain %d bottle gold!\n",
+					enemy->class->gold_on_kill);
 				if (list)
 				{
 					printf("\nYou were able to loot the following items:\n");

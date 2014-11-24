@@ -147,7 +147,7 @@ inventory(Game* game)
 
 		back(1);
 		move(40);
-		printf(WHITE " Money:     %-8i\n" NOCOLOR, player->caps);
+		printf(WHITE " Money:     %-8i\n" NOCOLOR, player->gold);
 
 		if (!game->location->shop_items)
 			printf(BLACK);

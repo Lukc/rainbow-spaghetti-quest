@@ -90,7 +90,7 @@ buy_item(Entity* player, Item* selected_item)
 	if (!selected_item)
 		return NULL;
 
-	if (player->caps >= selected_item->price)
+	if (player->gold >= selected_item->price)
 	{
 		for (i = 0; i < INVENTORY_SIZE && player->inventory[i]; i++)
 			;;
@@ -102,13 +102,13 @@ buy_item(Entity* player, Item* selected_item)
 		}
 		else
 		{
-			player->caps -= selected_item->price;
+			player->gold -= selected_item->price;
 			player->inventory[i] = selected_item;
 		}
 	}
 	else
 	{
-		return "You do not have enough bottlecaps to buy this item.";
+		return "You do not have enough bottlegold to buy this item.";
 	}
 
 	return NULL;
@@ -225,7 +225,7 @@ sell_item(Entity* player, Item* item)
 
 	player->inventory[i] = NULL;
 
-	player->caps += 2 * item->price / 3;
+	player->gold += 2 * item->price / 3;
 
 	return NULL;
 }
@@ -332,7 +332,7 @@ enter_shop(Game* game)
 				if (i == selection)
 					printf(NOCOLOR "\033[47m");
 
-				if (item->price <= player->caps)
+				if (item->price <= player->gold)
 					printf(BRIGHT GREEN);
 				else
 					printf(BLACK);
@@ -343,7 +343,7 @@ enter_shop(Game* game)
 				for (j = 0; j < 68 - printed; j++)
 					printf(" ");
 
-				printed = printf("(%ic)", item->price);
+				printed = printf("(%igp)", item->price);
 
 				for (j = 0; j < 12 - printed; j++)
 					printf(" ");
@@ -359,7 +359,7 @@ enter_shop(Game* game)
 
 		menu_separator();
 
-		printf(WHITE " Money: %-5i" NOCOLOR, player->caps);
+		printf(WHITE " Money: %i%-5s" NOCOLOR, player->gold, "gp");
 		move(40);
 		printf(WHITE " (b)  Buy\n" NOCOLOR);
 		if (selected_item)

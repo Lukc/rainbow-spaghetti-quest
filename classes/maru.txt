@@ -19,7 +19,7 @@ Mana on Focus: 10
 Arcane resistance: -50
 Fire resistance: -50
 Slashing resistance: 14 # Protected by boxes, I guess?
-Caps on kill: 50
+Gold on kill: 50
 Drop: [
 	Item: Maru's Box
 	Rarity: 1
