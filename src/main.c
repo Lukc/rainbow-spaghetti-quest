@@ -26,17 +26,27 @@ print_menu(Game* game)
 
 	printf(
 		WHITE
-		"%s  (b)  Find someone to beat to death!\n" NOCOLOR
-		"%s  (s)  Buy new equipment to improve your stats!\n" NOCOLOR
-		WHITE "  (i)  Choose your katanas and golden armors!\n"
+		"%s  (b) Random battle\n" NOCOLOR
+		"%s  (s) Enter shop\n" NOCOLOR
+		WHITE "  (i) Open inventory\n"
 		BLACK
-			"  (d)  Enter a terrible dungeon and fight hordes of enemies!\n"
+			"  (d) Enter dungeon\n"
 		WHITE
-		"  (t)  Travel to far far away places and explore the world!\n"
+		"  (t) Travel\n"
 		NOCOLOR,
 		location->random_enemies ? WHITE : BLACK,
 		location->shop_items ? WHITE : BLACK
 	);
+
+	back(5);
+	move(40);
+	printf(BLACK " (c) Craft items\n" NOCOLOR);
+	move(40);
+	printf(BLACK " (q) Show quests\n" NOCOLOR);
+	printf("\n");
+	printf("\n");
+	move(40);
+	printf(BLACK " (S) Save game\n" NOCOLOR);
 
 	menu_separator();
 }
@@ -104,12 +114,17 @@ main(int argc, char* argv[])
 				logs = NULL;
 				inventory(&game);
 				break;
-			case 'd':
-				logs = NULL;
-				break;
 			case 't':
 				logs = NULL;
 				travel(&game);
+				break;
+
+			/* Unimplemented stuff */
+			case 'S':
+			case 'd':
+			case 'c':
+			case 'q':
+				logs = NULL;
 				break;
 			case -42:
 				break;
@@ -117,7 +132,6 @@ main(int argc, char* argv[])
 				error = "Unrecognized key.";
 		}
 
-		/*logs = execute_commands(line, commands, &game);*/
 		logs = NULL;
 
 		player.health = get_max_health(&player);
