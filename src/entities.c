@@ -132,6 +132,9 @@ init_entity_from_class(Entity* e, Class* c)
 		e->inventory[i].item = NULL;
 	}
 
+	for (i = 0; i < SKILL_MAX; i++)
+		e->skills_cooldown[i] = 0;
+
 	return 42;
 }
 

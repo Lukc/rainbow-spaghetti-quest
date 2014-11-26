@@ -6,6 +6,7 @@
 #include "classes.h"
 #include "attack.h"
 #include "items.h"
+#include "skills.h"
 
 /* Why? Because! */
 #define INVENTORY_SIZE 24
@@ -27,6 +28,8 @@ typedef struct Entity {
 	int mana;
 	unsigned int kills;
 	int gold;
+
+	int skills_cooldown[SKILL_MAX];
 
 	struct Class *class;
 

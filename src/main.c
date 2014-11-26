@@ -16,6 +16,8 @@
 #include "inventory.h"
 #include "travel.h"
 #include "images.h"
+#include "craft.h"
+#include "skills.h"
 
 static void
 print_menu(Game* game)
@@ -40,10 +42,13 @@ print_menu(Game* game)
 
 	back(5);
 	move(40);
-	printf(BLACK " (c) Craft items\n" NOCOLOR);
+	fg(2, 1, 0);
+	printf(" (c) <WIP> Craft items\n" NOCOLOR);
+	move(40);
+	fg(2, 1, 0);
+	printf(" (k) <WIP> Use skills\n" NOCOLOR);
 	move(40);
 	printf(BLACK " (q) Show quests\n" NOCOLOR);
-	printf("\n");
 	printf("\n");
 	move(40);
 	printf(BLACK " (S) Save game\n" NOCOLOR);
@@ -118,11 +123,18 @@ main(int argc, char* argv[])
 				logs = NULL;
 				travel(&game);
 				break;
+			case 'c':
+				logs = NULL;
+				craft(&game);
+				break;
+			case 'k':
+				logs = NULL;
+				skills(&game);
+				break;
 
 			/* Unimplemented stuff */
 			case 'S':
 			case 'd':
-			case 'c':
 			case 'q':
 				logs = NULL;
 				break;

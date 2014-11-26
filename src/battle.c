@@ -40,7 +40,7 @@ print_attacks(Entity* player, List* list)
 
 			printf("%s", color);
 
-			printf("  (%i) %-9s %3i-%i %-10s" NOCOLOR, i,
+			printf("  (%i) %-9s %3i-%i %-10s" NOCOLOR, i + 1,
 				name,
 				attack->damage + get_attack_bonus(player),
 				attack->strikes, type_to_string(attack->type));
@@ -56,56 +56,8 @@ print_attacks(Entity* player, List* list)
 		}
 		else
 		{
-			printf(
-				BLACK "  (%i) --------- \n" NOCOLOR, i);
+			printf(BLACK "  (%i) --------- \n" NOCOLOR, i + 1);
 		}
-	}
-}
-
-/**
- * Prints the items’ selection menu of the battle interface.
- * @param page: Integer representing the “page” of the inventory to display.
- *  Each “page” is a group of 5 successive entries from the inventory.
- *
- * @todo: Print the effects of using the item somewhere...
- */
-static void
-print_items(Entity* player, int page)
-{
-	int i;
-
-	for (i = 0; i < 5; i++)
-	{
-		int index = i + page * 5;
-
-		if (index < INVENTORY_SIZE)
-		{
-			Item* item;
-
-			if ((item = player->inventory[index].item))
-			{
-				if (is_item_usable(item))
-				{
-					if (item->consumable)
-						printf(GREEN);
-					else
-						printf(WHITE);
-				}
-				else
-					printf(BLACK);
-
-				if (player->inventory[index].quantity > 1)
-					printf("  (%i) %ix %-9s\n" NOCOLOR, i,
-						player->inventory[index].quantity, item->name);
-				else
-					printf("  (%i) %-9s\n" NOCOLOR, i, item->name);
-			}
-			else
-				printf(
-					BLACK "  (%i) --------- \n" NOCOLOR, i);
-		}
-		else
-			printf("\n");
 	}
 }
 
@@ -380,9 +332,9 @@ battle(Game *game)
 					page = page == 0 ? 0 : page - 1;
 					break;
 				default:
-					if (input >= '0' && input < '5')
+					if (input > '0' && input <= '5')
 					{
-						input = input - '0';
+						input = input - '1';
 						if (view == ATTACKS)
 							if (list_size(player_attacks) > input)
 							{
@@ -477,7 +429,7 @@ battle(Game *game)
 			}
 			else if (view == ITEMS)
 			{
-				print_items(player, page);
+				print_items_menu(player, page);
 			}
 
 			back(5);

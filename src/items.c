@@ -8,6 +8,8 @@
 #include "items.h"
 #include "types.h"
 
+#include "colors.h"
+
 #include "parser.h"
 
 #define MAX_ITEMS 255
@@ -336,6 +338,52 @@ give_item(Entity* player, Item* item)
 	player->inventory[i].quantity += 1;
 
 	return i;
+}
+
+/**
+ * Prints the items’ selection menu of the battle interface.
+ * @param page: Integer representing the “page” of the inventory to display.
+ *  Each “page” is a group of 5 successive entries from the inventory.
+ *
+ * @todo: Print the effects of using the item somewhere...
+ */
+void
+print_items_menu(Entity* player, int page)
+{
+	int i;
+
+	for (i = 0; i < 5; i++)
+	{
+		int index = i + page * 5;
+
+		if (index < INVENTORY_SIZE)
+		{
+			Item* item;
+
+			if ((item = player->inventory[index].item))
+			{
+				if (is_item_usable(item))
+				{
+					if (item->consumable)
+						printf(GREEN);
+					else
+						printf(WHITE);
+				}
+				else
+					printf(BLACK);
+
+				if (player->inventory[index].quantity > 1)
+					printf("  (%i) %ix %-9s\n" NOCOLOR, i + 1,
+						player->inventory[index].quantity, item->name);
+				else
+					printf("  (%i) %-9s\n" NOCOLOR, i + 1, item->name);
+			}
+			else
+				printf(BLACK "  (%i) --------- \n" NOCOLOR, i + 1);
+		}
+		else
+			printf("\n");
+	}
 }
 
 /* vim: set ts=4 sw=4 cc=80 : */
