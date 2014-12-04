@@ -16,6 +16,7 @@ enum STATUSES {
 };
 
 char* status_to_string(int);
+int string_to_status(char*);
 
 int has_status(Entity*, int);
 

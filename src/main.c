@@ -68,7 +68,7 @@ main(int argc, char* argv[])
 	List* items;
 	Game game;
 	List* world;
-	
+
 	items = load_items("items");
 	game.items = items;
 

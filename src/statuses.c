@@ -1,3 +1,4 @@
+#include <string.h>
 
 #include "statuses.h"
 
@@ -13,6 +14,20 @@ status_to_string(int status)
 		default:
 			return "unknown status";
 	}
+}
+
+int
+string_to_status(char* string)
+{
+	int i;
+
+	for (i = 0; i < STATUS_MAX; i++)
+	{
+		if (!strcmp(status_to_string(i), string))
+			return i;
+	}
+
+	return -1;
 }
 
 int

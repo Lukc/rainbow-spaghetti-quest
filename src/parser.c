@@ -228,16 +228,18 @@ parser_get_attack(ParserElement* element, Logs* logs)
 			else if (!strcmp(element->name, "strikes"))
 				attack->strikes =
 					parser_get_integer(element, logs);
-			else if (!strcmp(element->name, "inflicts"))
-				/* FIXME: Strings preferred, thanks! */
-				attack->inflicts_status =
-					parser_get_integer(element, logs);
 			else if (!strcmp(element->name, "mana"))
 				attack->mana_cost =
 					parser_get_integer(element, logs);
 			else if (!strcmp(element->name, "name"))
 				attack->name =
 					parser_get_string(element, logs);
+			else if (!strcmp(element->name, "inflicts"))
+			{
+				char string = parser_get_string(element, logs);
+
+				attack->inflicts_status = string_to_status(string);
+			}
 			else if (!strcmp(element->name, "type"))
 			{
 				char* type = parser_get_string(element, logs);
