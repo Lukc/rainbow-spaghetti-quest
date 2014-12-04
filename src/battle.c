@@ -61,6 +61,21 @@ print_attacks(Entity* player, List* list)
 	}
 }
 
+static void
+inflict_status(Entity* e, int status)
+{
+	List* l;
+
+	for (l = e->statuses; l; l = l->next)
+	{
+		if ((int) l->data == status)
+			/* Already inflicted? Kewl. */
+			return;
+	}
+
+	list_add(&e->statuses, (void*) status);
+}
+
 /**
  * Checks whether someone has enough mana to use an attack or not.
  */
@@ -98,6 +113,9 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 	attacker->mana -= attack->mana_cost;
 	defender->health -= damage_inflicted;
 
+	if (attack->inflicts_status != -1)
+		inflict_status(defender, attack->inflicts_status);
+
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(log, 128,
 		BRIGHT WHITE "%s " RED ">>>"
@@ -117,6 +135,8 @@ focus(Entity* entity, Logs* logs)
 	int mana_gained, health_gained;
 	int i;
 	char* log;
+
+	remove_statuses(entity);
 
 	health_gained = entity->class->health_regen_on_focus;
 

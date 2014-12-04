@@ -42,6 +42,10 @@ list_size(List* list)
 	return i;
 }
 
+/**
+ * Returns a new list with the content of the first one in reverse order.
+ * Frees the list given as parameter.
+ */
 List*
 list_rev_and_free(List* list)
 {
@@ -58,5 +62,19 @@ list_rev_and_free(List* list)
 	}
 
 	return new_list;
+}
+
+void
+list_free(List* list)
+{
+	List* t;
+
+	while (list)
+	{
+		t = list;
+		list = list->next;
+
+		free(t);
+	}
 }
 

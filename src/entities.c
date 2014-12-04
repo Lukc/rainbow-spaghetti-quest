@@ -4,6 +4,7 @@
 #include <ctype.h>
 
 #include "types.h"
+#include "statuses.h"
 #include "colors.h"
 #include "entities.h"
 
@@ -131,6 +132,8 @@ init_entity_from_class(Entity* e, Class* c)
 		e->inventory[i].quantity = 0;
 		e->inventory[i].item = NULL;
 	}
+
+	e->statuses = NULL;
 
 	for (i = 0; i < SKILL_MAX; i++)
 		e->skills_cooldown[i] = 0;
@@ -278,7 +281,23 @@ print_attacks(Entity* e)
 void
 print_entity_basestats(Entity* e)
 {
-	printf(BRIGHT BLUE ">> %s\n" NOCOLOR, e->name);
+	printf(BRIGHT BLUE ">> %s" NOCOLOR, e->name);
+
+	if (e->statuses)
+	{
+		printf(WHITE "  <");
+	
+		if (e->statuses->next)
+			for (List* l = e->statuses; l; l = l->next)
+				printf("%c",
+					toupper(status_to_string((unsigned int) l->data)[0]));
+		else
+			printf("%s", status_to_string((unsigned int) e->statuses->data));
+
+		printf(">" NOCOLOR);
+	}
+
+	printf("\n");
 
 	print_bar(
 		BRIGHT WHITE "  Health:   ",
@@ -368,6 +387,20 @@ get_all_attacks(Entity* e)
 	}
 
 	return result;
+}
+
+void
+remove_statuses(Entity* e)
+{
+	List* list;
+
+	/* For now, no content to free. */
+	for (list = e->statuses; list; list = list->next)
+		;
+
+	list_free(e->statuses);
+
+	e->statuses = (List*) NULL;
 }
 
 /* vim: set ts=4 sw=4 cc=80 : */

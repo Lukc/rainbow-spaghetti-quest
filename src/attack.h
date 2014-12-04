@@ -8,6 +8,7 @@ typedef struct Attack {
 	int type;
 	int damage;
 	int strikes;
+	int inflicts_status;
 } Attack;
 
 #endif

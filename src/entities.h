@@ -2,6 +2,7 @@
 #ifndef ENTITIES_H
 #define ENTITIES_H
 
+#include "list.h"
 #include "game.h"
 #include "classes.h"
 #include "attack.h"
@@ -31,6 +32,8 @@ typedef struct Entity {
 
 	int skills_cooldown[SKILL_MAX];
 
+	List* statuses;
+
 	struct Class *class;
 
 	Item* equipment[EQ_MAX];
@@ -51,6 +54,8 @@ int init_entity_from_class(Entity*, Class*);
 
 void print_entity_basestats(Entity*);
 void print_entity(Entity*);
+
+void remove_statuses(Entity*);
 
 List* get_all_attacks(Entity*);
 

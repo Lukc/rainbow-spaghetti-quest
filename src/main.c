@@ -148,6 +148,7 @@ main(int argc, char* argv[])
 
 		player.health = get_max_health(&player);
 		player.mana = get_max_mana(&player);
+		remove_statuses(&player);
 
 		if (game.location->image)
 		{

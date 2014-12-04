@@ -22,4 +22,3 @@ typedef struct Game {
 
 #endif
 
-

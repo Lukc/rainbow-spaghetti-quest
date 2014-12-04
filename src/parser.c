@@ -216,6 +216,7 @@ parser_get_attack(ParserElement* element, Logs* logs)
 	else
 	{
 		memset(attack, 0, sizeof(Attack));
+		attack->inflicts_status = -1;
 
 		for (list = element->value; list; list = list->next)
 		{
@@ -226,6 +227,10 @@ parser_get_attack(ParserElement* element, Logs* logs)
 					parser_get_integer(element, logs);
 			else if (!strcmp(element->name, "strikes"))
 				attack->strikes =
+					parser_get_integer(element, logs);
+			else if (!strcmp(element->name, "inflicts"))
+				/* FIXME: Strings preferred, thanks! */
+				attack->inflicts_status =
 					parser_get_integer(element, logs);
 			else if (!strcmp(element->name, "mana"))
 				attack->mana_cost =
