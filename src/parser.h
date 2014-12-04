@@ -3,6 +3,8 @@
 #define PARSER_H
 
 #include "list.h"
+#include "drop.h"
+#include "attack.h"
 #include "commands.h"
 
 enum PARSER_TYPES {
@@ -23,6 +25,8 @@ void parser_free(ParserElement*);
 
 int parser_get_integer(ParserElement*, Logs*);
 char* parser_get_string(ParserElement*, Logs*);
+Attack* parser_get_attack(ParserElement*, Logs*);
+Drop* parser_get_drop(List*, ParserElement*, Logs*);
 
 #endif
 

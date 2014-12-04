@@ -71,29 +71,6 @@ check_type_resistance(Class* class, ParserElement* element, Logs* logs)
 	return 0;
 }
 
-static int
-get_type(char* string, Logs* logs)
-{
-	char* type;
-	char* log;
-	int i;
-
-	for (i = 0; i < TYPE_MAX; i++)
-	{
-		type = type_to_string(i);
-
-		if (!strcmp(string, type))
-			return i;
-	}
-
-	log = (char*) malloc(sizeof(char) * 128);
-	snprintf(log, 128, "Invalid type: “%s”.", string);
-
-	logs_add(logs, log);
-
-	return 0;
-}
-
 Class*
 load_class (Game* game, char* filename)
 {
@@ -135,87 +112,17 @@ load_class (Game* game, char* filename)
 			class->gold_on_kill = parser_get_integer(element, logs);
 		else if (!strcmp(field, "attack"))
 		{
-			List* sublist;
-			ParserElement* subelement;
-			Attack* attack = (Attack*) malloc(sizeof(Attack));
+			Attack* attack = parser_get_attack(element, logs);
 
-			if (element->type != PARSER_LIST)
-			{
-				logs_add(logs,
-					strdup("Trying to add attack improperly defined.\n"));
-				free(attack);
-			}
-			else
-				memset(attack, 0, sizeof(Attack));
-
-				for (sublist = element->value; sublist; sublist = sublist->next)
-				{
-					subelement = sublist->data;
-
-					if (!strcmp(subelement->name, "damage"))
-						attack->damage =
-							parser_get_integer(subelement, logs);
-					else if (!strcmp(subelement->name, "strikes"))
-						attack->strikes =
-							parser_get_integer(subelement, logs);
-					else if (!strcmp(subelement->name, "mana"))
-						attack->mana_cost =
-							parser_get_integer(subelement, logs);
-					else if (!strcmp(subelement->name, "name"))
-						attack->name =
-							parser_get_string(subelement, logs);
-					else if (!strcmp(subelement->name, "type"))
-					{
-						char* type = parser_get_string(subelement, logs);
-
-						if (type)
-							attack->type = get_type(type, logs);
-					}
-				}
-
-			list_add(&class->attacks, (void*) attack);
+			if (attack)
+				list_add(&class->attacks, (void*) attack);
 		}
 		else if (!strcmp(field, "drop"))
 		{
-			List* sublist;
-			ParserElement* subelement;
-			Drop* drop = (Drop*) malloc(sizeof(Drop));
+			Drop* drop = parser_get_drop(game->items, element, logs);
 
-			if (element->type != PARSER_LIST)
-			{
-				logs_add(logs,
-					strdup("Trying to add drop improperly defined.\n"));
-				free(drop);
-			}
-			else
-			{
-				memset(drop, 0, sizeof(Drop));
-
-				for (sublist = element->value; sublist; sublist = sublist->next)
-				{
-					subelement = sublist->data;
-
-					if (!strcmp(subelement->name, "item"))
-					{
-						char* name = parser_get_string(subelement, logs);
-						drop->item = get_item_by_name(game->items, name);
-					}
-					else if (!strcmp(subelement->name, "rarity"))
-						drop->rarity =
-							parser_get_integer(subelement, logs);
-				}
-
-				if (!drop->item)
-				{
-					char* log = (char*) malloc(sizeof(char) * 128);
-					snprintf(log, 128,
-						"Drop item with no valid “item” field!");
-					logs_add(logs, log);
-				}
-				else
-					list_add(&class->drop, drop);
-
-			}
+			if (drop)
+				list_add(&class->drop, drop);
 		}
 		else if (check_type_resistance(class, element, logs))
 			;

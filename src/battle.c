@@ -124,9 +124,8 @@ focus(Entity* entity, Logs* logs)
 		if (entity->equipment[i])
 			health_gained += entity->equipment[i]->health_on_focus;
 
-	health_gained =
-		entity->health + health_gained > get_max_health(entity) ?
-			get_max_health(entity) : health_gained;
+	if (entity->health + health_gained > get_max_health(entity))
+		health_gained = get_max_health(entity) - entity->health;
 
 	mana_gained = entity->class->mana_regen_on_focus;
 
@@ -134,9 +133,8 @@ focus(Entity* entity, Logs* logs)
 		if (entity->equipment[i])
 			mana_gained += entity->equipment[i]->mana_on_focus;
 
-	mana_gained =
-		entity->mana + mana_gained > get_max_mana(entity) ?
-			get_max_mana(entity) : mana_gained;
+	if (entity->mana + mana_gained > get_max_mana(entity))
+		mana_gained = get_max_mana(entity) - entity->mana;
 
 	entity->mana += mana_gained;
 	entity->health += health_gained;
@@ -476,7 +474,7 @@ battle(Game *game)
 			{
 				player->gold += enemy->class->gold_on_kill;
 
-				list = give_drop(player, enemy);
+				list = give_drop(player, enemy->class->drop);
 
 				system("clear");
 				printf("\nYou are VICTORIOUS.\n");
@@ -552,6 +550,8 @@ enter_battle(Game* game)
 	{
 		player->kills++;
 	}
+
+	lower_skills_cooldown(player);
 
 	system("clear");
 

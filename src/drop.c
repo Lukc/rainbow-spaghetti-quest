@@ -7,20 +7,21 @@
 #include "shop.h"
 
 /**
- * Give to the first entity the drop it should receive if it killed the
- * second one.
+ * Gives random drop from a list of Drop* to an Entity*. Returns a list
+ * of the given Item*s.
  *
+ * @param droplist: List* of Drop*
  * @return List* of Item*
  */
 List*
-give_drop(Entity* to, Entity* of)
+give_drop(Entity* to, List* droplist)
 {
 	List* out = NULL;
 	List* list;
 	Drop* drop;
 	Item* item;
 
-	for (list = of->class->drop; list; list = list->next)
+	for (list = droplist; list; list = list->next)
 	{
 		drop = list->data;
 		item = drop->item;

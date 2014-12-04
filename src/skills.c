@@ -8,7 +8,7 @@
 #include "skills.h"
 
 char*
-skill_string(int skill)
+skill_to_string(int skill)
 {
 	switch (skill)
 	{
@@ -40,20 +40,52 @@ skill_string(int skill)
 }
 
 void
-print_skill(int skill, int x, int selected, int cooldown)
+lower_skills_cooldown(Entity* player)
+{
+	int i;
+
+	for (i = 0; i < SKILL_MAX; i++)
+		if (player->skills_cooldown[i] > 0)
+			player->skills_cooldown[i]--;
+}
+
+void
+print_skill(int skill, int x, int selected, int cooldown, int usable)
 {
 	int c = selected ? '>' : ' ';
 
 	move(x);
-	printf("  %c %s\n", c, skill_string(skill));
+	if (usable)
+	{
+		if (cooldown)
+			printf(RED);
+		else
+			printf(BRIGHT BLUE);
+	}
+	else
+		printf(BLACK);
+	printf("  %c %s", c, skill_to_string(skill));
+	printf(NOCOLOR "\n");
+
 	move(x);
-	printf("  %c  cooldown: %i\n", c, cooldown);
+	if (usable)
+	{
+		if (cooldown)
+			printf(RED);
+		else
+			printf(BRIGHT BLUE);
+	}
+	else
+		printf(BLACK);
+	printf("  %c  cooldown: %i", c, cooldown);
+	printf(NOCOLOR "\n");
 }
 
 void
 skills(Game* game)
 {
 	int input = -42;
+	int default_cooldown = 6;
 	int selection = 0;
 	int i;
 	char* error;
@@ -85,6 +117,16 @@ skills(Game* game)
 				selection =
 					selection + 9 < SKILL_MAX ? selection + 9 : selection;
 				break;
+			case 13: /* \n ??? */
+				if (player->skills_cooldown[selection] == 0 &&
+				    game->location->skill_drop[selection])
+				{
+					give_drop(player, game->location->skill_drop[selection]);
+					player->skills_cooldown[selection] = default_cooldown;
+
+					/* FIXME: Print the obtained items! */
+				}
+				break;
 			default:
 				error = "Unrecognized key!";
 		}
@@ -94,7 +136,9 @@ skills(Game* game)
 		for (i = 0; i < 9; i++)
 		{
 			if (i < SKILL_MAX)
-				print_skill(i, 0, i == selection, player->skills_cooldown[i]);
+				print_skill(
+					i, 0, i == selection, player->skills_cooldown[i],
+					game->location->skill_drop[i] != NULL);
 			else
 				printf("\n\n");
 
@@ -102,13 +146,14 @@ skills(Game* game)
 			{
 				back(2);
 				print_skill(i + 9, 40, i + 9 == selection,
-					player->skills_cooldown[i + 9]);
+					player->skills_cooldown[i + 9],
+					game->location->skill_drop[i + 9] != NULL);
 			}
 		}
 
 		menu_separator();
 
-		printf("Cooldown after use:  4247\n");
+		printf("Cooldown after use:  %i\n", default_cooldown);
 		printf("Possible drop here:  (none)\n");
 		printf("Needed resources:    (none)\n");
 

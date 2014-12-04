@@ -3,8 +3,7 @@
 #define SKILLS_H
 
 /*
- * @fixme: ’k, so... how do I differenciate collect skills from crafting ones?
- * @fixme: Need about 10 skills (because it fits a (24-4)/2 lines term)
+ * @fixme: Add more skills. Yeah, srsly.
  */
 enum SKILLS {
 	SKILL_WOODCUTTING,
@@ -23,9 +22,11 @@ enum SKILLS {
 };
 
 #include "game.h"
+#include "entities.h"
 
-char* skill_string(int);
+char* skill_to_string(int);
 
+void lower_skills_cooldown(struct Entity*);
 void skills(Game*);
 
 #endif

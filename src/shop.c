@@ -323,7 +323,11 @@ enter_shop(Game* game)
 					printf(NOCOLOR "\033[47m");
 
 				if (item->price <= player->gold)
-					printf(BRIGHT GREEN);
+					printf(GREEN);
+				else if (get_count_from_inventory(player->inventory, item))
+					/* Sellable. That’s an action, let’s not print the entry
+					 * as “disabled black”.*/
+					printf(YELLOW);
 				else
 					printf(BLACK);
 

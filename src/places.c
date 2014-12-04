@@ -10,6 +10,7 @@
 #include "classes.h"
 #include "parser.h"
 #include "destinations.h"
+#include "skills.h"
 
 /**
  * @return: List* of Place*
@@ -139,6 +140,44 @@ parse_destination(Game* game, List* elements, Logs* logs)
 	return destination;
 }
 
+static int
+load_skill(Place* place, List* items, ParserElement* element, Logs* logs)
+{
+	char* skill_name;
+	List* list;
+	int skill;
+
+	for (skill = 0; skill < SKILL_MAX; skill++)
+	{
+		skill_name = skill_to_string(skill);
+
+		if (!strcmp(element->name, skill_name))
+		{
+			list = element->value;
+			element = list->data;
+
+			while (list)
+			{
+				element = list->data;
+
+				if (!strcmp(element->name, "drop"))
+				{
+					Drop* drop = parser_get_drop(items, element, logs);
+
+					if (drop)
+						list_add(place->skill_drop + skill, drop);
+				}
+
+				list = list->next;
+			}
+
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
 Place*
 load_place (Game* game, char* filename)
 {
@@ -163,7 +202,9 @@ load_place (Game* game, char* filename)
 
 		field = element->name;
 
-		if (!strcmp(field, "name"))
+		if (load_skill(place, game->items, element, logs))
+			;
+		else if (!strcmp(field, "name"))
 			place->name = parser_get_string(element, logs);
 		else if (!strcmp(field, "shop item"))
 		{

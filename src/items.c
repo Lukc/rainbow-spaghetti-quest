@@ -96,33 +96,6 @@ get_slot(char* string, Logs* logs)
 	return 0;
 }
 
-/**
- * Returns the numeric id of a damage type corresponding to a given string,
- * or -1 if none.
- */
-static int
-get_type(char* string, Logs* logs)
-{
-	char* type;
-	char* log;
-	int i;
-
-	for (i = 0; i < TYPE_MAX; i++)
-	{
-		type = type_to_string(i);
-
-		if (!strcmp(string, type))
-			return i;
-	}
-
-	log = (char*) malloc(sizeof(char) * 128);
-	snprintf(log, 128, "Invalid type: “%s”.", string);
-
-	logs_add(logs, log);
-
-	return -1;
-}
-
 Item*
 load_item(char* filename)
 {
@@ -183,45 +156,10 @@ load_item(char* filename)
 		}
 		else if (!strcmp(field, "attack"))
 		{
-			List* sublist;
-			ParserElement* subelement;
-			Attack* attack = (Attack*) malloc(sizeof(Attack));
+			Attack* attack = parser_get_attack(element, logs);
 
-			memset(attack, 0, sizeof(Attack));
-
-			if (element->type != PARSER_LIST)
-			{
-				logs_add(logs,
-					strdup("Trying to add attack improperly defined.\n"));
-				free(attack);
-			}
-			else
-				for (sublist = element->value; sublist; sublist = sublist->next)
-				{
-					subelement = sublist->data;
-
-					if (!strcmp(subelement->name, "damage"))
-						attack->damage =
-							parser_get_integer(subelement, logs);
-					else if (!strcmp(subelement->name, "strikes"))
-						attack->strikes =
-							parser_get_integer(subelement, logs);
-					else if (!strcmp(subelement->name, "mana"))
-						attack->mana_cost =
-							parser_get_integer(subelement, logs);
-					else if (!strcmp(subelement->name, "name"))
-						attack->name =
-							parser_get_string(subelement, logs);
-					else if (!strcmp(subelement->name, "type"))
-					{
-						char* type = parser_get_string(subelement, logs);
-
-						if (type)
-							attack->type = get_type(type, logs);
-					}
-				}
-
-			list_add(&item->attacks, (void*) attack);
+			if (attack)
+				list_add(&item->attacks, (void*) attack);
 		}
 		else if (check_type_resistance(item, element, logs))
 			;
@@ -316,17 +254,29 @@ give_item(Entity* player, Item* item)
 
 	if (item->slot >= 0)
 		for (i = 0; i < INVENTORY_SIZE && player->inventory[i].item; i++)
-
 			;
 	else
-		/* Non-equipment is stackable */
-		for (i = 0;
-				i < INVENTORY_SIZE && (
-					player->inventory[i].item == item &&
-					player->inventory[i].quantity >= 99
-				);
-				i++)
-			;
+	{
+		/* Non-equipment is stackable. */
+		i = 0;
+		while (
+			i < INVENTORY_SIZE &&
+			! (
+				player->inventory[i].item == item &&
+				player->inventory[i].quantity < 99
+			)
+		)
+			i++;
+
+		if (i == INVENTORY_SIZE)
+		{
+			for (i = 0; i < INVENTORY_SIZE && player->inventory[i].item; i++)
+				;
+
+			/* Precaution. */
+			player->inventory[i].quantity = 0;
+		}
+	}
 
 	if (i == INVENTORY_SIZE)
 		return -1; /* No space left in inventory */

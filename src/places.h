@@ -3,6 +3,7 @@
 #define PLACES_H
 
 #include "list.h"
+#include "skills.h"
 #include "game.h"
 
 typedef struct Place {
@@ -11,6 +12,8 @@ typedef struct Place {
 	List* random_enemies;  /* List* of Class* */
 	List* destinations;    /* List* of Destination* */
 	char** image;
+
+	List* skill_drop[SKILL_MAX]; /* List*s of Drop* */
 
 	List* on_first_visit;  /* List* of char** (images) */
 } Place;

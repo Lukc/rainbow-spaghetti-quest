@@ -82,7 +82,7 @@ type_to_attack_name(int type)
 }
 
 int
-type_id(char* string)
+string_to_type(char* string)
 {
 	int i;
 

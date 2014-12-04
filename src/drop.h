@@ -11,7 +11,7 @@ typedef struct Drop {
 	int rarity;
 } Drop;
 
-List* give_drop(struct Entity*, struct Entity*);
+List* give_drop(struct Entity*, List*);
 
 #endif
 

@@ -155,5 +155,112 @@ parser_get_integer(ParserElement* element, Logs* logs)
 	}
 }
 
+Drop*
+parser_get_drop(List* items, ParserElement* element, Logs* logs)
+{
+	List* list;
+	Drop* drop = (Drop*) malloc(sizeof(Drop));
+
+	if (element->type != PARSER_LIST)
+	{
+		logs_add(logs,
+			strdup("Drop that is not a list found.\n"));
+		free(drop);
+
+		return NULL;
+	}
+	else
+	{
+		memset(drop, 0, sizeof(Drop));
+
+		for (list = element->value; list; list = list->next)
+		{
+			element = list->data;
+
+			if (!strcmp(element->name, "item"))
+			{
+				char* name = parser_get_string(element, logs);
+				drop->item = get_item_by_name(items, name);
+			}
+			else if (!strcmp(element->name, "rarity"))
+				drop->rarity = parser_get_integer(element, logs);
+		}
+
+		if (!drop->item)
+		{
+			char* log = (char*) malloc(sizeof(char) * 128);
+			snprintf(log, 128, "Drop item with no valid “item” field!");
+			logs_add(logs, log);
+
+			free(drop);
+
+			return NULL;
+		}
+
+		return drop;
+	}
+}
+
+Attack*
+parser_get_attack(ParserElement* element, Logs* logs)
+{
+	List* list;
+	Attack* attack = (Attack*) malloc(sizeof(Attack));
+
+	if (element->type != PARSER_LIST)
+	{
+		logs_add(logs,
+				strdup("Trying to add attack improperly defined.\n"));
+		free(attack);
+	}
+	else
+	{
+		memset(attack, 0, sizeof(Attack));
+
+		for (list = element->value; list; list = list->next)
+		{
+			element = list->data;
+
+			if (!strcmp(element->name, "damage"))
+				attack->damage =
+					parser_get_integer(element, logs);
+			else if (!strcmp(element->name, "strikes"))
+				attack->strikes =
+					parser_get_integer(element, logs);
+			else if (!strcmp(element->name, "mana"))
+				attack->mana_cost =
+					parser_get_integer(element, logs);
+			else if (!strcmp(element->name, "name"))
+				attack->name =
+					parser_get_string(element, logs);
+			else if (!strcmp(element->name, "type"))
+			{
+				char* type = parser_get_string(element, logs);
+
+				if (type)
+				{
+					attack->type = string_to_type(type);
+
+					if (attack->type == -1)
+					{
+						char* log = (char*) malloc(sizeof(char) * 128);
+						snprintf(log, 128, "Invalid type: “%s”.", type);
+						logs_add(logs, log);
+
+						/* FIXME: free_attack()? */
+						if (attack->name)
+							free(attack->name);
+						free(attack);
+
+						return NULL;
+					}
+				}
+			}
+		}
+	}
+
+	return attack;
+}
+
 
 /* vim: set ts=4 sw=4 cc=80 : */
