@@ -290,9 +290,11 @@ print_entity_basestats(Entity* e)
 		if (e->statuses->next)
 			for (List* l = e->statuses; l; l = l->next)
 				printf("%c",
-					toupper(status_to_string((unsigned int) l->data)[0]));
+					toupper(((StatusData*) l->data)->status->
+						affliction_name[0]));
 		else
-			printf("%s", status_to_string((unsigned int) e->statuses->data));
+			printf("%s",
+				((StatusData*) e->statuses->data)->status->affliction_name);
 
 		printf(">" NOCOLOR);
 	}

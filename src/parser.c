@@ -202,7 +202,7 @@ parser_get_drop(List* items, ParserElement* element, Logs* logs)
 }
 
 Attack*
-parser_get_attack(ParserElement* element, Logs* logs)
+parser_get_attack(Game* game, ParserElement* element, Logs* logs)
 {
 	List* list;
 	Attack* attack = (Attack*) malloc(sizeof(Attack));
@@ -216,7 +216,7 @@ parser_get_attack(ParserElement* element, Logs* logs)
 	else
 	{
 		memset(attack, 0, sizeof(Attack));
-		attack->inflicts_status = -1;
+		attack->inflicts_status = NULL;
 
 		for (list = element->value; list; list = list->next)
 		{
@@ -236,9 +236,18 @@ parser_get_attack(ParserElement* element, Logs* logs)
 					parser_get_string(element, logs);
 			else if (!strcmp(element->name, "inflicts"))
 			{
-				char string = parser_get_string(element, logs);
+				char* string = parser_get_string(element, logs);
 
-				attack->inflicts_status = string_to_status(string);
+				attack->inflicts_status =
+					get_status_by_name(game->statuses, string);
+
+				if (!attack->inflicts_status)
+				{
+					fprintf(stderr, "[Attack:%s] Unknown status: %s!\n",
+						attack->name, string);
+
+					exit(1);
+				}
 			}
 			else if (!strcmp(element->name, "type"))
 			{
@@ -254,10 +263,7 @@ parser_get_attack(ParserElement* element, Logs* logs)
 						snprintf(log, 128, "Invalid type: “%s”.", type);
 						logs_add(logs, log);
 
-						/* FIXME: free_attack()? */
-						if (attack->name)
-							free(attack->name);
-						free(attack);
+						free_attack(attack);
 
 						return NULL;
 					}

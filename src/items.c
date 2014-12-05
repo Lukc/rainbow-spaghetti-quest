@@ -12,10 +12,8 @@
 
 #include "parser.h"
 
-#define MAX_ITEMS 255
-
 List*
-load_items(char* dirname)
+load_items(Game* game, char* dirname)
 {
 	List* items = NULL;
 	DIR* dir;
@@ -36,7 +34,7 @@ load_items(char* dirname)
 		sprintf(filename, "%s/%s", dirname, entry->d_name);
 
 		printf(" > %s\n", filename);
-		list_add(&items, (void*) load_item(filename));
+		list_add(&items, (void*) load_item(game, filename));
 
 		free(filename);
 	}
@@ -97,7 +95,7 @@ get_slot(char* string, Logs* logs)
 }
 
 Item*
-load_item(char* filename)
+load_item(Game* game, char* filename)
 {
 	List* list = load_file(filename);
 	List* temp;
@@ -156,7 +154,7 @@ load_item(char* filename)
 		}
 		else if (!strcmp(field, "attack"))
 		{
-			Attack* attack = parser_get_attack(element, logs);
+			Attack* attack = parser_get_attack(game, element, logs);
 
 			if (attack)
 				list_add(&item->attacks, (void*) attack);

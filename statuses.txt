@@ -1,0 +1,16 @@
+Status: [
+	Name: Confusion
+	Afflicted name: confused
+]
+Status: [
+	Name: Poisoning
+	Afflicted name: poisoned
+]
+Status: [
+	Name: Burn
+	Afflicted name: burned
+]
+Status: [
+	Name: Freeze
+	Afflicted name: frozen
+]

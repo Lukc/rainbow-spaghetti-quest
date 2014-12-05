@@ -13,14 +13,15 @@ Attack: [
 	Type: slashing
 	Mana: 0
 ]
+Health on Focus: 18
 Mana on Focus: 6
-Defense bonus: 5
+Defense bonus: 3
 Slashing resistance: 15
 Piercing resistance: 15
 Impact resistance: 5
 Fire resistance: 80
 Arcane resistance: -25
-Gold on kill: 10
+Gold on kill: 15
 Drop: [
 	Item: Nightmare Fuel
 	Rarity: 60

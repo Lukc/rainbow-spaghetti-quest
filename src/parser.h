@@ -6,6 +6,7 @@
 #include "drop.h"
 #include "attack.h"
 #include "commands.h"
+#include "game.h"
 
 enum PARSER_TYPES {
 	PARSER_INTEGER,
@@ -25,7 +26,7 @@ void parser_free(ParserElement*);
 
 int parser_get_integer(ParserElement*, Logs*);
 char* parser_get_string(ParserElement*, Logs*);
-Attack* parser_get_attack(ParserElement*, Logs*);
+Attack* parser_get_attack(Game*, ParserElement*, Logs*);
 Drop* parser_get_drop(List*, ParserElement*, Logs*);
 
 #endif

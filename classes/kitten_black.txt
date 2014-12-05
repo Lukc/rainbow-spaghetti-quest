@@ -13,9 +13,10 @@ Attack: [
 	Type: arcane
 	Mana: 2
 ]
+Health on Focus: 9
 Mana on Focus: 3
 Defense bonus: 3
-Gold on kill: 5
+Gold on kill: 10
 Drop: [
 	Item: Nightmare Fuel
 	Rarity: 100

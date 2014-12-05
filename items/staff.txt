@@ -1,12 +1,12 @@
 Max mana: 10
 Attack: [
-	Damage: 2
+	Damage: 0
 	Strikes: 2
 	Type: impact
 	Name: Staff hit
 ]
 Attack: [
-	Damage: 5
+	Damage: 2
 	Strikes: 4
 	Type: fire
 	Name: Fireball

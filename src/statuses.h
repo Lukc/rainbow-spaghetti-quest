@@ -2,6 +2,7 @@
 #ifndef _STATUSES_H
 #define _STATUSES_H
 
+#include "list.h"
 #include "entities.h"
 
 enum STATUSES {
@@ -15,10 +16,25 @@ enum STATUSES {
 	STATUS_MAX
 };
 
-char* status_to_string(int);
-int string_to_status(char*);
+/* Container for a status’ effects. */
+typedef struct Status {
+	char* name;
+	char* affliction_name;
+} Status;
 
-int has_status(Entity*, int);
+/* Container for the duration and strength of a status on an Entity. */
+typedef struct {
+	Status* status;
+	int strength;
+	int duration;
+} StatusData;
+
+List* load_statuses(char*);
+
+Status* get_status_by_name(List*, char*);
+
+int has_status(struct Entity*, Status*);
+int inflict_status(struct Entity*, Status*);
 
 #endif
 

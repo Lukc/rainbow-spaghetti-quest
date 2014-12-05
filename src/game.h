@@ -4,6 +4,9 @@
 
 #include "list.h"
 
+/**
+ * Mega-container for everything.
+ */
 typedef struct Game {
 	struct Entity* player;
 	struct Entity* enemy;
@@ -11,6 +14,7 @@ typedef struct Game {
 	List* items;
 	struct Place* location;
 	List* images; /* List* of char* */
+	List* statuses; /* List* of StatusData* */
 
 	List* visited; /* List* of Place* */
 

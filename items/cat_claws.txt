@@ -1,7 +1,6 @@
 Name: Cat Claws
-Attack bonus: 2
 Attack: [
-	Damage: 4
+	Damage: 2
 	Strikes: 4
 	Type: slashing
 	Name: Slash
