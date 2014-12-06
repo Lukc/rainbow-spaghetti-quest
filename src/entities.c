@@ -51,6 +51,7 @@ get_max_health(Entity* e)
 int
 get_attack_bonus(Entity* e)
 {
+	List* list;
 	Item* equipment;
 	int i;
 	int bonus = 0;
@@ -65,12 +66,27 @@ get_attack_bonus(Entity* e)
 		}
 	}
 
+	/* Some statuses can cut an entity’s attack in half. */
+	for (list = e->statuses; list; list = list->next)
+	{
+		StatusData* data = list->data;
+		Status* status = data->status;
+
+		if (status->divides_attack)
+		{
+			bonus = bonus / 2;
+
+			break;
+		}
+	}
+
 	return e->class->attack_bonus + bonus;
 }
 
 int
 get_defense_bonus(Entity* e)
 {
+	List* list;
 	Item* equipment;
 	int i;
 	int bonus = 0;
@@ -85,6 +101,18 @@ get_defense_bonus(Entity* e)
 		}
 	}
 
+	for (list = e->statuses; list; list = list->next)
+	{
+		StatusData* data = list->data;
+		Status* status = data->status;
+
+		if (status->divides_defense)
+		{
+			bonus = bonus / 2;
+
+			break;
+		}
+	}
 
 	return e->class->defense_bonus + bonus;
 }

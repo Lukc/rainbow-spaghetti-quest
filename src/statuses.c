@@ -43,6 +43,11 @@ load_status(ParserElement* root)
 			status->name = parser_get_string(element, NULL);
 		else if (!strcmp(field, "affliction name"))
 			status->affliction_name = parser_get_string(element, NULL);
+		/* FIXME: Those values should be booleans, not integers. */
+		else if (!strcmp(field, "divides attack"))
+			status->divides_attack = parser_get_integer(element, NULL);
+		else if (!strcmp(field, "divides defense"))
+			status->divides_defense = parser_get_integer(element, NULL);
 		else
 		{
 			fprintf(stderr,

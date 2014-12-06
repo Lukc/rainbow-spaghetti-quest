@@ -1,16 +1,18 @@
 Status: [
 	Name: Confusion
-	Afflicted name: confused
+	Affliction name: confused
+	Divides attack: 1
 ]
 Status: [
 	Name: Poisoning
-	Afflicted name: poisoned
+	Affliction name: poisoned
 ]
 Status: [
 	Name: Burn
-	Afflicted name: burned
+	Affliction name: burned
 ]
 Status: [
 	Name: Freeze
-	Afflicted name: frozen
+	Affliction name: frozen
+	Divides defense: 1
 ]

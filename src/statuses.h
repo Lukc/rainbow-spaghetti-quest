@@ -20,6 +20,8 @@ enum STATUSES {
 typedef struct Status {
 	char* name;
 	char* affliction_name;
+	short divides_attack;
+	short divides_defense;
 } Status;
 
 /* Container for the duration and strength of a status on an Entity. */
