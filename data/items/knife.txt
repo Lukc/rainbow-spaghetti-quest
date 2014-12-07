@@ -1,0 +1,11 @@
+Item: [
+	Name: Knife
+	Attack: [
+		Damage: 1
+		Strikes: 3
+		Type: slashing
+		Name: Slash
+	]
+	Price: 45
+	Slot: weapon
+]

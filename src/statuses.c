@@ -22,8 +22,8 @@ has_status(Entity* e, Status* status)
 	return 0;
 }
 
-static Status*
-load_status(ParserElement* root)
+void
+load_status(Game* game, List* elements)
 {
 	List* list;
 	Status* status;
@@ -31,7 +31,7 @@ load_status(ParserElement* root)
 	status = (Status*) malloc(sizeof(Status));
 	memset(status, 0, sizeof(Status));
 
-	for (list = root->value; list; list = list->next)
+	for (list = elements; list; list = list->next)
 	{
 		char* field;
 		ParserElement* element;
@@ -51,57 +51,12 @@ load_status(ParserElement* root)
 		else
 		{
 			fprintf(stderr,
-				"[Status:%s] Unknown field “%s”.\n",
-				status->name ? status->name : "(null)", field);
+				"[Status:%s:%i] Unknown field “%s”.\n",
+				status->name ? status->name : "??", element->lineno, field);
 		}
-
-		parser_free(element);
 	}
 
-	return status;
-}
-
-List*
-load_statuses(char* filename)
-{
-	List* list = load_file(filename);
-	List* statuses = NULL;
-
-	while (list)
-	{
-		char* field;
-		ParserElement* element;
-
-		element = list->data;
-		field = element->name;
-
-		if (!strcmp(field, "status"))
-		{
-			Status* status;
-
-			if (element->type != PARSER_LIST)
-			{
-				fprintf(stderr, "[%s]> Status improperly defined.\n",
-					filename);
-
-				continue;
-			}
-
-			status = load_status(element);
-
-			if (status)
-				list_add(&statuses, status);
-		}
-		else
-		{
-			fprintf(stderr, "[%s]> Unknown field: “%s”.\n",
-				filename, element->name);
-		}
-
-		list = list->next;
-	}
-
-	return statuses;
+	list_add(&game->statuses, status);
 }
 
 int

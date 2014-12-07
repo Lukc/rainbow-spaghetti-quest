@@ -1,0 +1,29 @@
+Place: [
+	Name: Electrical Ocean
+	Leads to: Felinopolis
+	Leads to: [
+		Name: Land of the Apocalisp
+		Needs item: Maru's Box
+	]
+	Leads to: [
+		Name: Below the Electrical Ocean
+		Needs item: Legendary Trollscales
+	]
+	
+	# Oh god, we need another way of defining this...
+	Random Enemies: Trollfish
+	Random Enemies: Trollfish
+	Random Enemies: Trollfish
+	Random Enemies: Trollfish
+	Random Enemies: Trollfish
+	Random Enemies: Trollfish
+	
+	Random Enemies: Greater Trollfish
+	Random Enemies: Greater Trollfish
+	Random Enemies: Greater Trollfish
+	
+	Random Enemies: Legendary Trollfish
+	
+	Image: electrical_ocean
+	On first visit: electrical_ocean_first
+]

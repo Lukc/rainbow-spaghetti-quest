@@ -1,0 +1,12 @@
+Item: [
+	Name: Small Sword
+	Attack bonus: 1
+	Attack: [
+		Damage: 6
+		Strikes: 3
+		Type: slashing
+		Name: Slash
+	]
+	Price: 170
+	Slot: weapon
+]

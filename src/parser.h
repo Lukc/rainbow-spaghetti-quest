@@ -2,11 +2,8 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "list.h"
-#include "drop.h"
-#include "attack.h"
 #include "commands.h"
-#include "game.h"
+#include "attack.h"
 
 enum PARSER_TYPES {
 	PARSER_INTEGER,
@@ -19,15 +16,22 @@ typedef struct ParserElement {
 	char* name;
 	void* value;
 	struct ParserElement* parent;
+	int lineno;
 } ParserElement;
 
-List* load_file(char*);
+#include "list.h"
+#include "drop.h"
+#include "game.h"
+
+List* parse_file(char*);
 void parser_free(ParserElement*);
 
 int parser_get_integer(ParserElement*, Logs*);
 char* parser_get_string(ParserElement*, Logs*);
-Attack* parser_get_attack(Game*, ParserElement*, Logs*);
-Drop* parser_get_drop(List*, ParserElement*, Logs*);
+struct Attack* parser_get_attack(Game*, ParserElement*, Logs*);
+Drop* parser_get_drop(ParserElement*, Logs*);
+
+void load_game(Game*, char*);
 
 #endif
 

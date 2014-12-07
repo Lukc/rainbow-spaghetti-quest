@@ -12,38 +12,6 @@
 
 #include "parser.h"
 
-List*
-load_items(Game* game, char* dirname)
-{
-	List* items = NULL;
-	DIR* dir;
-	struct dirent *entry;
-	char* filename;
-
-	dir = opendir(dirname);
-
-	while ((entry = readdir(dir)))
-	{
-		/* Hidden files ignored. Just because. */
-		if (entry->d_name[0] == '.')
-			continue;
-
-		filename = (char*) malloc(sizeof(char) * (
-			strlen(dirname) + strlen(entry->d_name) + 2
-		));;
-		sprintf(filename, "%s/%s", dirname, entry->d_name);
-
-		printf(" > %s\n", filename);
-		list_add(&items, (void*) load_item(game, filename));
-
-		free(filename);
-	}
-
-	closedir(dir);
-
-	return items;
-}
-
 static int
 check_type_resistance(Item* item, ParserElement* element, Logs* logs)
 {
@@ -94,10 +62,9 @@ get_slot(char* string, Logs* logs)
 	return 0;
 }
 
-Item*
-load_item(Game* game, char* filename)
+void
+load_item(Game* game, List* list)
 {
-	List* list = load_file(filename);
 	List* temp;
 	ParserElement* element;
 	Item* item;
@@ -168,12 +135,8 @@ load_item(Game* game, char* filename)
 			logs_add(logs, log);
 		}
 
-		parser_free(element);
-
 		temp = list;
 		list = list->next;
-
-		free(temp);
 	}
 
 	if (logs->head)
@@ -181,11 +144,9 @@ load_item(Game* game, char* filename)
 		/* FIXME: stderr */
 		logs_print(logs);
 		logs_free(logs);
-
-		exit(1);
 	}
 
-	return item;
+	list_add(&game->items, item);
 }
 
 /**

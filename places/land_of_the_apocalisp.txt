@@ -1,4 +1,0 @@
-Name: Land of the Apocalisp
-Leads to: Electrical Ocean
-image: land_of_the_apocalisp
-# FIXME: Add a temple in which the player is given some plot on entry.

@@ -1,0 +1,12 @@
+Item: [
+	Name: Tiger Cloak
+	Defense bonus: 1
+	Attack bonus: 1
+	Price: 2000
+	Slot: armor
+	Slashing resistance: 10
+	Piercing resistance: 10
+	Impact resistance: 10
+	Fire resistance: 10
+	Arcane resistance: -20
+]

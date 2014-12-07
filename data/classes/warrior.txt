@@ -1,0 +1,18 @@
+Class: [
+	# Comments \o/
+	Name: Warrior
+	Health: 30
+	Mana: 25
+	Attack: [
+		Damage: 0
+		Strikes: 2
+		Type: impact
+		Name: Hands
+		Inflicts: confusion
+	]
+	Attack bonus: 5
+	Defense bonus: 5
+	Mana on focus: 5
+	Health on focus: 5
+	Gold on kill: 35
+]

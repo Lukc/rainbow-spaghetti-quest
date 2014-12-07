@@ -16,10 +16,13 @@ typedef struct Place {
 	List* skill_drop[SKILL_MAX]; /* List*s of Drop* */
 
 	List* on_first_visit;  /* List* of char** (images) */
+
+	/* Stuff required at load-time */
+	List* random_enemy_names; /* List* of char* */
+	List* shop_item_names; /* List* of char* */
 } Place;
 
-List* load_places(Game*, char*);
-Place* load_place(Game*, char*);
+void load_place(Game*, List*);
 
 Place* get_place_by_name(List*, char*);
 

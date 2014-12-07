@@ -1,0 +1,11 @@
+Item: [
+	Name: Cat Claws
+	Attack: [
+		Damage: 2
+		Strikes: 4
+		Type: slashing
+		Name: Slash
+	]
+	Price: 160
+	Slot: weapon
+]

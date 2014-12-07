@@ -1,4 +1,0 @@
-Name: Statue of Maru
-Leads to: Boxes Factory
-image: statue_of_maru
-Random Enemies: Maru's Statue

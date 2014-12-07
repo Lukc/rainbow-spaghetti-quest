@@ -7,41 +7,6 @@
 #include "classes.h"
 #include "parser.h"
 
-/**
- * @return: List* of Class*
- */
-List*
-load_classes(Game* game, char* dirname)
-{
-	List* classes = NULL;
-	DIR* dir;
-	struct dirent *entry;
-	char* filename;
-
-	dir = opendir(dirname);
-
-	while ((entry = readdir(dir)))
-	{
-		/* Hidden files ignored. Just because. */
-		if (entry->d_name[0] == '.')
-			continue;
-
-		filename = (char*) malloc(sizeof(char) * (
-			strlen(dirname) + strlen(entry->d_name) + 2
-		));;
-		sprintf(filename, "%s/%s", dirname, entry->d_name);
-
-		printf(" > %s\n", filename);
-		list_add(&classes, load_class(game, filename));
-
-		free(filename);
-	}
-
-	closedir(dir);
-
-	return classes;
-}
-
 static int
 check_type_resistance(Class* class, ParserElement* element, Logs* logs)
 {
@@ -71,11 +36,9 @@ check_type_resistance(Class* class, ParserElement* element, Logs* logs)
 	return 0;
 }
 
-Class*
-load_class (Game* game, char* filename)
+void
+load_class(Game* game, List* list)
 {
-	List* list = load_file(filename);
-	List* temp;
 	ParserElement* element;
 	Class* class;
 	Logs* logs;
@@ -86,7 +49,7 @@ load_class (Game* game, char* filename)
 
 	logs = logs_new();
 
-	while (list)
+	for (; list; list = list->next)
 	{
 		char* field;
 
@@ -119,7 +82,7 @@ load_class (Game* game, char* filename)
 		}
 		else if (!strcmp(field, "drop"))
 		{
-			Drop* drop = parser_get_drop(game->items, element, logs);
+			Drop* drop = parser_get_drop(element, logs);
 
 			if (drop)
 				list_add(&class->drop, drop);
@@ -132,13 +95,6 @@ load_class (Game* game, char* filename)
 			snprintf(log, 128, "Unknown field: “%s”.", element->name);
 			logs_add(logs, log);
 		}
-
-		parser_free(element);
-
-		temp = list;
-		list = list->next;
-
-		free(temp);
 	}
 
 	if (logs->head)
@@ -146,11 +102,9 @@ load_class (Game* game, char* filename)
 		/* FIXME: stderr */
 		logs_print(logs);
 		logs_free(logs);
-
-		exit(1);
 	}
 
-	return class;
+	list_add(&game->classes, class);
 }
 
 /**

@@ -12,6 +12,7 @@ typedef struct Game {
 	struct Entity* enemy;
 	List* classes;
 	List* items;
+	List* places;
 	struct Place* location;
 	List* images; /* List* of char* */
 	List* statuses; /* List* of StatusData* */

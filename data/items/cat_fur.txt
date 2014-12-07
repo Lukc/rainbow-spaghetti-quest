@@ -1,0 +1,4 @@
+Item: [
+	Name: Cat Fur
+	Price: 30
+]

@@ -1,0 +1,50 @@
+Class: [
+	Name: Greater Trollfish
+	Health: 60
+	Mana: 8
+	Mana on focus: 4
+	Health on focus: 30
+	Attack bonus: 1
+	Defense bonus: 1
+	Attack: [
+		Name: Bite
+		Type: slashing
+		Damage: 6
+		Strikes: 3
+	]
+	Attack: [
+		Name: Troll
+		Type: arcane
+		Damage: 4
+		Strikes: 4
+		Mana: 2
+	]
+	Attack: [
+		Name: Flame
+		Type: fire
+		Damage: 8
+		Strikes: 2
+	]
+	Arcane Resistance: 50
+	Fire Resistance: 50
+	Cold Resistance: 20
+	# Well... they gotta have some weakness, right?
+	Poison Resistance: -80
+	Gold on kill: 30
+	Drop: [
+		Item: Troll Staff
+		Rarity: 20
+	]
+	Drop: [
+		Item: Trollfish Meat
+		Rarity: 4
+	]
+	Drop: [
+		Item: Trollfish Meat
+		Rarity: 4
+	]
+	Drop: [
+		Item: Trollfish Meat
+		Rarity: 4
+	]
+]

@@ -1,5 +1,0 @@
-Name: Trollfish Meat
-Health on use: 18
-Mana on use: 2
-Consumable: 1
-Price: 12

@@ -32,8 +32,7 @@ typedef struct Class {
 #include "attack.h"
 #include "drop.h"
 
-Class* load_class(Game*, char*);
-List* load_classes(Game*, char*);
+void load_class(Game*, List*);
 Class* get_class_by_name(List*, char*);
 
 #endif

@@ -2,7 +2,6 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
-#include "entities.h"
 #include "list.h"
 
 typedef struct Logs* CommandFunction(void*);

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <ctype.h>
+#include <string.h>
 
 #include "types.h"
 #include "commands.h"
@@ -18,6 +19,7 @@
 #include "images.h"
 #include "craft.h"
 #include "skills.h"
+#include "parser.h"
 
 static void
 print_menu(Game* game)
@@ -64,25 +66,18 @@ main(int argc, char* argv[])
 	int input;
 	int i;
 	Logs* logs;
-	List* classes;
-	List* items;
 	Game game;
-	List* world;
 
-	game.statuses = load_statuses("statuses.txt");
+	memset(&game, 0, sizeof(game));
 
-	items = load_items(&game, "items");
-	game.items = items;
+	load_game(&game, "data");
 
-	classes = load_classes(&game, "classes");
-	game.classes = classes;
-
-	world = load_places(&game, "places");
+	getch();
 
 	/* For now, repeatability would be useful */
 	srand(42);
 
-	init_entity_from_class(&player, get_class_by_name(classes, "Warrior"));
+	init_entity_from_class(&player, get_class_by_name(game.classes, "Warrior"));
 
 	player.name = (char*) malloc(sizeof(char) * 80);
 	snprintf(
@@ -93,7 +88,7 @@ main(int argc, char* argv[])
 	game.player = &player;
 	game.enemy = &enemy;
 
-	game.location = get_place_by_name(world, "Felinopolis");
+	game.location = get_place_by_name(game.places, "Felinopolis");
 	game.visited = NULL;
 
 	system("clear");

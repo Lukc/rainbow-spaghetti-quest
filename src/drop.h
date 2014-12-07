@@ -8,6 +8,7 @@
 
 typedef struct Drop {
 	Item* item;
+	char* item_name; /* Temporary container used at load-time */
 	int rarity;
 } Drop;
 

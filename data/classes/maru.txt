@@ -1,0 +1,28 @@
+Class: [
+	Name: Maru's Statue
+	Health: 160
+	Mana: 30
+	Attack: [
+		Name: Charge
+		Type: impact
+		Damage: 18
+		Strikes: 1
+		Mana: 5
+	]
+	Attack: [
+		Name: Lazyfying Ray
+		Type: arcane
+		Damage: 10
+		Strikes: 2
+		Mana: 15
+	]
+	Mana on Focus: 10
+	Arcane resistance: -50
+	Fire resistance: -50
+	Slashing resistance: 14 # Protected by boxes, I guess?
+	Gold on kill: 50
+	Drop: [
+		Item: Maru's Box
+		Rarity: 1
+	]
+]

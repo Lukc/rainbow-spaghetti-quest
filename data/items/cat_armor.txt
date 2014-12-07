@@ -1,0 +1,7 @@
+Item: [
+	Name: Light Cat Armor
+	Max health: 8
+	Defense bonus: 1
+	Price: 360
+	Slot: armor
+]

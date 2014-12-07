@@ -1,3 +1,0 @@
-Name: Below the Electrical Ocean
-Leads to: Electrical Ocean
-Image: electrical_ocean

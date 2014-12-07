@@ -1,0 +1,10 @@
+Item: [
+	Name: Wooden Shield
+	Defense bonus: 3
+	Price: 120
+	Slot: shield
+	Slashing resistance: 10
+	Piercing resistance: 14
+	Impact resistance: 8
+	Fire resistance: -20
+]

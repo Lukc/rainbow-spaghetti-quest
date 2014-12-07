@@ -31,7 +31,7 @@ typedef struct {
 	int duration;
 } StatusData;
 
-List* load_statuses(char*);
+void load_status(Game*, List*);
 
 Status* get_status_by_name(List*, char*);
 

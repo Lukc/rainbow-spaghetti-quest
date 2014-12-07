@@ -12,66 +12,6 @@
 #include "destinations.h"
 #include "skills.h"
 
-/**
- * @return: List* of Place*
- */
-List*
-load_places(Game* game, char* dirname)
-{
-	List* places = NULL;
-	List* list, * list2;
-	DIR* dir;
-	struct dirent *entry;
-	char* filename;
-
-	dir = opendir(dirname);
-
-	while ((entry = readdir(dir)))
-	{
-		/* Hidden files ignored. Just because. */
-		if (entry->d_name[0] == '.')
-			continue;
-
-		filename = (char*) malloc(sizeof(char) * (
-			strlen(dirname) + strlen(entry->d_name) + 2
-		));;
-		sprintf(filename, "%s/%s", dirname, entry->d_name);
-
-		printf(" > %s\n", filename);
-		list_add(&places, load_place(game, filename));
-
-		free(filename);
-	}
-
-	for (list = places; list; list = list->next)
-	{
-		Place* place = list->data;
-
-		list2 = place->destinations;
-		while (list2)
-		{
-			Destination* dest = list2->data;
-
-			dest->place = get_place_by_name(places, dest->name);
-
-			if (!dest->place)
-			{
-				fprintf(stderr,
-					"[Places/%s] invalid destination: %s.\n",
-					place->name, dest->name);
-
-				exit(1);
-			}
-
-			list2 = list2->next;
-		}
-	}
-
-	closedir(dir);
-
-	return places;
-}
-
 static List*
 comas_to_list(char* input)
 {
@@ -93,8 +33,6 @@ comas_to_list(char* input)
 
 		/* In case we stopped at ' '. */
 		string[i] = '\0';
-
-		printf(" > %s\n", string);
 
 		list_add(&list, strdup(string));
 
@@ -141,7 +79,7 @@ parse_destination(Game* game, List* elements, Logs* logs)
 }
 
 static int
-load_skill(Place* place, List* items, ParserElement* element, Logs* logs)
+load_skill(Place* place, ParserElement* element, Logs* logs)
 {
 	char* skill_name;
 	List* list;
@@ -162,7 +100,7 @@ load_skill(Place* place, List* items, ParserElement* element, Logs* logs)
 
 				if (!strcmp(element->name, "drop"))
 				{
-					Drop* drop = parser_get_drop(items, element, logs);
+					Drop* drop = parser_get_drop(element, logs);
 
 					if (drop)
 						list_add(place->skill_drop + skill, drop);
@@ -178,10 +116,10 @@ load_skill(Place* place, List* items, ParserElement* element, Logs* logs)
 	return 0;
 }
 
-Place*
-load_place (Game* game, char* filename)
+void
+load_place (Game* game, List* elements)
 {
-	List* list = load_file(filename);
+	List* list = elements;
 	List* temp;
 	List* helper;
 	ParserElement* element;
@@ -202,13 +140,12 @@ load_place (Game* game, char* filename)
 
 		field = element->name;
 
-		if (load_skill(place, game->items, element, logs))
+		if (load_skill(place, element, logs))
 			;
 		else if (!strcmp(field, "name"))
 			place->name = parser_get_string(element, logs);
 		else if (!strcmp(field, "shop item"))
 		{
-			Item* item;
 			char* string = parser_get_string(element, logs);
 
 			if (string)
@@ -217,11 +154,7 @@ load_place (Game* game, char* filename)
 
 				for (helper = temp; helper; helper = helper->next)
 				{
-					item =
-						get_item_by_name(game->items, (char*) helper->data);
-
-					if (item)
-						list_add(&place->shop_items, item);
+					list_add(&place->shop_item_names, helper->data);
 				}
 			}
 		}
@@ -250,17 +183,14 @@ load_place (Game* game, char* filename)
 
 			if (string)
 			{
-				Class* class;
-
 				temp = comas_to_list(string);
 
 				for (helper = temp; helper; helper = helper->next)
 				{
-					class = get_class_by_name(game->classes, helper->data);
-
-					if (class)
-						list_add(&place->random_enemies, class);
+					list_add(&place->random_enemy_names, helper->data);
 				}
+
+				list_free(temp);
 			}
 		}
 		else if (!strcmp(field, "image"))
@@ -269,11 +199,10 @@ load_place (Game* game, char* filename)
 
 			if (name)
 			{
-				/* Note: Too lazy to put the exact value needed.
-				 *       Besides, it’s bound to change. */
-				char* filename = (char*) malloc(42 + strlen(name));
+				char* filename = (char*) malloc(
+					strlen("data/images/") + strlen(name) + 1);
 
-				snprintf(filename, 42 + strlen(name), "images/%s", name);
+				sprintf(filename, "data/images/%s", name);
 
 				place->image = load_image(filename);
 			}
@@ -288,7 +217,7 @@ load_place (Game* game, char* filename)
 				char* name = helper->data;
 				char* filename = (char*) malloc(42 + strlen(name));
 
-				snprintf(filename, 42 + strlen(name), "images/%s", name);
+				snprintf(filename, 42 + strlen(name), "data/images/%s", name);
 
 				helper->data = load_image(filename);
 
@@ -304,12 +233,7 @@ load_place (Game* game, char* filename)
 			logs_add(logs, log);
 		}
 
-		parser_free(element);
-
-		temp = list;
 		list = list->next;
-
-		free(temp);
 	}
 
 	if (logs->head)
@@ -321,7 +245,7 @@ load_place (Game* game, char* filename)
 		exit(1);
 	}
 
-	return place;
+	list_add(&game->places, place);
 }
 
 /**

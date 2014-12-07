@@ -2,16 +2,25 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <dirent.h>
+#include <sys/types.h>
 
 #include "parser.h"
+#include "skills.h"
+#include "destinations.h"
 #include "list.h"
 
+/**
+ * Opens and reads a file and returns a List* of ParserElement* representing
+ * the content of the file, assuming it was a valid Spaghetti Quest file.
+ */
 List*
-load_file(char* filename)
+parse_file(char* filename)
 {
 	FILE* f = fopen(filename, "r");
 	char* str = NULL;
 	size_t n;
+	int lineno = 0;
 	int i;
 	char* field;
 	char* value;
@@ -22,6 +31,8 @@ load_file(char* filename)
 
 	while (getline(&str, &n, f) > 0)
 	{
+		lineno++;
+
 		/* Whole line is a comment? Let’s go to the next one. */
 		if (str[0] == '#')
 			continue;
@@ -43,16 +54,23 @@ load_file(char* filename)
 
 		element = (ParserElement*) malloc(sizeof(ParserElement));
 		element->parent = parent;
+		element->lineno = lineno;
 
 		if (field[0] == ']')
 		{
 			free(element);
 
 			if (!parent)
-				fprintf(stderr, " [%s]> Syntax error. Unexpected ]...\n",
-					filename);
+				fprintf(stderr, " [%s]> Line %i: unexpected ']'...\n",
+					filename, lineno);
 			else
 				parent = parent->parent;
+
+			continue;
+		}
+		else if (!strcmp(field, ""))
+		{
+			free(element);
 
 			continue;
 		}
@@ -114,6 +132,8 @@ parser_free(ParserElement* element)
 		{
 			parser_free(list->data);
 		}
+
+		list_free(list);
 	}
 	else if (element->type == PARSER_STRING)
 	{
@@ -156,7 +176,7 @@ parser_get_integer(ParserElement* element, Logs* logs)
 }
 
 Drop*
-parser_get_drop(List* items, ParserElement* element, Logs* logs)
+parser_get_drop(ParserElement* element, Logs* logs)
 {
 	List* list;
 	Drop* drop = (Drop*) malloc(sizeof(Drop));
@@ -179,22 +199,11 @@ parser_get_drop(List* items, ParserElement* element, Logs* logs)
 
 			if (!strcmp(element->name, "item"))
 			{
-				char* name = parser_get_string(element, logs);
-				drop->item = get_item_by_name(items, name);
+				/* Will be transformed into an Item* later */
+				drop->item_name = parser_get_string(element, logs);
 			}
 			else if (!strcmp(element->name, "rarity"))
 				drop->rarity = parser_get_integer(element, logs);
-		}
-
-		if (!drop->item)
-		{
-			char* log = (char*) malloc(sizeof(char) * 128);
-			snprintf(log, 128, "Drop item with no valid “item” field!");
-			logs_add(logs, log);
-
-			free(drop);
-
-			return NULL;
 		}
 
 		return drop;
@@ -275,5 +284,195 @@ parser_get_attack(Game* game, ParserElement* element, Logs* logs)
 	return attack;
 }
 
+void
+import_dir(Game* game, char* dirname)
+{
+	DIR* dir;
+	struct dirent* entry;
+	char* filename;
+	List* parsed_file;
+	List* l;
+
+	dir = opendir(dirname);
+
+	while ((entry = readdir(dir)))
+	{
+		if (entry->d_name[0] == '.')
+			continue;
+
+		filename = (char*) malloc(sizeof(char) *
+			(strlen(dirname) + strlen(entry->d_name) + 2));
+		sprintf(filename, "%s/%s", dirname, entry->d_name);
+
+		/* FIXME: Portability issue here. */
+		if (entry->d_type == DT_DIR)
+		{
+			import_dir(game, filename);
+		}
+		else
+		{
+			if (strcmp(entry->d_name + strlen(entry->d_name) - 4, ".txt"))
+				continue;
+
+			printf(" > Loading %s\n", filename);
+
+			parsed_file = parse_file(filename);
+
+			for (l = parsed_file; l; l = l->next)
+			{
+				ParserElement* element = l->data;
+				char* field = element->name;
+
+				if (!strcmp(field, "status"))
+				{
+					if (element->type == PARSER_LIST)
+						load_status(game, element->value);
+					else
+						fprintf(stderr,
+							"Status is not a list of keys and values.\n");
+				}
+				else if (!strcmp(field, "item"))
+				{
+					if (element->type == PARSER_LIST)
+						load_item(game, element->value);
+					else
+						fprintf(stderr,
+							"Item is not a list of keys and values.\n");
+				}
+				else if (!strcmp(field, "class"))
+				{
+					if (element->type == PARSER_LIST)
+						load_class(game, element->value);
+					else
+						fprintf(stderr,
+							"Item is not a list of keys and values.\n");
+				}
+				else if (!strcmp(field, "place"))
+				{
+					if (element->type == PARSER_LIST)
+						load_place(game, element->value);
+					else
+						fprintf(stderr,
+							"Item is not a list of keys and values.\n");
+				}
+				else
+					fprintf(stderr,
+						"Unknown top-level element: %s\n", field);
+
+				parser_free(element);
+			}
+
+			list_free(parsed_file);
+		}
+
+		free(filename);
+	}
+}
+
+/**
+ * Loads the game’s data in two stages.
+ *
+ * The first stage is about reading files and storing their data in the
+ * corresponding structures used internally.
+ *
+ * The second stage is about replacing references (char*) by pointers
+ * to the corresponding structures (Entity*, Place*, Item*, …) in various
+ * places.
+ * This takes place mostly in lists, where no type checking is done at
+ * build-time. Be very careful when adding that kind of stuff!
+ */
+void
+load_game(Game* game, char* dirname)
+{
+	List* l;
+
+	/* Phase 1. Separate because (not so) very highly recursive. */
+	import_dir(game, dirname);
+
+	/* Phase 2 */
+	/* FIXME: Put somewhere else? */
+	for (l = game->classes; l; l = l->next)
+	{
+		Class* class = l->data;
+		List* l2;
+
+		for (l2 = class->drop; l2; l2 = l2->next)
+		{
+			Drop* drop = l2->data;
+
+			drop->item = get_item_by_name(game->items, drop->item_name);
+
+			if (!drop->item)
+			{
+				fprintf(stderr,
+					"Item “%s” does not exist!\n", drop->item_name);
+
+				exit(0);
+			}
+
+			free(drop->item_name);
+		}
+	}
+
+	for (l = game->places; l; l = l->next)
+	{
+		int i;
+		Place* place = l->data;
+		List* sl;
+		
+		for (sl = place->random_enemy_names; sl; sl = sl->next)
+		{
+			Class* class = get_class_by_name(game->classes, sl->data);
+
+			if (class)
+				list_add(&place->random_enemies, class);
+			else
+				fprintf(stderr, "Unknown enemy: %s\n", sl->data);
+		}
+
+		for (sl = place->destinations; sl; sl = sl->next)
+		{
+			Destination* dest = sl->data;
+			Place* place = get_place_by_name(game->places, dest->name);
+
+			if (place)
+				dest->place = place;
+			else
+			{
+				fprintf(stderr, "Unknown place: %s\n", dest->name);
+				exit(1);
+			}
+		}
+
+		for (i = 0; i < SKILL_MAX; i++)
+		{
+			for (sl = place->skill_drop[i]; sl; sl = sl->next)
+			{
+				Drop* drop = sl->data;
+
+				drop->item = get_item_by_name(game->items, drop->item_name);
+
+				if (!drop->item)
+				{
+					fprintf(stderr,
+						"Item “%s” does not exist!\n", drop->item_name);
+
+					exit(0);
+				}
+			}
+		}
+
+		for (sl = place->shop_item_names; sl; sl = sl->next)
+		{
+			char* name = sl->data;
+			Item* item = get_item_by_name(game->items, name);
+
+			if (item)
+				list_add(&place->shop_items, item);
+			else
+				fprintf(stderr, "Unknown item: %s", name);
+		}
+	}
+}
 
 /* vim: set ts=4 sw=4 cc=80 : */

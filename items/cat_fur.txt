@@ -1,2 +1,0 @@
-Name: Cat Fur
-Price: 30
