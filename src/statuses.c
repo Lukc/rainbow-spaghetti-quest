@@ -5,23 +5,6 @@
 #include "parser.h"
 #include "statuses.h"
 
-int
-has_status(Entity* e, Status* status)
-{
-	List* list;
-	StatusData* data;
-
-	for (list = e->statuses; list; list = list->next)
-	{
-		data = list->data;
-
-		if (data->status == status)
-			return 1;
-	}
-
-	return 0;
-}
-
 void
 load_status(Game* game, List* elements)
 {
@@ -84,6 +67,48 @@ inflict_status(Entity* e, Status* status)
 	list_add(&e->statuses, data);
 
 	return 1;
+}
+
+void
+cure_status(Entity* e, Status* status)
+{
+	List* list;
+	List* prev = NULL;
+
+	for (list = e->statuses; list; list = list->next)
+	{
+		StatusData* data = list->data;
+
+		if (data->status == status)
+		{
+			if (prev)
+				prev->next = list->next;
+			else
+				e->statuses = list->next;
+
+			free(data);
+			free(list);
+		}
+		else
+			prev = list;
+	}
+}
+
+int
+has_status(Entity* e, Status* status)
+{
+	List* list;
+	StatusData* data;
+
+	for (list = e->statuses; list; list = list->next)
+	{
+		data = list->data;
+
+		if (data->status == status)
+			return 1;
+	}
+
+	return 0;
 }
 
 Status*

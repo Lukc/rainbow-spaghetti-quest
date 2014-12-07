@@ -101,6 +101,18 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 	if (attack->inflicts_status)
 		inflict_status(defender, attack->inflicts_status);
 
+	if (attack->cures_statuses)
+	{
+		List* l;
+
+		for (l = attack->cures_statuses; l; l = l->next)
+		{
+			Status* status = l->data;
+
+			cure_status(attacker, status);
+		}
+	}
+
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(log, 128,
 		BRIGHT WHITE "%s " RED ">>>"
@@ -120,8 +132,6 @@ focus(Entity* entity, Logs* logs)
 	int mana_gained, health_gained;
 	int i;
 	char* log;
-
-	remove_statuses(entity);
 
 	health_gained = entity->class->health_regen_on_focus;
 

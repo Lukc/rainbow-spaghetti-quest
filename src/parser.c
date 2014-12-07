@@ -243,6 +243,9 @@ parser_get_attack(Game* game, ParserElement* element, Logs* logs)
 			else if (!strcmp(element->name, "name"))
 				attack->name =
 					parser_get_string(element, logs);
+			else if (!strcmp(element->name, "cures"))
+				list_add(&attack->cures_status_names,
+					parser_get_string(element, logs));
 			else if (!strcmp(element->name, "inflicts"))
 			{
 				char* string = parser_get_string(element, logs);
@@ -391,6 +394,8 @@ load_game(Game* game, char* dirname)
 
 	/* Phase 2 */
 	/* FIXME: Put somewhere else? */
+
+	/* Items-related updates. */
 	for (l = game->classes; l; l = l->next)
 	{
 		Class* class = l->data;
@@ -414,6 +419,56 @@ load_game(Game* game, char* dirname)
 		}
 	}
 
+	/* Attacks-related updates. */
+	for (l = game->classes; l; l = l->next)
+	{
+		Class* class = l->data;
+		List* sl;
+
+		for (sl = class->attacks; sl; sl = sl->next)
+		{
+			Attack* attack = sl->data;
+			List* ssl; /* “sub-sub-list”? This is getting crazy. */
+
+			for (ssl = attack->cures_status_names; ssl; ssl = ssl->next)
+			{
+				char* name = ssl->data;
+				Status* status = get_status_by_name(game->statuses, name);
+
+				if (status)
+					list_add(&attack->cures_statuses, status);
+				else
+					fprintf(stderr, "Unknown status: %s\n", name);
+			}
+		}
+	}
+
+	/* Exactly the same code as above, but the Classes are being replaced
+	 * by Items… */
+	for (l = game->items; l; l = l->next)
+	{
+		Item* item = l->data;
+		List* sl;
+
+		for (sl = item->attacks; sl; sl = sl->next)
+		{
+			Attack* attack = sl->data;
+			List* ssl; /* “sub-sub-list”? This is getting crazy. */
+
+			for (ssl = attack->cures_status_names; ssl; ssl = ssl->next)
+			{
+				char* name = ssl->data;
+				Status* status = get_status_by_name(game->statuses, name);
+
+				if (status)
+					list_add(&attack->cures_statuses, status);
+				else
+					fprintf(stderr, "Unknown status: %s\n", name);
+			}
+		}
+	}
+
+	/* Places-related updates. And tons of them. */
 	for (l = game->places; l; l = l->next)
 	{
 		int i;

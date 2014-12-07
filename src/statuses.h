@@ -37,6 +37,7 @@ Status* get_status_by_name(List*, char*);
 
 int has_status(struct Entity*, Status*);
 int inflict_status(struct Entity*, Status*);
+void cure_status(struct Entity*, Status*);
 
 #endif
 

@@ -9,6 +9,7 @@ Class: [
 		Type: slashing
 		Damage: 6
 		Strikes: 3
+		Inflicts: poisoning
 	]
 	Attack: [
 		Name: Troll
@@ -16,12 +17,14 @@ Class: [
 		Damage: 4
 		Strikes: 4
 		Mana: 2
+		Inflicts: poisoning
 	]
 	Attack: [
 		Name: Flame
 		Type: fire
 		Damage: 8
 		Strikes: 2
+		Inflicts: burn
 	]
 	Arcane Resistance: 50
 	Fire Resistance: 50

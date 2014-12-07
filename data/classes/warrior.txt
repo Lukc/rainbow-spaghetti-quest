@@ -1,5 +1,4 @@
 Class: [
-	# Comments \o/
 	Name: Warrior
 	Health: 30
 	Mana: 25
@@ -8,7 +7,6 @@ Class: [
 		Strikes: 2
 		Type: impact
 		Name: Hands
-		Inflicts: confusion
 	]
 	Attack bonus: 5
 	Defense bonus: 5
