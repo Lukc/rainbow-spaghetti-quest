@@ -138,6 +138,27 @@ get_type_resistance(Entity* e, int type)
 }
 
 int
+give_health(Entity* e, int amount)
+{
+	int max = get_max_health(e);
+
+	if (e->health + amount > max)
+	{
+		int r = max - e->health;
+
+		e->health = max;
+
+		return r;
+	}
+	else
+	{
+		e->health += amount;
+
+		return amount;
+	}
+}
+
+int
 init_entity_from_class(Entity* e, Class* c)
 {
 	unsigned int i;

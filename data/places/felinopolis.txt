@@ -4,6 +4,7 @@ Place: [
 	
 	Shop Item: Small Healing Potion
 	Shop Item: Knife
+	Shop Item: Staff
 	Shop Item: Tiger Cloak
 	Shop Item: Light Cat Armor
 	Shop Item: Cat Claws

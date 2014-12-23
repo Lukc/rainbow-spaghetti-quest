@@ -40,10 +40,14 @@ print_attacks(Entity* player, List* list)
 
 			printf("%s", color);
 
-			printf("  (%i) %-9s %3i-%i %-10s" NOCOLOR, i + 1,
-				name,
-				attack->damage + get_attack_bonus(player),
-				attack->strikes, type_to_string(attack->type));
+			if (attack->strikes)
+				printf("  (%i) %-9s %3i-%i %-10s" NOCOLOR, i + 1,
+					name,
+					attack->damage + get_attack_bonus(player),
+					attack->strikes, type_to_string(attack->type));
+			else
+				printf("  (%i) %-9s  " BRIGHT GREEN "%+3iHP %-9s" NOCOLOR,
+					i + 1, name, attack->gives_health, "");
 
 			if (attack->mana_cost)
 				printf(" %+3iMP", -attack->mana_cost);
@@ -77,26 +81,28 @@ can_use_attack(Entity* attacker, Attack* attack)
 static void
 attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 {
-	int damage_inflicted;
+	int damage_inflicted = 0;
 	int type_modifier;
 	char* log;
 
-	type_modifier = get_type_resistance(defender, attack->type);
+	if (attack->strikes)
+	{
+		type_modifier = get_type_resistance(defender, attack->type);
 
-	/* Calculating for a single strike */
-	damage_inflicted =
-		(int) (((get_attack_bonus(attacker) + attack->damage) *
-				(100. - type_modifier)) / 100.) -
-		get_defense_bonus(defender);
+		/* Calculating for a single strike */
+		damage_inflicted =
+			(int) (((get_attack_bonus(attacker) + attack->damage) *
+					(100. - type_modifier)) / 100.) -
+			get_defense_bonus(defender);
 
-	/* Taking care of negative damages... */
-	damage_inflicted = damage_inflicted < 0 ? 0 : damage_inflicted;
+		/* Taking care of negative damages... */
+		damage_inflicted = damage_inflicted < 0 ? 0 : damage_inflicted;
 
-	/* Taking the number of strikes into account now */
-	damage_inflicted = damage_inflicted * attack->strikes;
+		/* Taking the number of strikes into account now */
+		damage_inflicted = damage_inflicted * attack->strikes;
 
-	attacker->mana -= attack->mana_cost;
-	defender->health -= damage_inflicted;
+		defender->health -= damage_inflicted;
+	}
 
 	if (attack->inflicts_status)
 		inflict_status(defender, attack->inflicts_status);
@@ -112,6 +118,12 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 			cure_status(attacker, status);
 		}
 	}
+
+	if (attack->gives_health)
+		/* FIXME: Add it in the logs */
+		give_health(attacker, attack->gives_health);
+
+	attacker->mana -= attack->mana_cost;
 
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(log, 128,

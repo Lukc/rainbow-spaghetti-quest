@@ -13,7 +13,17 @@ Item: [
 		Name: Fireball
 		Mana: 3
 	]
+	Attack: [
+		Name: Heal
+		Strikes: 0
+		Mana: 5
+		Cures: poisoning
+		Cures: burn
+		Cures: frozen
+		Cures: confusion
+		Health on use: 8
+	]
 	Name: Staff
-	Price: 80
+	Price: 800
 	Slot: weapon
 ]

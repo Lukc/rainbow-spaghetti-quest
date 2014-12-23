@@ -246,6 +246,8 @@ parser_get_attack(Game* game, ParserElement* element, Logs* logs)
 			else if (!strcmp(element->name, "cures"))
 				list_add(&attack->cures_status_names,
 					parser_get_string(element, logs));
+			else if (!strcmp(element->name, "health on use"))
+				attack->gives_health = parser_get_integer(element, logs);
 			else if (!strcmp(element->name, "inflicts"))
 			{
 				char* string = parser_get_string(element, logs);

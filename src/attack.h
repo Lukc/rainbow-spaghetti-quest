@@ -7,6 +7,7 @@
 typedef struct Attack {
 	char *name;
 	int mana_cost;
+	int gives_health;
 	int type;
 	int damage;
 	int strikes;

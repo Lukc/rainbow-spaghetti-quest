@@ -48,6 +48,8 @@ int get_defense_bonus(Entity*);
 int get_type_resistance(Entity*, int);
 int get_attack_type(Game*, Entity*);
 
+int give_health(Entity*, int);
+
 char* equipment_string(int);
 
 int init_entity_from_class(Entity*, Class*);
