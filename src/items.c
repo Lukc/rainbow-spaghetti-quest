@@ -212,8 +212,11 @@ give_item(Entity* player, Item* item)
 	int i;
 
 	if (item->slot >= 0)
+	{
 		for (i = 0; i < INVENTORY_SIZE && player->inventory[i].item; i++)
-			;
+			if (item->unique && player->inventory[i].item == item)
+				return -2; /* Unique item already possessed */
+	}
 	else
 	{
 		/* Non-equipment is stackable. */
@@ -227,6 +230,7 @@ give_item(Entity* player, Item* item)
 		)
 			i++;
 
+		/* No compatible stack found, looking for free slot. */
 		if (i == INVENTORY_SIZE)
 		{
 			for (i = 0; i < INVENTORY_SIZE && player->inventory[i].item; i++)
@@ -235,13 +239,12 @@ give_item(Entity* player, Item* item)
 			/* Precaution. */
 			player->inventory[i].quantity = 0;
 		}
+		else if (item->unique && player->inventory[i].item == item)
+			return -2; /* Unique item already possessed */
 	}
 
 	if (i == INVENTORY_SIZE)
 		return -1; /* No space left in inventory */
-
-	if (item->unique && player->inventory[i].item == item)
-		return -2; /* Unique item already possessed */
 
 	player->inventory[i].item = item;
 	player->inventory[i].quantity += 1;
