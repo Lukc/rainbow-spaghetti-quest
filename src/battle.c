@@ -84,6 +84,22 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 	int damage_inflicted = 0;
 	int type_modifier;
 	char* log;
+	char attack_string[64];
+	char status_string[64];
+	char healing_string[64];
+	char* cure_string = "";
+
+	attack_string[0] = '\0';
+	status_string[0] = '\0';
+	healing_string[0] = '\0';
+
+	log = (char*) malloc(sizeof(char) * 128);
+	snprintf(log, 128,
+		BRIGHT WHITE "%s used “%s”",
+		attacker->name,
+		attack->name
+	);
+	logs_add(logs, log);
 
 	if (attack->strikes)
 	{
@@ -102,10 +118,25 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 		damage_inflicted = damage_inflicted * attack->strikes;
 
 		defender->health -= damage_inflicted;
+
+		snprintf(attack_string, 64,
+			RED " >>>" WHITE " %s " RED "-%iHP " WHITE "<%i-%i %s>",
+			defender->name,
+			damage_inflicted,
+			attack->damage, attack->strikes, type_to_string(attack->type)
+		);
 	}
 
 	if (attack->inflicts_status)
+	{
 		inflict_status(defender, attack->inflicts_status);
+
+		snprintf(
+			status_string, 64,
+			MAGENTA " >>> %s",
+			attack->inflicts_status->name
+		);
+	}
 
 	if (attack->cures_statuses)
 	{
@@ -117,21 +148,31 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 
 			cure_status(attacker, status);
 		}
+
+		cure_string = BRIGHT WHITE " <" CYAN "Cured!" WHITE ">";
 	}
 
 	if (attack->gives_health)
-		/* FIXME: Add it in the logs */
+	{
 		give_health(attacker, attack->gives_health);
+
+		snprintf(
+			healing_string, 64,
+			GREEN " <<< +%iHP" WHITE,
+			attack->gives_health
+		);
+	}
 
 	attacker->mana -= attack->mana_cost;
 
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(log, 128,
-		BRIGHT WHITE "%s " RED ">>>"
-		WHITE " %s (%i-%i %s):  " RED "%iHP",
-		attacker->name, defender->name,
-		attack->damage, attack->strikes, type_to_string(attack->type),
-		damage_inflicted);
+		BRIGHT WHITE "  %s%s%s%s",
+		healing_string,
+		attack_string,
+		status_string,
+		cure_string
+	);
 	logs_add(logs, log);
 }
 
@@ -146,6 +187,14 @@ focus(Entity* entity, Logs* logs)
 	char* log;
 
 	health_gained = entity->class->health_regen_on_focus;
+
+	log = (char*) malloc(sizeof(char) * 128);
+	snprintf(
+		log, 128,
+		BRIGHT WHITE "%s focuses"
+		NOCOLOR,
+		entity->name);
+	logs_add(logs, log);
 
 	for (i = 0; i < EQ_MAX; i++)
 		if (entity->equipment[i])
@@ -169,9 +218,9 @@ focus(Entity* entity, Logs* logs)
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(
 		log, 128,
-		BRIGHT WHITE "%s focused >> " GREEN "%+-3iHP  " BLUE "%+-3iMP"
+		BRIGHT WHITE "   " BLUE "<<< " GREEN "%iHP  " BLUE "%iMP"
 		NOCOLOR,
-		entity->name, health_gained, mana_gained);
+		health_gained, mana_gained);
 	logs_add(logs, log);
 }
 
@@ -179,6 +228,15 @@ static void
 use_item(Entity* entity, Item* item, Logs* logs)
 {
 	char* log;
+
+	log = (char*) malloc(sizeof(char) * 128);
+	snprintf(
+		log, 128,
+		BRIGHT WHITE "%s uses a “%s” from its inventory"
+		NOCOLOR,
+		entity->name, item->name
+	);
+	logs_add(logs, log);
 
 	entity->health += item->health_on_use;
 	entity->mana += item->mana_on_use;
@@ -192,9 +250,8 @@ use_item(Entity* entity, Item* item, Logs* logs)
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(
 		log, 128,
-		BRIGHT WHITE "%s used a %s >> " GREEN "%+-3iHP  " BLUE "%+-3iMP"
+		BRIGHT GRAY "   <<< " GREEN "%+-3iHP  " BLUE "%+-3iMP"
 		NOCOLOR,
-		entity->name, item->name,
 		item->health_on_use, item->mana_on_use);
 	logs_add(logs, log);
 }
@@ -326,6 +383,8 @@ battle(Game *game)
 
 	system("clear");
 
+	logs = NULL;
+
 	while (1)
 	{
 		if (!isexit(input))
@@ -334,14 +393,18 @@ battle(Game *game)
 
 			back_to_top();
 
-			logs = NULL;
-
 			switch (input)
 			{
 				case 'f':
+					if (logs)
+						logs_free(logs);
+
 					logs = command_focus(game);
 					break;
 				case 'l':
+					if (logs)
+						logs_free(logs);
+
 					logs = command_flee(game);
 					break;
 				case 'i':
@@ -366,6 +429,9 @@ battle(Game *game)
 								Attack* attack =
 									list_nth(player_attacks, input);
 
+								if (logs)
+									logs_free(logs);
+
 								logs = command_attack(game, attack);
 							}
 							else
@@ -380,8 +446,10 @@ battle(Game *game)
 							if (index < INVENTORY_SIZE &&
 								(item = player->inventory[index].item))
 							{
-								logs = command_use_item(
-									game, player, item);
+								if (logs)
+									logs_free(logs);
+
+								logs = command_use_item(game, player, item);
 
 								if (item->consumable)
 								{
@@ -432,9 +500,6 @@ battle(Game *game)
 				}
 			}
 
-			if (logs)
-				logs_free(logs);
-
 			menu_separator();
 
 			for (i = 0; i < 5; i++)
@@ -462,18 +527,25 @@ battle(Game *game)
 			printf(WHITE "  (f) focus\n" NOCOLOR);
 			move(40);
 			printf(WHITE "  (l) flee\n" NOCOLOR);
-			move(40);
-			printf(YELLOW "  (i) use item\n" NOCOLOR);
 
 			if (view == ITEMS)
 			{
 				move(40);
-				printf(YELLOW "  (+) next\n" NOCOLOR);
+				printf(WHITE "%-40s\n" NOCOLOR, "  (i) actions");
 				move(40);
-				printf(YELLOW "  (-) previous\n" NOCOLOR);
+				printf(WHITE "%-40s\n" NOCOLOR, "  (+) next");
+				move(40);
+				printf(WHITE "%-40s\n" NOCOLOR, "  (-) previous");
 			}
 			else
-				printf("\n\n");
+			{
+				move(40);
+				printf(WHITE "  (i) use item\n" NOCOLOR);
+				move(40);
+				printf("%40s\n", "");
+				move(40);
+				printf("%40s\n", "");
+			}
 
 			menu_separator();
 

@@ -346,6 +346,10 @@ print_entity_basestats(Entity* e)
 				((StatusData*) e->statuses->data)->status->affliction_name);
 
 		printf(">" NOCOLOR);
+
+		/* Easier than cleaning, I suppose. */
+		/* FIXME: Horrible way of keeping things clean. */
+		printf("        ");
 	}
 
 	printf("\n");
