@@ -19,7 +19,7 @@ inventory(Game* game)
 
 	system("clear");
 
-	while (!isexit(input))
+	while (input != 'l')
 	{
 		error = NULL;
 
@@ -174,6 +174,8 @@ inventory(Game* game)
 		}
 
 		printf(YELLOW "  (v)  View item.\n" NOCOLOR);
+
+		printf(WHITE "  (l)  Leave\n" NOCOLOR);
 
 		printf(NOCOLOR);
 

@@ -93,7 +93,7 @@ skills(Game* game)
 
 	system("clear");
 
-	while (!isexit(input))
+	while (input != 'l')
 	{
 		error = NULL;
 
@@ -156,6 +156,10 @@ skills(Game* game)
 		printf("Cooldown after use:  %i\n", default_cooldown);
 		printf("Possible drop here:  (none)\n");
 		printf("Needed resources:    (none)\n");
+
+		back(1);
+		move(40);
+		printf(WHITE " (l)  Leave\n" NOCOLOR);
 
 		menu_separator();
 

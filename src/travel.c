@@ -83,13 +83,13 @@ travel(Game* game)
 
 	system("clear");
 
-	while (!isexit(input))
+	while (input != 'l')
 	{
 		if (input == -42)
 			;
 		else if (isdigit(input))
 		{
-			input = input - '0';
+			input = (input - '1' - 1) % 10 + 1;
 
 			if ((destination = list_nth(game->location->destinations, input)))
 			{
@@ -109,7 +109,7 @@ travel(Game* game)
 			}
 			else
 			{
-				info = "Hey! Invalid input!";
+				info = "Hey! There’s no place like that!";
 			}
 		}
 		else
@@ -126,18 +126,19 @@ travel(Game* game)
 
 			if (can_travel_to(game, destination))
 				printf(WHITE "  (%i)  %s\n" NOCOLOR,
-					i, destination->name);
+					i + 1, destination->name);
 			else
 				printf(BLACK "  (%i)  %s\n" NOCOLOR,
-					i, destination->name);
+					i + 1, destination->name);
 
 			i++;
 		}
 
-		for (; i < 17; i++)
+		for (; i < 16; i++)
 			printf("\n");
 
 		printf("\nPlease select a destination.\n");
+		printf(WHITE " (l)  Cancel\n" NOCOLOR);
 
 		menu_separator();
 

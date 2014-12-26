@@ -247,7 +247,7 @@ enter_shop(Game* game)
 	if (!items)
 		return NULL;
 
-	while (input == -42 || !isexit(input))
+	while (input == -42 || input != 'l')
 	{
 		err = NULL;
 
@@ -366,8 +366,7 @@ enter_shop(Game* game)
 		printf(WHITE
 			" (e)  Equip\n" NOCOLOR);
 		move(40);
-		printf(WHITE
-			" (s)  Sell\n" NOCOLOR);
+		printf(WHITE "%-20s%-20s\n" NOCOLOR, " (s)  Sell", " (l)  Leave");
 
 		menu_separator();
 

@@ -162,6 +162,8 @@ craft(Game* game)
 
 		input = getch();
 	}
+
+	system("clear");
 }
 
 /* vim: set ts=4 sw=4 : */
