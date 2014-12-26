@@ -10,7 +10,11 @@ Place: [
 		Needs item: Legendary Trollscales
 	]
 	
-	# Oh god, we need another way of defining this...
+	# Oh god, we need another way of doing this...
+	Random Enemies: Trollfish
+	Random Enemies: Trollfish
+	Random Enemies: Trollfish
+	Random Enemies: Trollfish
 	Random Enemies: Trollfish
 	Random Enemies: Trollfish
 	Random Enemies: Trollfish
@@ -18,6 +22,8 @@ Place: [
 	Random Enemies: Trollfish
 	Random Enemies: Trollfish
 	
+	Random Enemies: Greater Trollfish
+	Random Enemies: Greater Trollfish
 	Random Enemies: Greater Trollfish
 	Random Enemies: Greater Trollfish
 	Random Enemies: Greater Trollfish

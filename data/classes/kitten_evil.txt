@@ -27,4 +27,8 @@ Class: [
 		Item: Nightmare Fuel
 		Rarity: 60
 	]
+	Drop: [
+		Item: Evil Fur
+		Rarity: 7
+	]
 ]
