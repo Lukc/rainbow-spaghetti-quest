@@ -1,6 +1,8 @@
 Item: [
 	Name: Small Healing Potion
-	Health on use: 20
+	On use: [
+		Health on use: 20
+	]
 	Consumable: 1
 	Price: 20
 ]

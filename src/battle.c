@@ -13,6 +13,10 @@
 #include "entities.h"
 
 /**
+ * @fixme: deduplicate (mostly, redundant string operations)
+ */
+
+/**
  * Prints the attacks’ selection menu of the battle interface.
  * @param list: The List* of Attack* to display.
  */
@@ -92,14 +96,6 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 	attack_string[0] = '\0';
 	status_string[0] = '\0';
 	healing_string[0] = '\0';
-
-	log = (char*) malloc(sizeof(char) * 128);
-	snprintf(log, 128,
-		BRIGHT WHITE "%s used “%s”",
-		attacker->name,
-		attack->name
-	);
-	logs_add(logs, log);
 
 	if (attack->strikes)
 	{
@@ -225,35 +221,20 @@ focus(Entity* entity, Logs* logs)
 }
 
 static void
-use_item(Entity* entity, Item* item, Logs* logs)
+use_item(Entity* entity, Item* item, Entity* enemy, Logs* logs)
 {
 	char* log;
 
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(
 		log, 128,
-		BRIGHT WHITE "%s uses a “%s” from its inventory"
+		BRIGHT WHITE "%s uses “%s” <" YELLOW "inventory" WHITE ">"
 		NOCOLOR,
 		entity->name, item->name
 	);
 	logs_add(logs, log);
 
-	entity->health += item->health_on_use;
-	entity->mana += item->mana_on_use;
-
-	if (entity->health > get_max_health(entity))
-		entity->health = get_max_health(entity);
-
-	if (entity->mana > get_max_mana(entity))
-		entity->mana = get_max_mana(entity);
-
-	log = (char*) malloc(sizeof(char) * 128);
-	snprintf(
-		log, 128,
-		BRIGHT GRAY "   <<< " GREEN "%+-3iHP  " BLUE "%+-3iMP"
-		NOCOLOR,
-		item->health_on_use, item->mana_on_use);
-	logs_add(logs, log);
+	attack(entity, item->on_use, enemy, logs);
 }
 
 static void
@@ -263,6 +244,7 @@ ai_action(Game* game, Logs* logs)
 	Entity* enemy;
 	List* available_attacks;
 	Attack* selected_attack;
+	char* log;
 
 	player = game->player;
 	enemy = game->enemy;
@@ -273,12 +255,22 @@ ai_action(Game* game, Logs* logs)
 		rand() % list_size(available_attacks));
 
 	if (can_use_attack(enemy, selected_attack))
+	{
+		log = (char*) malloc(sizeof(char) * 128);
+		snprintf(log, 128,
+			BRIGHT WHITE "%s used “%s”",
+			enemy->name,
+			selected_attack->name
+		);
+		logs_add(logs, log);
+
 		attack(
 			enemy,
 			selected_attack,
 			player,
 			logs
 		);
+	}
 	else
 		focus(enemy, logs);
 }
@@ -290,7 +282,7 @@ command_use_item(Game* game, Entity* player, Item* item)
 
 	logs = logs_new();
 
-	use_item(player, item, logs);
+	use_item(player, item, game->enemy, logs);
 
 	ai_action(game, logs);
 
@@ -322,6 +314,7 @@ command_attack(Game* game, Attack* player_attack)
 	Entity* player;
 	Entity* enemy;
 	Logs* logs;
+	char* log;
 
 	logs = logs_new();
 
@@ -334,6 +327,14 @@ command_attack(Game* game, Attack* player_attack)
 
 		return logs;
 	}
+
+	log = (char*) malloc(sizeof(char) * 128);
+	snprintf(log, 128,
+		BRIGHT WHITE "%s uses “%s”",
+		player->name,
+		player_attack->name
+	);
+	logs_add(logs, log);
 
 	attack(player, player_attack, enemy, logs);
 

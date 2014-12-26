@@ -8,12 +8,14 @@
 typedef struct Item {
 	char* name;
 
-	int slot; /* values <0 for non-equipment? */
+	int slot; /* values <0 for non-equipment */
 	int price;
 
+	/* Max health modifiers. */
 	int health_bonus;
 	int mana_bonus;
 
+	/* Base stats modifiers. */
 	int attack_bonus;
 	int defense_bonus;
 
@@ -22,9 +24,10 @@ typedef struct Item {
 	int unique;
 	int consumable;
 
-	int health_on_use;
-	int mana_on_use;
+	/* Consumable-related stats. */
+	struct Attack* on_use;
 
+	/* Equipment-related stats. */
 	int health_on_focus;
 	int mana_on_focus;
 

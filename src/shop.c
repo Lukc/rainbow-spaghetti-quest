@@ -45,13 +45,16 @@ print_item(Item* item)
 			attack->damage, attack->strikes, type_to_string(attack->type));
 	}
 
-	if (item->health_on_use)
-		printf("    %s%+i HP\n" NOCOLOR,
-			stat_color(item->health_on_use), item->health_on_use);
+	if (item->on_use)
+	{
+		if (item->on_use->gives_health)
+			printf("    %s%+i HP\n" NOCOLOR,
+				stat_color(item->on_use->gives_health), item->on_use->gives_health);
 
-	if (item->mana_on_use)
-		printf("    %s%+i MP\n" NOCOLOR,
-			stat_color(item->mana_on_use), item->mana_on_use);
+		if (item->on_use->mana_cost)
+			printf("    %s%+i MP\n" NOCOLOR,
+				stat_color(item->on_use->mana_cost), item->on_use->mana_cost);
+	}
 
 	if (item->health_bonus)
 		printf("    %s%+i max health\n" NOCOLOR,

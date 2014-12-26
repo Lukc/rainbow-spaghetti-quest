@@ -94,10 +94,6 @@ load_item(Game* game, List* list)
 			item->unique = parser_get_integer(element, logs);
 		else if (!strcmp(field, "consumable"))
 			item->consumable = parser_get_integer(element, logs);
-		else if (!strcmp(field, "health on use"))
-			item->health_on_use = parser_get_integer(element, logs);
-		else if (!strcmp(field, "mana on use"))
-			item->mana_on_use = parser_get_integer(element, logs);
 		else if (!strcmp(field, "health on focus"))
 			item->health_on_focus = parser_get_integer(element, logs);
 		else if (!strcmp(field, "mana on focus"))
@@ -112,6 +108,8 @@ load_item(Game* game, List* list)
 			item->health_bonus = parser_get_integer(element, logs);
 		else if (!strcmp(field, "max mana"))
 			item->mana_bonus = parser_get_integer(element, logs);
+		else if (!strcmp(field, "on use"))
+			item->on_use = parser_get_attack(game, element, logs);
 		else if (!strcmp(field, "slot"))
 		{
 			char* slot = parser_get_string(element, logs);
@@ -194,7 +192,7 @@ get_count_from_inventory(ItemStack inventory[INVENTORY_SIZE], Item* item)
 int
 is_item_usable(Item* item)
 {
-	return item->health_on_use || item->mana_on_use;
+	return item->on_use != NULL;
 }
 
 /**
