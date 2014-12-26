@@ -209,6 +209,11 @@ give_item(Entity* player, Item* item)
 {
 	int i;
 
+	if (item->unique)
+		for (i = 0; i < EQ_MAX; i++)
+			if (player->equipment[i] == item)
+				return -2; /* Unique item already possessed AND equipped */
+
 	if (item->slot >= 0)
 	{
 		for (i = 0; i < INVENTORY_SIZE && player->inventory[i].item; i++)
