@@ -585,7 +585,19 @@ battle(Game *game)
 					printf("\nYou were able to loot the following items:\n");
 
 					for (; list; list = list->next)
-						printf("  - %s\n", ((Item*) list->data)->name);
+					{
+						Item* item = list->data;
+
+						printf(BRIGHT);
+						if (item->slot >= 0)
+							printf(WHITE);
+						else if (item->on_use && item->on_use->strikes > 0)
+							printf(YELLOW);
+						else if (is_item_usable(item))
+							printf(GREEN);
+
+						printf("  - %s\n" NOCOLOR, item->name);
+					}
 				}
 
 				printf("\nPress any key to continue...\n\n");
