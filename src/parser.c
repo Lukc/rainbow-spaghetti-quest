@@ -211,7 +211,7 @@ parser_get_drop(ParserElement* element, Logs* logs)
 }
 
 Attack*
-parser_get_attack(Game* game, ParserElement* element, Logs* logs)
+parser_get_attack(ParserElement* element, Logs* logs)
 {
 	List* list;
 	Attack* attack = (Attack*) malloc(sizeof(Attack));
@@ -249,20 +249,7 @@ parser_get_attack(Game* game, ParserElement* element, Logs* logs)
 			else if (!strcmp(element->name, "health on use"))
 				attack->gives_health = parser_get_integer(element, logs);
 			else if (!strcmp(element->name, "inflicts"))
-			{
-				char* string = parser_get_string(element, logs);
-
-				attack->inflicts_status =
-					get_status_by_name(game->statuses, string);
-
-				if (!attack->inflicts_status)
-				{
-					fprintf(stderr, "[Attack:%s] Unknown status: %s!\n",
-						attack->name, string);
-
-					exit(1);
-				}
-			}
+				attack->inflicts_status_name = parser_get_string(element, logs);
 			else if (!strcmp(element->name, "type"))
 			{
 				char* type = parser_get_string(element, logs);
@@ -375,6 +362,42 @@ import_dir(Game* game, char* dirname)
 }
 
 /**
+ * Makes an Attack* usable in-game.
+ *
+ * Strings representing statuses are converted into pointers.
+ */
+static void
+update_attack(Game* game, Attack* attack)
+{
+	List* list;
+
+	if (attack->inflicts_status_name)
+	{
+		attack->inflicts_status =
+			get_status_by_name(game->statuses,
+				attack->inflicts_status_name);
+
+		if (!attack->inflicts_status)
+		{
+			fprintf(stderr, "[Attack:%s] Inflicts unknown status: %s!\n",
+				attack->name, attack->inflicts_status_name);
+		}
+	}
+
+	for (list = attack->cures_status_names; list; list = list->next)
+	{
+		char* name = list->data;
+		Status* status = get_status_by_name(game->statuses, name);
+
+		if (status)
+			list_add(&attack->cures_statuses, status);
+		else
+			fprintf(stderr, "[Attack:%s] Cures unknown status: %s\n",
+				attack->name, name);
+	}
+}
+
+/**
  * Loads the game’s data in two stages.
  *
  * The first stage is about reading files and storing their data in the
@@ -430,18 +453,8 @@ load_game(Game* game, char* dirname)
 		for (sl = class->attacks; sl; sl = sl->next)
 		{
 			Attack* attack = sl->data;
-			List* ssl; /* “sub-sub-list”? This is getting crazy. */
 
-			for (ssl = attack->cures_status_names; ssl; ssl = ssl->next)
-			{
-				char* name = ssl->data;
-				Status* status = get_status_by_name(game->statuses, name);
-
-				if (status)
-					list_add(&attack->cures_statuses, status);
-				else
-					fprintf(stderr, "Unknown status: %s\n", name);
-			}
+			update_attack(game, attack);
 		}
 	}
 
@@ -455,18 +468,8 @@ load_game(Game* game, char* dirname)
 		for (sl = item->attacks; sl; sl = sl->next)
 		{
 			Attack* attack = sl->data;
-			List* ssl; /* “sub-sub-list”? This is getting crazy. */
 
-			for (ssl = attack->cures_status_names; ssl; ssl = ssl->next)
-			{
-				char* name = ssl->data;
-				Status* status = get_status_by_name(game->statuses, name);
-
-				if (status)
-					list_add(&attack->cures_statuses, status);
-				else
-					fprintf(stderr, "Unknown status: %s\n", name);
-			}
+			update_attack(game, attack);
 		}
 	}
 

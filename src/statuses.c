@@ -88,6 +88,8 @@ cure_status(Entity* e, Status* status)
 
 			free(data);
 			free(list);
+
+			return;
 		}
 		else
 			prev = list;

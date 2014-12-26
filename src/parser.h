@@ -28,7 +28,7 @@ void parser_free(ParserElement*);
 
 int parser_get_integer(ParserElement*, Logs*);
 char* parser_get_string(ParserElement*, Logs*);
-struct Attack* parser_get_attack(Game*, ParserElement*, Logs*);
+struct Attack* parser_get_attack(ParserElement*, Logs*);
 Drop* parser_get_drop(ParserElement*, Logs*);
 
 void load_game(Game*, char*);

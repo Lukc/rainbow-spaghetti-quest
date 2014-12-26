@@ -4,7 +4,7 @@ Status: [
 	Divides attack: 1
 ]
 Status: [
-	Name: Poisoning
+	Name: Poison
 	Affliction name: poisoned
 ]
 Status: [

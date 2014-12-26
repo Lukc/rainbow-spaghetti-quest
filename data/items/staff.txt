@@ -17,9 +17,9 @@ Item: [
 		Name: Heal
 		Strikes: 0
 		Mana: 5
-		Cures: poisoning
+		Cures: poison
 		Cures: burn
-		Cures: frozen
+		Cures: freeze
 		Cures: confusion
 		Health on use: 8
 	]

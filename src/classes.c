@@ -75,7 +75,7 @@ load_class(Game* game, List* list)
 			class->gold_on_kill = parser_get_integer(element, logs);
 		else if (!strcmp(field, "attack"))
 		{
-			Attack* attack = parser_get_attack(game, element, logs);
+			Attack* attack = parser_get_attack(element, logs);
 
 			if (attack)
 				list_add(&class->attacks, (void*) attack);

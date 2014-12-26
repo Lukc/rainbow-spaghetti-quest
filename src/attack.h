@@ -15,6 +15,7 @@ typedef struct Attack {
 	List* cures_statuses; /* List* of Status* */
 
 	/* Fields required at load-time. */
+	char* inflicts_status_name;
 	List* cures_status_names; /* List of char* */
 } Attack;
 
