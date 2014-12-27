@@ -21,6 +21,128 @@
 #include "skills.h"
 #include "parser.h"
 
+void
+save(Game* game, char* filename)
+{
+	Entity* player = game->player;
+	FILE* f;
+	List* l;
+	int i;
+
+	f = fopen(filename, "w");
+
+	if (!f)
+	{
+		system("clear");
+		fprintf(stderr, "Error while opening save file:\n");
+		perror(" >> fopen");
+
+		fprintf(stderr, "Save file will be dumped to stdout. Just in case.\n");
+		fprintf(stderr, "Press any key to continue.\n");
+		getch();
+
+		f = stdout;
+	}
+
+	fprintf(f, "Money: %i\n", player->gold);
+	fprintf(f, "Location: %s\n", game->location->name);
+
+	for (l = game->visited; l; l = l->next)
+		fprintf(f, "Visited Place: %s\n", ((Place*) l->data)->name);
+
+	for (i = 0; i < EQ_MAX; i++)
+	{
+		Item* eq = player->equipment[i];
+
+		if (eq)
+			fprintf(f, "Equipment: %s\n", eq->name);
+	}
+
+	for (i = 0; i < INVENTORY_SIZE; i++)
+	{
+		ItemStack* stack = player->inventory + i;
+
+		if (stack->item)
+		{
+			fprintf(f,
+				"Inventory: [\n\tItem: %s\n\tQuantity: %i\n]\n",
+				player->inventory[i].item->name,
+				player->inventory[i].quantity
+			);
+		}
+	}
+
+	for (i = 0; i < SKILL_MAX; i++)
+	{
+		fprintf(f,
+			"%s cooldown: %i\n",
+			skill_to_string(i),
+			player->skills_cooldown[i]
+		);
+	}
+}
+
+static void
+load(Game* game, char* filename)
+{
+	List* elements;
+	List* l;
+	ParserElement* element;
+
+	elements = parse_file(filename);
+
+	for (l = elements; l; l = l->next)
+	{
+		char* field;
+
+		element = l->data;
+		field = element->name;
+
+		if (!strcmp(field, "money"))
+			game->player->gold = parser_get_integer(element, NULL);
+		else if (!strcmp(field, "visited place"))
+			list_add(&game->visited, get_place_by_name(game->places, parser_get_string(element, NULL)));
+		else if (!strcmp(field, "location"))
+			game->location = get_place_by_name(game->places, parser_get_string(element, NULL));
+		else if (!strcmp(field, "inventory"))
+		{
+			List* sl = element->value;
+			Item* item = NULL;
+			int quantity = 0;
+			int i;
+
+			if (element->type == PARSER_LIST)
+			{
+				for (; sl; sl = sl->next)
+				{
+					element = sl->data;
+
+					if (!strcmp(element->name, "item"))
+						item = get_item_by_name(
+							game->items, parser_get_string(element, NULL));
+					else if (!strcmp(element->name, "quantity"))
+						quantity = parser_get_integer(element, NULL);
+				}
+
+				if (item && quantity)
+					/* Okay… having a loop for *THIS* definitely sucks. */
+					for (i = 0; i < quantity; i++)
+						give_item(game->player, item);
+			}
+			else
+				fprintf(stderr, "Inventory item ignored because not a list.\n");
+		}
+		else if (!strcmp(field, "equipment"))
+		{
+			Item* item = get_item_by_name(game->items, parser_get_string(element, NULL));
+
+			game->player->equipment[item->slot] = item;
+		}
+		else
+			fprintf(stderr, "Ignored field in save-file: %s\n", field);
+	}
+}
+
 static void
 print_menu(Game* game)
 {
@@ -72,8 +194,6 @@ main(int argc, char* argv[])
 
 	load_game(&game, "data");
 
-	getch();
-
 	/* For now, repeatability would be useful */
 	srand(42);
 
@@ -90,6 +210,10 @@ main(int argc, char* argv[])
 
 	game.location = get_place_by_name(game.places, "Felinopolis");
 	game.visited = NULL;
+
+	load(&game, "rsq.save");
+
+	getch();
 
 	system("clear");
 	input = -42;
@@ -199,6 +323,9 @@ main(int argc, char* argv[])
 	}
 
 	system("stty sane");
+
+	/* Saving game here? */
+	save(&game, "rsq.save");
 
 	return 0;
 }
