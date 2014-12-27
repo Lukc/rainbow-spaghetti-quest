@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "term.h"
 #include "colors.h"
@@ -60,17 +61,12 @@ print_skill(int skill, int x, int selected, int cooldown, int usable)
 	if (usable)
 	{
 		if (cooldown)
-			printf(YELLOW);
+			printf(BRIGHT YELLOW);
 		else
 			printf(BRIGHT GREEN);
 	}
 	else
-	{
-		if (cooldown)
-			fg(1, 1, 1);
-		else
-			printf(YELLOW);
-	}
+		fg(1, 1, 1);
 
 	printf(" %s", skill_to_string(skill));
 	printf(NOCOLOR "\n");
@@ -84,16 +80,11 @@ print_skill(int skill, int x, int selected, int cooldown, int usable)
 			printf(BLUE);
 	}
 	else
-	{
-		if (cooldown)
-			fg(1, 1, 1);
-		else
-			printf(YELLOW);
-	}
+		fg(1, 1, 1);
 
 	printf("      <");
 	for (i = 0; i < 28; i++)
-		printf("%c", i * 100 / 28 >= cooldown * 100 / 6 ? '=' : ' ');
+		printf("%c", i * 100 / 28 < (6 - cooldown) * 100 / 6 ? '=' : ' ');
 	printf(">");
 
 	printf(NOCOLOR "\n");
@@ -106,14 +97,14 @@ skills(Game* game)
 	int default_cooldown = 6;
 	int selection = 0;
 	int i;
-	char* error;
+	char* log;
 	Entity* player = game->player;
 
 	system("clear");
 
 	while (input != 'l')
 	{
-		error = NULL;
+		log = NULL;
 
 		switch (input)
 		{
@@ -136,18 +127,22 @@ skills(Game* game)
 				selection =
 					selection + 9 < SKILL_MAX ? selection + 9 : selection;
 				break;
-			case 13: /* \n ??? */
+			case 'u':
 				if (player->skills_cooldown[selection] == 0 &&
 				    game->location->skill_drop[selection])
 				{
 					give_drop(player, game->location->skill_drop[selection]);
 					player->skills_cooldown[selection] = default_cooldown;
 
+					log = strdup(
+						BRIGHT GREEN " >> " WHITE "Items collected." NOCOLOR);
+
 					/* FIXME: Print the obtained items! */
 				}
 				break;
 			default:
-				error = "Unrecognized key!";
+				log = strdup(
+					BRIGHT RED " >> " WHITE "Unrecognized key!" NOCOLOR);
 		}
 
 		back_to_top();
@@ -172,21 +167,36 @@ skills(Game* game)
 
 		menu_separator();
 
-		printf("Cooldown after use:  %i\n", default_cooldown);
-		printf("Possible drop here:  (none)\n");
-		printf("Needed resources:    (none)\n");
+		printf(WHITE);
+		printf("Cooldown:            ");
+		if (player->skills_cooldown[selection] > 4)
+			printf(BRIGHT RED);
+		else if (player->skills_cooldown[selection] > 0)
+			printf(BRIGHT YELLOW);
+		else
+			printf(BRIGHT);
+		printf("%-5i\n", player->skills_cooldown[selection]);
+		printf(NOCOLOR);
 
+		printf("Possible drop here:  (none)\n");
+		back(1);
+		move(40);
+		printf(WHITE " (u)  Use skill\n" NOCOLOR);
+
+		printf("Needed resources:    (none)\n");
 		back(1);
 		move(40);
 		printf(WHITE " (l)  Leave\n" NOCOLOR);
 
 		menu_separator();
 
-		if (error)
+		printf("%-80s", log ? log : "");
+		back(1);
+		printf("\n");
+
+		if (log)
 		{
-			printf("%s", error);
-			back(1);
-			printf("\n");
+			free(log);
 		}
 
 		input = getch();

@@ -2,7 +2,7 @@ Place: [
 	Name: Forest of Realities
 	Leads to: Felinopolis
 	Random Enemies: Evil Kitten, Black Kitten
-	image: forest_of_realities
+	image: forest_of_realities.out
 	Woodcutting: [
 		Drop: [
 			Item: Reality Branch
@@ -14,6 +14,28 @@ Place: [
 		]
 		Drop: [
 			Item: Reality Branch
+			Rarity: 2
+		]
+		Drop: [
+			Item: Reality Branch
+			Rarity: 3
+		]
+		Drop: [
+			Item: Reality Branch
+			Rarity: 3
+		]
+	]
+	Gathering: [
+		Drop: [
+			Item: Inter-dimensional Fruit
+			Rarity: 1
+		]
+		Drop: [
+			Item: Inter-dimensional Fruit
+			Rarity: 2
+		]
+		Drop: [
+			Item: Inter-dimensional Fruit
 			Rarity: 2
 		]
 	]
