@@ -7,7 +7,7 @@ type[rsq]=binary
 sources[rsq]="$(echo src/*.c)"
 
 dist=(
-	items/*.txt classes/*.txt places/*.txt images/*
+	data/**/*.txt
 	build.zsh build/*.zsh project.zsh
 )
 

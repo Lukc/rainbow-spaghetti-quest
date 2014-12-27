@@ -9,6 +9,7 @@ Place: [
 	Shop Item: Light Cat Armor
 	Shop Item: Cat Claws
 	Shop Item: Cat Hyper-Claws
+	Shop Item: String
 	
 	Leads to: Electrical Ocean
 	Leads to: Eastern Kawai Plains

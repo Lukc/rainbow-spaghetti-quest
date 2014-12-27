@@ -18,3 +18,14 @@ Item: [
 	Price: 320
 	Slot: weapon
 ]
+Recipe: [
+	Output: Troll Staff
+	Ingredient: [
+		Item: Trollfish Meat
+		Quantity: 16
+	]
+	Ingredient: [
+		Item: Reality Branch
+		Quantity: 8
+	]
+]

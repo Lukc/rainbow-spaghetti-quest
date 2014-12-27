@@ -14,9 +14,10 @@ typedef struct {
 
 Logs* enter_shop(Game*);
 
-char* sell_item(Entity* player, Item* item);
-char* equip_item(Entity* player, Item* item);
-char* unequip_item(Entity* player, Item* item);
+void print_item(Item*);
+char* sell_item(Entity*, Item*);
+char* equip_item(Entity*, Item*);
+char* unequip_item(Entity*, Item*);
 
 void print_equipment(Entity*);
 

@@ -45,18 +45,26 @@ Class: [
 	]
 	Drop: [
 		Item: Trollfish Meat
-		Rarity: 4
+		Rarity: 3
 	]
 	Drop: [
 		Item: Trollfish Meat
-		Rarity: 4
+		Rarity: 3
 	]
 	Drop: [
 		Item: Trollfish Meat
-		Rarity: 4
+		Rarity: 3
 	]
 	Drop: [
 		Item: Trollfish Meat
-		Rarity: 4
+		Rarity: 2
+	]
+	Drop: [
+		Item: Trollfish Meat
+		Rarity: 2
+	]
+	Drop: [
+		Item: Trollfish Meat
+		Rarity: 1
 	]
 ]

@@ -13,6 +13,7 @@ void back(int);
 #define KEY_DOWN  (-66)
 #define KEY_RIGHT (-67)
 #define KEY_LEFT  (-68)
+#define KEY_CLEAR  (12)
 
 #endif
 

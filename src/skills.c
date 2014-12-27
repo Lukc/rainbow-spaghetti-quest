@@ -53,31 +53,49 @@ void
 print_skill(int skill, int x, int selected, int cooldown, int usable)
 {
 	int c = selected ? '>' : ' ';
+	int i;
 
 	move(x);
+	printf(BRIGHT WHITE " %c%c " NOCOLOR, c, c);
 	if (usable)
 	{
 		if (cooldown)
-			printf(RED);
+			printf(YELLOW);
 		else
-			printf(BRIGHT BLUE);
+			printf(BRIGHT GREEN);
 	}
 	else
-		printf(BLACK);
-	printf("  %c %s", c, skill_to_string(skill));
+	{
+		if (cooldown)
+			fg(1, 1, 1);
+		else
+			printf(YELLOW);
+	}
+
+	printf(" %s", skill_to_string(skill));
 	printf(NOCOLOR "\n");
 
 	move(x);
 	if (usable)
 	{
 		if (cooldown)
-			printf(RED);
+			printf(YELLOW);
 		else
-			printf(BRIGHT BLUE);
+			printf(BLUE);
 	}
 	else
-		printf(BLACK);
-	printf("  %c  cooldown: %i", c, cooldown);
+	{
+		if (cooldown)
+			fg(1, 1, 1);
+		else
+			printf(YELLOW);
+	}
+
+	printf("      <");
+	for (i = 0; i < 28; i++)
+		printf("%c", i * 100 / 28 >= cooldown * 100 / 6 ? '=' : ' ');
+	printf(">");
+
 	printf(NOCOLOR "\n");
 }
 
@@ -100,6 +118,7 @@ skills(Game* game)
 		switch (input)
 		{
 			case -42:
+			case KEY_CLEAR:
 				break;
 			case KEY_DOWN:
 				if (selection % 9 != 8)

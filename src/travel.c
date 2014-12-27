@@ -46,8 +46,7 @@ first_visit(Game* game)
 void
 check_first_visit(Game* game)
 {
-	if (!has_visited(game, game->location) &&
-		game->location->on_first_visit)
+	if (!has_visited(game, game->location))
 	{
 		first_visit(game);
 
@@ -125,8 +124,15 @@ travel(Game* game)
 			destination = list->data;
 
 			if (can_travel_to(game, destination))
-				printf(WHITE "  (%i)  %s\n" NOCOLOR,
-					i + 1, destination->name);
+				printf(WHITE "  (%i)  %-40s %s %s %s\n" NOCOLOR,
+					i + 1, destination->name,
+					destination->place->shop_items ?
+						"<" BRIGHT GREEN "sh" NOCOLOR WHITE ">" : "    ",
+					destination->place->random_enemies ?
+						"<" BRIGHT RED "en" NOCOLOR WHITE ">" : "    ",
+					has_visited(game, destination->place) ?
+						"" : "<" BRIGHT YELLOW "unvisited" NOCOLOR WHITE ">"
+				);
 			else
 				printf(BLACK "  (%i)  %s\n" NOCOLOR,
 					i + 1, destination->name);
@@ -134,11 +140,15 @@ travel(Game* game)
 			i++;
 		}
 
-		for (; i < 16; i++)
+		/* wtf, 14? But… we only have 10 digit keys! */
+		for (; i < 14; i++)
 			printf("\n");
 
-		printf("\nPlease select a destination.\n");
-		printf(WHITE " (l)  Cancel\n" NOCOLOR);
+		printf("\nPlease select a destination.\n\n");
+
+		menu_separator();
+
+		printf(WHITE "  (l)  Cancel\n" NOCOLOR);
 
 		menu_separator();
 

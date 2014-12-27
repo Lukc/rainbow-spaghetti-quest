@@ -117,6 +117,12 @@ logs_print(Logs* l)
 	printf("\n");
 }
 
+int
+logs_empty(Logs* l)
+{
+	return l->head == NULL;
+}
+
 void
 logs_free(Logs* l)
 {

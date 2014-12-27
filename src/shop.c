@@ -18,7 +18,7 @@ stat_color(int i)
 		return BRIGHT RED;
 }
 
-static void
+void
 print_item(Item* item)
 {
 	int i, l;

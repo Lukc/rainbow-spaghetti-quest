@@ -24,7 +24,7 @@ void print_commands(Command*);
 Logs* logs_new();
 void logs_add(Logs*, char*);
 void logs_print(Logs*);
-void logs_empty(Logs*);
+int  logs_empty(Logs*);
 void logs_free(Logs*);
 
 #endif

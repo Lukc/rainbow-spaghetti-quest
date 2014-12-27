@@ -39,6 +39,10 @@ check_type_resistance(Item* item, ParserElement* element, Logs* logs)
 	return 0;
 }
 
+/**
+ * Gets the slot number matching a string representing the slot.
+ * For example, "weapon" becomes 0.
+ */
 static int
 get_slot(char* string, Logs* logs)
 {
@@ -299,6 +303,43 @@ print_items_menu(Entity* player, int page)
 		else
 			printf("\n");
 	}
+}
+
+/**
+ * @return 0 if no error occurred and the item was removed. 1 otherwise.
+ * @return 1 no such item or quantity is greater than number of items found.
+ *
+ * @precheck
+ *   - player is not NULL
+ *   - item is not NULL
+ *   - quantity > 0
+ */
+int
+remove_items(Entity* player, Item* item, int quantity)
+{
+	int i;
+
+	for (i = 0; i < INVENTORY_SIZE && player->inventory[i].item != item; i++)
+		;
+
+	if (i == INVENTORY_SIZE)
+		return 1;
+
+	if (player->inventory[i].quantity >= quantity)
+	{
+		player->inventory[i].quantity -= quantity;
+		if (player->inventory[i].quantity <= 0)
+			player->inventory[i].item = NULL;
+	}
+	else
+	{
+		quantity -= player->inventory[i].quantity;
+		player->inventory[i].item = NULL;
+
+		return remove_items(player, item, quantity);
+	}
+
+	return 0;
 }
 
 /* vim: set ts=4 sw=4 cc=80 : */

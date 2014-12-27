@@ -16,6 +16,7 @@ typedef struct Game {
 	struct Place* location;
 	List* images; /* List* of char* */
 	List* statuses; /* List* of StatusData* */
+	List* recipes; /* List* of Recipe* */
 
 	List* visited; /* List* of Place* */
 

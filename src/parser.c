@@ -8,6 +8,7 @@
 #include "parser.h"
 #include "skills.h"
 #include "destinations.h"
+#include "recipe.h"
 #include "list.h"
 
 /**
@@ -151,8 +152,10 @@ parser_get_string(ParserElement* element, Logs* logs)
 		return strdup(element->value);
 	else
 	{
+		int len;
 		char* log = (char*) malloc(sizeof(char) * 128);
-		snprintf(log, 128, "Element “%s” is no string!", element->name);
+		len = snprintf(log, 128, "Element “%s” is no string!", element->name);
+		realloc(log, len + 1);
 		logs_add(logs, log);
 
 		return NULL;
@@ -166,9 +169,11 @@ parser_get_integer(ParserElement* element, Logs* logs)
 		return (int) element->value;
 	else
 	{
+		int len;
 		char* log = (char*) malloc(sizeof(char) * 128);
-		snprintf(log, 128,
+		len = snprintf(log, 128,
 			"Element “%s” element is no integer!", element->name);
+		realloc(log, len + 1);
 		logs_add(logs, log);
 
 		return 0;
@@ -347,6 +352,14 @@ import_dir(Game* game, char* dirname)
 						fprintf(stderr,
 							"Item is not a list of keys and values.\n");
 				}
+				else if (!strcmp(field, "recipe"))
+				{
+					if (element->type == PARSER_LIST)
+						load_recipe(game, element->value);
+					else
+						fprintf(stderr,
+							"Recipe is not a list of keys and values.\n");
+				}
 				else
 					fprintf(stderr,
 						"Unknown top-level element: %s\n", field);
@@ -517,7 +530,7 @@ load_game(Game* game, char* dirname)
 					fprintf(stderr,
 						"Item “%s” does not exist!\n", drop->item_name);
 
-					exit(0);
+					exit(1);
 				}
 			}
 		}
@@ -530,7 +543,40 @@ load_game(Game* game, char* dirname)
 			if (item)
 				list_add(&place->shop_items, item);
 			else
-				fprintf(stderr, "Unknown item: %s", name);
+				fprintf(stderr, "[Place:%s/Shop Items] Unknown item: %s",
+					place->name, name);
+		}
+	}
+
+	for (l = game->recipes; l; l = l->next)
+	{
+		Recipe* recipe = l->data;
+		List* sl;
+
+		recipe->output = get_item_by_name(game->items, (char*) recipe->output);
+
+		if (!recipe->output)
+		{
+			fprintf(stderr,
+				"[Recipe:??] Item “%s” does not exist!\n", (char*) recipe->output);
+
+			exit(1);
+		}
+
+		for (sl = recipe->ingredients; sl; sl = sl->next)
+		{
+			Ingredient* ig = sl->data;
+			Item* item = get_item_by_name(game->items, (char*) ig->item);
+
+			if (item)
+				ig->item = item;
+			else
+			{
+				fprintf(stderr, "[Recipe:%s] Unknown item: %s\n",
+					recipe->output->name, ig->item);
+
+				exit(1);
+			}
 		}
 	}
 }
