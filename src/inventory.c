@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "strings.h"
 #include "colors.h"
 #include "entities.h"
 #include "shop.h"
@@ -126,9 +127,9 @@ inventory(Game* game)
 
 					/* FIXME: Make sure item’s name isn’t too long. */
 					if (item->slot >= 0)
-						printed = printf("  %s", item->name);
+						printed = printf("  %s", strcut(item->name, 24));
 					else
-						printed = printf("  %ix %s", quantity, item->name);
+						printed = printf("  %ix %s", quantity, strcut(item->name, 22));
 				}
 				else
 					printed = printf("  (empty)");
