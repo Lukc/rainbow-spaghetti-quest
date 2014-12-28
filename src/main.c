@@ -91,6 +91,9 @@ load(Game* game, char* filename)
 
 	elements = parse_file(filename);
 
+	if (!elements)
+		return;
+
 	for (l = elements; l; l = l->next)
 	{
 		char* field;

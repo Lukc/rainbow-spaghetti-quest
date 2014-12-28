@@ -30,6 +30,9 @@ parse_file(char* filename)
 	ParserElement* element;
 	ParserElement* parent = NULL;
 
+	if (!f)
+		return NULL;
+
 	while (getline(&str, &n, f) > 0)
 	{
 		lineno++;
@@ -573,7 +576,7 @@ load_game(Game* game, char* dirname)
 			else
 			{
 				fprintf(stderr, "[Recipe:%s] Unknown item: %s\n",
-					recipe->output->name, ig->item);
+					recipe->output->name, ig->item->name);
 
 				exit(1);
 			}
