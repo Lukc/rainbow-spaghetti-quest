@@ -82,6 +82,30 @@ save(Game* game, char* filename)
 	}
 }
 
+static int
+load_cooldown(Game* game, ParserElement* element, Logs* logs)
+{
+	int i;
+
+	for (i = 0; i < SKILL_MAX; i++)
+	{
+		char* skill = skill_to_string(i);
+		size_t len = strlen(skill);
+
+		if (
+			!strncmp(element->name, skill, len) &&
+			!strcmp(element->name + len, " cooldown")
+		)
+		{
+			game->player->skills_cooldown[i] = parser_get_integer(element, logs);
+
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
 static void
 load(Game* game, char* filename)
 {
@@ -141,6 +165,8 @@ load(Game* game, char* filename)
 
 			game->player->equipment[item->slot] = item;
 		}
+		else if (load_cooldown(game, element, NULL))
+			;
 		else
 			fprintf(stderr, "Ignored field in save-file: %s\n", field);
 	}
