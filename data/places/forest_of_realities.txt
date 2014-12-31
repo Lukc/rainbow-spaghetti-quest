@@ -1,8 +1,14 @@
 Place: [
 	Name: Forest of Realities
 	Leads to: Felinopolis
-	Random Enemies: Evil Kitten, Black Kitten
 	image: forest_of_realities.out
+
+	Random Enemy: Evil Kitten
+	Random Enemy: [
+		Class: Black Kitten
+		Frequency: 3
+	]
+
 	Woodcutting: [
 		Drop: [
 			Item: Reality Branch

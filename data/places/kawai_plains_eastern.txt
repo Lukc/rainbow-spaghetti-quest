@@ -2,13 +2,15 @@ Place: [
 	Name: Eastern Kawai Plains
 	Leads to: Felinopolis
 	Leads to: Western Kawai Plains
-	Random Enemies: Black Kitten
-	Random Enemies: Black Kitten
-	Random Enemies: Black Kitten
-	Random Enemies: Black Kitten
-	Random Enemies: Black Kitten
-	Random Enemies: Evil Kitten
-	Random Enemies: Evil Kitten
 	Image: kawai_plains
 	On first visit: kawai_plains_first
+
+	Random Enemy: [
+		Class: Black Kitten
+		Frequency: 5
+	]
+	Random Enemy: [
+		Class: Evil Kitten
+		Frequency: 2
+	]
 ]

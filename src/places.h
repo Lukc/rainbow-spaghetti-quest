@@ -9,7 +9,7 @@
 typedef struct Place {
 	char* name;
 	List* shop_items;      /* List* of Item* */
-	List* random_enemies;  /* List* of Class* */
+	List* random_enemies;  /* List* of RandomEnemy* */
 	List* destinations;    /* List* of Destination* */
 	char** image;
 

@@ -10,25 +10,16 @@ Place: [
 		Needs item: Legendary Trollscales
 	]
 	
-	# Oh god, we need another way of doing this...
-	Random Enemies: Trollfish
-	Random Enemies: Trollfish
-	Random Enemies: Trollfish
-	Random Enemies: Trollfish
-	Random Enemies: Trollfish
-	Random Enemies: Trollfish
-	Random Enemies: Trollfish
-	Random Enemies: Trollfish
-	Random Enemies: Trollfish
-	Random Enemies: Trollfish
+	Random Enemy: [
+		Class: Trollfish
+		Frequency: 20
+	]
+	Random Enemy: [
+		Class: Greater Trollfish
+		Frequency: 7
+	]
 	
-	Random Enemies: Greater Trollfish
-	Random Enemies: Greater Trollfish
-	Random Enemies: Greater Trollfish
-	Random Enemies: Greater Trollfish
-	Random Enemies: Greater Trollfish
-	
-	Random Enemies: Legendary Trollfish
+	Random Enemy: Legendary Trollfish
 	
 	Image: electrical_ocean
 	On first visit: electrical_ocean_first

@@ -9,6 +9,7 @@
 #include "skills.h"
 #include "destinations.h"
 #include "recipe.h"
+#include "enemies.h"
 #include "list.h"
 
 /**
@@ -495,16 +496,6 @@ load_game(Game* game, char* dirname)
 		int i;
 		Place* place = l->data;
 		List* sl;
-		
-		for (sl = place->random_enemy_names; sl; sl = sl->next)
-		{
-			Class* class = get_class_by_name(game->classes, sl->data);
-
-			if (class)
-				list_add(&place->random_enemies, class);
-			else
-				fprintf(stderr, "Unknown enemy: %s\n", sl->data);
-		}
 
 		for (sl = place->destinations; sl; sl = sl->next)
 		{
@@ -548,6 +539,30 @@ load_game(Game* game, char* dirname)
 			else
 				fprintf(stderr, "[Place:%s/Shop Items] Unknown item: %s",
 					place->name, name);
+		}
+
+		for (sl = place->random_enemies; sl; sl = sl->next)
+		{
+			RandomEnemy* r = sl->data;
+			char* name = (char*) r->class;
+			Class* class = get_class_by_name(game->classes, name);
+
+			if (class)
+			{
+				r->class = class;
+
+				free(name);
+			}
+			else
+			{
+				fprintf(stderr, "[Place:%s/Enemies] Unknown class: %s",
+					place->name, name);
+
+				free(name);
+
+				exit(0);
+			}
+				
 		}
 	}
 

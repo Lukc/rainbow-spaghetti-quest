@@ -5,6 +5,7 @@
 #include <ctype.h>
 
 #include "game.h"
+#include "enemies.h"
 #include "battle.h"
 #include "types.h"
 #include "commands.h"
@@ -622,20 +623,33 @@ battle(Game *game)
 static Class*
 get_random_enemy(List* list)
 {
-	Class* class;
-	Class* valid_classes[1024];
-	int count = 0;
+	RandomEnemy* r;
+	List* l = list;
+	int max = 0;
+	int selection;
 
-	while (list)
+	while (l)
 	{
-		class = (Class*) list->data;
+		r = l->data;
 
-		valid_classes[count++] = class;
+		max += r->frequency;
 
-		list = list->next;
+		l = l->next;
 	}
 
-	return valid_classes[rand() % count];
+	selection = rand() % max;
+	for (l = list; l; l = l->next)
+	{
+		r = l->data;
+
+		if (selection <= r->frequency - 1)
+			return r->class;
+		else
+			selection -= r->frequency;
+	}
+
+	/* Should not happen. */
+	return NULL;
 }
 
 Logs*

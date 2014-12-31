@@ -11,6 +11,7 @@
 #include "parser.h"
 #include "destinations.h"
 #include "skills.h"
+#include "enemies.h"
 
 static List*
 comas_to_list(char* input)
@@ -177,21 +178,61 @@ load_place (Game* game, List* elements)
 					parse_destination(game, element->value, logs));
 			}
 		}
-		else if (!strcmp(field, "random enemies"))
+		else if (!strcmp(field, "random enemy"))
 		{
-			char* string = parser_get_string(element, logs);
+			RandomEnemy* r;
 
-			if (string)
+			if (element-> type == PARSER_STRING)
 			{
-				temp = comas_to_list(string);
+				char* string = parser_get_string(element, logs);
 
-				for (helper = temp; helper; helper = helper->next)
+				if (string)
 				{
-					list_add(&place->random_enemy_names, helper->data);
+					r = malloc(sizeof(*r));
+
+					/* Will be converted to Class* later. */
+					r->class = (Class*) string;
+					r->frequency = 1;
+
+					list_add(&place->random_enemies, r);
+				}
+			}
+			else if (element->type == PARSER_LIST)
+			{
+				char* class = NULL;
+				int frequency = 0;
+				List* sl = element->value;
+
+				for (; sl; sl = sl->next)
+				{
+					element = sl->data;
+					field = element->name;
+
+					if (!strcmp(field, "class"))
+						class = parser_get_string(element, logs);
+					else if (!strcmp(field, "frequency"))
+						frequency = parser_get_integer(element, logs);
+					else
+						fprintf(stderr,
+							"[Place:%s/Random Enemy:%i] Unknown field: %s\n",
+							place->name ? place->name : "??",
+							element->lineno, field);
 				}
 
-				list_free(temp);
+				if (class)
+				{
+					r = malloc(sizeof(*r));
+
+					r->class = (Class*) class;
+					r->frequency = frequency > 0 ? frequency : 1;
+
+					list_add(&place->random_enemies, r);
+				}
 			}
+			else
+				fprintf(stderr,
+					"[Place:%s:%i] <Random enemy> field is not a string or a list.\n",
+					place->name ? place->name : "??", element->lineno);
 		}
 		else if (!strcmp(field, "image"))
 		{
@@ -229,7 +270,8 @@ load_place (Game* game, List* elements)
 		else
 		{
 			char* log = (char*) malloc(sizeof(char) * 128);
-			snprintf(log, 128, "Unknown field: “%s”.", element->name);
+			snprintf(log, 128, "[Place/%s] Unknown field: “%s”.",
+				place->name ? place->name : "??", element->name);
 			logs_add(logs, log);
 		}
 
