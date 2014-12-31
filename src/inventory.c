@@ -73,17 +73,17 @@ inventory(Game* game)
 			selection = selection % (INVENTORY_SIZE / 3) == 0 ?
 				selection : selection - 1;
 		else if (input == KEY_RIGHT)
-			selection = selection < INVENTORY_SIZE - 8 ?
-				selection + 8 : selection;
+			selection = selection < INVENTORY_SIZE - 9 ?
+				selection + 9 : selection;
 		else if (input == KEY_LEFT)
-			selection = selection >= 8 ?
-				selection - 8 : selection;
+			selection = selection >= 9 ?
+				selection - 9 : selection;
 
 		print_equipment(player);
 		printf("\n");
 
 		back_to_top();
-		for (i = 0; i < 7; i++)
+		for (i = 0; i < 8; i++)
 		{
 			move(40);
 			printf("│");
@@ -117,13 +117,13 @@ inventory(Game* game)
 
 			for (k = 0; k < 3; k++)
 			{
-				if (selection == i + k * 8)
+				if (selection == i + k * 9)
 					printf("\033[47m");
 
-				if (player->inventory[i + k * 8].item)
+				if (player->inventory[i + k * 9].item)
 				{
-					Item* item = player->inventory[i + k * 8].item;
-					int quantity = player->inventory[i + k * 8].quantity;
+					Item* item = player->inventory[i + k * 9].item;
+					int quantity = player->inventory[i + k * 9].quantity;
 
 					/* FIXME: Make sure item’s name isn’t too long. */
 					if (item->slot >= 0)
