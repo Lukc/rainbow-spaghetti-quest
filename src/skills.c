@@ -178,12 +178,14 @@ skills(Game* game)
 		printf("%-5i\n", player->skills_cooldown[selection]);
 		printf(NOCOLOR);
 
-		printf("Possible drop here:  (none)\n");
+		printf(WHITE "Possible drop here:  " YELLOW "<\?\?>\n" NOCOLOR);
 		back(1);
 		move(40);
 		printf(WHITE " (u)  Use skill\n" NOCOLOR);
 
-		printf("Needed resources:    (none)\n");
+		printf(WHITE "Needed resources:    ");
+		fg(1, 1, 1);
+		printf("(none)\n" NOCOLOR);
 		back(1);
 		move(40);
 		printf(WHITE " (l)  Leave\n" NOCOLOR);
