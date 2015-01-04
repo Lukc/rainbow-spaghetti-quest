@@ -31,6 +31,14 @@ load_status(Game* game, List* elements)
 			status->divides_attack = parser_get_integer(element, NULL);
 		else if (!strcmp(field, "divides defense"))
 			status->divides_defense = parser_get_integer(element, NULL);
+		else if (!strcmp(field, "increases mana costs"))
+			status->increases_mana_costs = parser_get_integer(element, NULL);
+		else if (!strcmp(field, "reduces physical strikes"))
+			status->reduces_physical_strikes = parser_get_integer(element, NULL);
+		else if (!strcmp(field, "reduces magical strikes"))
+			status->reduces_magical_strikes = parser_get_integer(element, NULL);
+		else if (!strcmp(field, "prevents recovery"))
+			status->prevents_recovery = parser_get_integer(element, NULL);
 		else
 		{
 			fprintf(stderr,
@@ -61,7 +69,6 @@ inflict_status(Entity* e, Status* status)
 	data = (StatusData*) malloc(sizeof(StatusData));
 
 	data->strength = 1;
-	data->duration = -1;
 	data->status = status;
 
 	list_add(&e->statuses, data);

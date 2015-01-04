@@ -17,6 +17,23 @@
  * @fixme: deduplicate (mostly, redundant string operations)
  */
 
+static int
+get_mana_cost(Entity* e, Attack* attack)
+{
+	List* l;
+	int cost = attack->mana_cost;
+
+	for (l = e->statuses; l; l = l->next)
+	{
+		StatusData* status = l->data;
+
+		if (status->status->increases_mana_costs)
+			cost *= 2;
+	}
+
+	return cost;
+}
+
 /**
  * Prints the attacks’ selection menu of the battle interface.
  * @param list: The List* of Attack* to display.
@@ -32,15 +49,20 @@ print_attacks(Entity* player, List* list)
 		
 		if (list)
 		{
-			attack = list->data;
-
-			char* name = attack->name;
+			int mana_cost;
+			char* name;
 			char* color = WHITE;
 
-			if (!name)
+			attack = list->data;
+
+			mana_cost = get_mana_cost(player, attack);
+
+			if (attack->name)
+				name = attack->name;
+			else
 				name = type_to_attack_name(attack->type);
 
-			if (attack->mana_cost > player->mana)
+			if (mana_cost > player->mana)
 				color = BLACK;
 
 			printf("%s", color);
@@ -54,12 +76,17 @@ print_attacks(Entity* player, List* list)
 				printf("  (%i) %-9s  " BRIGHT GREEN "%+3iHP %-9s" NOCOLOR,
 					i + 1, name, attack->gives_health, "");
 
-			if (attack->mana_cost)
-				printf(" %+3iMP", -attack->mana_cost);
+			if (mana_cost)
+			{
+				if (mana_cost > attack->mana_cost)
+					printf("%s", RED);
+
+				printf(" %+3iMP", -mana_cost);
+			}
 			else
 				printf("      ");
 
-			printf("\n");
+			printf("\n" NOCOLOR);
 
 			list = list->next;
 		}
@@ -76,7 +103,7 @@ print_attacks(Entity* player, List* list)
 static int
 can_use_attack(Entity* attacker, Attack* attack)
 {
-	return attacker->mana >= attack->mana_cost;
+	return attacker->mana >= get_mana_cost(attacker, attack);
 }
 
 /**
@@ -86,7 +113,9 @@ can_use_attack(Entity* attacker, Attack* attack)
 static void
 attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 {
+	int strikes;
 	int damage_inflicted = 0;
+	int mana_cost;
 	int type_modifier;
 	char* log;
 	char attack_string[64];
@@ -98,8 +127,29 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 	status_string[0] = '\0';
 	healing_string[0] = '\0';
 
+	mana_cost = get_mana_cost(attacker, attack);
+
 	if (attack->strikes)
 	{
+		List* l;
+
+		strikes = attack->strikes;
+
+		for (l = attacker->statuses; l; l = l->next)
+		{
+			StatusData* data = l->data;
+			Status* status = data->status;
+
+			if (mana_cost > 0)
+			{
+				if (status->reduces_magical_strikes)
+					strikes /= 2;
+			}
+			else
+				if (status->reduces_physical_strikes)
+					strikes /= 2;
+		}
+
 		type_modifier = get_type_resistance(defender, attack->type);
 
 		/* Calculating for a single strike */
@@ -151,16 +201,36 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 
 	if (attack->gives_health)
 	{
-		give_health(attacker, attack->gives_health);
+		List* l;
+		int can_recover = 1;
 
-		snprintf(
-			healing_string, 64,
-			GREEN " <<< +%iHP" WHITE,
-			attack->gives_health
-		);
+		for (l = attacker->statuses; l && can_recover; l = l->next)
+		{
+			StatusData* data = l->data;
+			Status* status = data->status;
+
+			if (status->prevents_recovery)
+				can_recover = 0;
+		}
+
+		if (can_recover)
+		{
+			give_health(attacker, attack->gives_health);
+
+			snprintf(
+				healing_string, 64,
+				GREEN " <<< +%iHP" WHITE,
+				attack->gives_health
+			);
+		}
+		else
+			snprintf(
+				healing_string, 64,
+				MAGENTA " <<< " BRIGHT "<recovery prevented>" NOCOLOR WHITE
+			);
 	}
 
-	attacker->mana -= attack->mana_cost;
+	attacker->mana -= mana_cost;
 
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(log, 128,
@@ -175,15 +245,28 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 
 /**
  * Gives back mana (and possibly health or other stats).
+ *
+ * @fixme: Be clearer about recovery being prevented, when it is.
  */
 static void
 focus(Entity* entity, Logs* logs)
 {
 	int mana_gained, health_gained;
+	int can_recover = 1;
 	int i;
+	char health_string[64];
+	char mana_string[64];
 	char* log;
+	List* l;
 
-	health_gained = entity->class->health_regen_on_focus;
+	for (l = entity->statuses; l && can_recover; l = l->next)
+	{
+		StatusData* data = l->data;
+		Status* status = data->status;
+
+		if (status->prevents_recovery)
+			can_recover = 0;
+	}
 
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(
@@ -193,12 +276,34 @@ focus(Entity* entity, Logs* logs)
 		entity->name);
 	logs_add(logs, log);
 
-	for (i = 0; i < EQ_MAX; i++)
-		if (entity->equipment[i])
-			health_gained += entity->equipment[i]->health_on_focus;
+	if (can_recover)
+	{
+		health_gained = entity->class->health_regen_on_focus;
 
-	if (entity->health + health_gained > get_max_health(entity))
-		health_gained = get_max_health(entity) - entity->health;
+		for (i = 0; i < EQ_MAX; i++)
+			if (entity->equipment[i])
+				health_gained += entity->equipment[i]->health_on_focus;
+
+		if (entity->health + health_gained > get_max_health(entity))
+			health_gained = get_max_health(entity) - entity->health;
+
+		snprintf(
+			health_string, 64,
+			GREEN " +%iHP" WHITE,
+			health_gained
+		);
+
+		entity->health += health_gained;
+	}
+	else
+	{
+		health_gained = 0;
+
+		snprintf(
+			health_string, 64,
+			MAGENTA BRIGHT "<recovery prevented>" NOCOLOR WHITE
+		);
+	}
 
 	mana_gained = entity->class->mana_regen_on_focus;
 
@@ -210,14 +315,22 @@ focus(Entity* entity, Logs* logs)
 		mana_gained = get_max_mana(entity) - entity->mana;
 
 	entity->mana += mana_gained;
-	entity->health += health_gained;
+
+	if (mana_gained)
+		snprintf(
+			mana_string, 64,
+			BRIGHT BLUE " +%iMP" WHITE,
+			mana_gained
+		);
+	else
+		mana_string[0] = '\0';
 
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(
 		log, 128,
-		BRIGHT WHITE "   " BLUE "<<< " GREEN "%iHP  " BLUE "%iMP"
+		BRIGHT WHITE "   " BLUE "<<< %s%s"
 		NOCOLOR,
-		health_gained, mana_gained);
+		health_string, mana_string);
 	logs_add(logs, log);
 }
 

@@ -22,22 +22,25 @@ typedef struct Status {
 	char* affliction_name;
 	short divides_attack;
 	short divides_defense;
+	short increases_mana_costs;
+	short reduces_physical_strikes;
+	short reduces_magical_strikes;
+	short prevents_recovery;
 } Status;
 
 /* Container for the duration and strength of a status on an Entity. */
 typedef struct {
 	Status* status;
 	int strength;
-	int duration;
 } StatusData;
 
 void load_status(Game*, List*);
 
 Status* get_status_by_name(List*, char*);
 
-int has_status(struct Entity*, Status*);
-int inflict_status(struct Entity*, Status*);
-void cure_status(struct Entity*, Status*);
+int  has_status     (struct Entity*, Status*);
+int  inflict_status (struct Entity*, Status*);
+void cure_status    (struct Entity*, Status*);
 
 #endif
 

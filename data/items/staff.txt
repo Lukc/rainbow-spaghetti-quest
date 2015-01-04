@@ -8,7 +8,7 @@ Item: [
 	]
 	Attack: [
 		Damage: 2
-		Strikes: 40
+		Strikes: 4
 		Type: fire
 		Name: Fireball
 		Mana: 3

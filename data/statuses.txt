@@ -1,18 +1,30 @@
 Status: [
 	Name: Confusion
 	Affliction name: confused
-	Divides attack: 1
+	Increases mana costs: 1
 ]
 Status: [
+	Name: Paralysis
+	Affliction name: paralyzed
+	Reduces physical strikes: 1
+]
+Status: [
+	# FIXME: Not quite working.
 	Name: Poison
 	Affliction name: poisoned
 ]
 Status: [
 	Name: Burn
 	Affliction name: burned
+	Divides attack: 1
 ]
 Status: [
 	Name: Freeze
 	Affliction name: frozen
 	Divides defense: 1
+]
+Status: [
+	Name: Bleeding
+	Affliction name: bleeding
+	Prevents recovery: 1
 ]
