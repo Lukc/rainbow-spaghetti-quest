@@ -485,7 +485,8 @@ int
 battle(Game *game)
 {
 	Logs* logs;
-	char input = -42;
+	char input = KEY_CLEAR;
+	char info[128];
 	Entity *player = game->player;
 	Entity *enemy = game->enemy;
 	List* player_attacks;
@@ -504,12 +505,17 @@ battle(Game *game)
 	{
 		if (!isexit(input))
 		{
+			info[0] = '\0';
+
 			player_attacks = get_all_attacks(player);
 
 			back_to_top();
 
 			switch (input)
 			{
+				case KEY_CLEAR:
+				case ' ':
+					break;
 				case 'f':
 					if (logs)
 						logs_free(logs);
@@ -551,7 +557,9 @@ battle(Game *game)
 							}
 							else
 							{
-								/* FIXME: Be mean to the player. */
+								snprintf(
+									info, 128, BRIGHT RED " >> " WHITE "No such attack..."
+								);
 							}
 						else if (view == ITEMS)
 						{
@@ -577,13 +585,17 @@ battle(Game *game)
 								}
 							}
 							else
-							{
-								/* FIXME: "No such item in inventory..." */
-							}
+								snprintf(
+									info, 128,
+									BRIGHT RED " >> " WHITE "No such item in inventory..."
+								);
 						}
 					}
 					else
-						; /* FIXME: Be mean. */
+						snprintf(
+							info, 128,
+							BRIGHT RED " >> " WHITE "Unrecognized key..."
+						);
 			}
 
 			print_entity_basestats(player);
@@ -663,6 +675,14 @@ battle(Game *game)
 			}
 
 			menu_separator();
+
+			for (i = 0; i < 80; i++)
+				printf(" ");
+			back(1);
+			printf("\n");
+			printf("%s", info);
+			back(1);
+			printf("\n");
 
 			if (game->flee)
 			{
