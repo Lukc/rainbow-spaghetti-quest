@@ -23,6 +23,10 @@ get_mana_cost(Entity* e, Attack* attack)
 	List* l;
 	int cost = attack->mana_cost;
 
+	if (cost < 0)
+		return e->mana - cost > get_max_mana(e) ?
+			- get_max_mana(e) + e->mana : cost;
+
 	for (l = e->statuses; l; l = l->next)
 	{
 		StatusData* status = l->data;
@@ -58,9 +62,12 @@ print_attacks(Entity* player, List* list)
 			mana_cost = get_mana_cost(player, attack);
 
 			if (attack->name)
-				name = attack->name;
+				name = strdup(attack->name);
 			else
-				name = type_to_attack_name(attack->type);
+				name = strdup(type_to_attack_name(attack->type));
+
+			if (strlen(name) > 10)
+				name[11] = '\0';
 
 			if (mana_cost > player->mana)
 				color = BLACK;
@@ -68,25 +75,33 @@ print_attacks(Entity* player, List* list)
 			printf("%s", color);
 
 			if (attack->strikes)
-				printf("  (%i) %-9s %3i-%i %-10s" NOCOLOR, i + 1,
+				printf("(%i) %-11s %3i-%i %-10s" NOCOLOR, i + 1,
 					name,
 					attack->damage + get_attack_bonus(player),
 					attack->strikes, type_to_string(attack->type));
 			else
-				printf("  (%i) %-9s  " BRIGHT GREEN "%+3iHP %-9s" NOCOLOR,
-					i + 1, name, attack->gives_health, "");
-
-			if (mana_cost)
 			{
-				if (mana_cost > attack->mana_cost)
-					printf("%s", RED);
+				printf("(%i) %-11s  ", i + 1, name);
 
-				printf(" %+3iMP", -mana_cost);
+				if (attack->gives_health > 0)
+					printf(BRIGHT GREEN);
+				else
+					printf(BRIGHT RED);
+				
+				printf("%+3iHP %-9s" NOCOLOR,
+					attack->gives_health, "");
 			}
-			else
-				printf("      ");
+
+			if (mana_cost > attack->mana_cost)
+				printf("%s", RED);
+			else if (mana_cost < 0)
+				printf("%s", BLUE);
+
+			printf(" %+3iMP", -mana_cost);
 
 			printf("\n" NOCOLOR);
+
+			free(name);
 
 			list = list->next;
 		}
@@ -120,14 +135,27 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 	char* log;
 	char attack_string[64];
 	char status_string[64];
+	char self_status_string[64];
 	char healing_string[64];
+	char injury_string[64];
+	char mana_string[64];
 	char* cure_string = "";
 
 	attack_string[0] = '\0';
+	self_status_string[0] = '\0';
 	status_string[0] = '\0';
 	healing_string[0] = '\0';
+	injury_string[0] = '\0';
+	mana_string[0] = '\0';
 
 	mana_cost = get_mana_cost(attacker, attack);
+
+	if (attack->self_inflicts_status)
+	{
+		inflict_status(attacker, attack->self_inflicts_status);
+
+		snprintf(self_status_string, 64, MAGENTA " <<< %s", attack->self_inflicts_status->name);
+	}
 
 	if (attack->strikes)
 	{
@@ -196,7 +224,7 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 			cure_status(attacker, status);
 		}
 
-		cure_string = BRIGHT WHITE " <" CYAN "Cured!" WHITE ">";
+		cure_string = BRIGHT WHITE " -" CYAN "Cured!" WHITE "-";
 	}
 
 	if (attack->gives_health)
@@ -204,41 +232,58 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 		List* l;
 		int can_recover = 1;
 
-		for (l = attacker->statuses; l && can_recover; l = l->next)
+		if (attack->gives_health > 0)
 		{
-			StatusData* data = l->data;
-			Status* status = data->status;
+			for (l = attacker->statuses; l && can_recover; l = l->next)
+			{
+				StatusData* data = l->data;
+				Status* status = data->status;
 
-			if (status->prevents_recovery)
-				can_recover = 0;
-		}
+				if (status->prevents_recovery)
+					can_recover = 0;
+			}
 
-		if (can_recover)
-		{
-			give_health(attacker, attack->gives_health);
+			if (can_recover)
+			{
+				give_health(attacker, attack->gives_health);
 
-			snprintf(
-				healing_string, 64,
-				GREEN " <<< +%iHP" WHITE,
-				attack->gives_health
-			);
+				snprintf(
+					healing_string, 64,
+					GREEN " <<< +%iHP" WHITE,
+					attack->gives_health
+				);
+			}
+			else
+				snprintf(
+					healing_string, 64,
+					MAGENTA " <<< -recovery prevented-"
+				);
 		}
 		else
+		{
+			attacker->health += attack->gives_health;
+
 			snprintf(
-				healing_string, 64,
-				MAGENTA " <<< " BRIGHT "<recovery prevented>" NOCOLOR WHITE
+				injury_string, 64,
+				RED " <<< %+iHP", attack->gives_health
 			);
+		}
 	}
+
+	snprintf(mana_string, 64, BLUE " <<< %s%+iMP",
+		mana_cost > 0 ? GRAY : "", -mana_cost);
 
 	attacker->mana -= mana_cost;
 
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(log, 128,
-		BRIGHT WHITE "  %s%s%s%s",
+		BRIGHT WHITE "  %s%s%s%s%s%s",
+		injury_string,
 		healing_string,
 		attack_string,
 		status_string,
-		cure_string
+		cure_string,
+		mana_string
 	);
 	logs_add(logs, log);
 }
@@ -256,8 +301,11 @@ focus(Entity* entity, Logs* logs)
 	int i;
 	char health_string[64];
 	char mana_string[64];
+	char cure_string[64];
+	int cured = 0;
 	char* log;
 	List* l;
+	List* next;
 
 	for (l = entity->statuses; l && can_recover; l = l->next)
 	{
@@ -267,6 +315,27 @@ focus(Entity* entity, Logs* logs)
 		if (status->prevents_recovery)
 			can_recover = 0;
 	}
+
+	for (l = entity->statuses; l; l = next)
+	{
+		StatusData* data = l->data;
+		Status* status = data->status;
+
+		/* l might be freed due to cure_status. Getting next element now. */
+		next = l->next;
+
+		if (status->removed_on_focus)
+			if (has_status(entity, status))
+			{
+				cured = 1;
+				cure_status(entity, status);
+			}
+	}
+
+	if (cured)
+		snprintf(cure_string, 64, BRIGHT WHITE " -" CYAN "Cured!" WHITE "-");
+	else
+		cure_string[0] = '\0';
 
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(
@@ -328,9 +397,9 @@ focus(Entity* entity, Logs* logs)
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(
 		log, 128,
-		BRIGHT WHITE "   " BLUE "<<< %s%s"
+		BRIGHT WHITE "   " BLUE "<<< %s%s%s"
 		NOCOLOR,
-		health_string, mana_string);
+		health_string, mana_string, cure_string);
 	logs_add(logs, log);
 }
 
@@ -434,13 +503,6 @@ command_attack(Game* game, Attack* player_attack)
 
 	player = game->player;
 	enemy = game->enemy;
-
-	if (!can_use_attack(player, player_attack))
-	{
-		logs_add(logs, strdup("Not enough mana!"));
-
-		return logs;
-	}
 
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(log, 128,
@@ -550,10 +612,18 @@ battle(Game *game)
 								Attack* attack =
 									list_nth(player_attacks, input);
 
-								if (logs)
-									logs_free(logs);
+								if (!can_use_attack(player, attack))
+								{
+									snprintf(info, 128,
+										BRIGHT RED " >> " WHITE "Not enough mana...");
+								}
+								else
+								{
+									if (logs)
+										logs_free(logs);
 
-								logs = command_attack(game, attack);
+									logs = command_attack(game, attack);
+								}
 							}
 							else
 							{

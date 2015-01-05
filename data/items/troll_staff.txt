@@ -2,18 +2,25 @@ Item: [
 	Name: Troll Staff
 	Attack bonus: 1
 	Attack: [
+		Name: Troll
 		Damage: 3
 		Strikes: 3
 		Type: arcane
-		Name: Troll
 		Mana: 2
 	]
 	Attack: [
+		Name: Flame
 		Damage: 1
 		Strikes: 4
 		Type: fire
-		Name: Flame
 		Mana: 2
+	]
+	Attack: [
+		Name: Troll Trance
+		Type: arcane
+		Mana: 5
+		Self inflicts: troll trance
+		# FIXME: Add some sort of crazy attack bonus?
 	]
 	Price: 320
 	Slot: weapon

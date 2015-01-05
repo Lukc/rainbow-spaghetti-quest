@@ -26,6 +26,7 @@ typedef struct Status {
 	short reduces_physical_strikes;
 	short reduces_magical_strikes;
 	short prevents_recovery;
+	short removed_on_focus;
 } Status;
 
 /* Container for the duration and strength of a status on an Entity. */

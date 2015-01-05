@@ -23,6 +23,11 @@ Item: [
 		Cures: confusion
 		Health on use: 8
 	]
+	Attack: [
+		Name: Mana Concentration
+		Mana: -12
+		Health on use: -2
+	]
 	Name: Staff
 	Price: 800
 	Slot: weapon

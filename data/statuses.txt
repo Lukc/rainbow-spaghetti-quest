@@ -28,3 +28,11 @@ Status: [
 	Affliction name: bleeding
 	Prevents recovery: 1
 ]
+
+# Special statuses
+Status: [
+	Name: Troll Trance
+	Affliction name: trolling
+	Removed on focus: 1
+	Divides defense: 1
+]

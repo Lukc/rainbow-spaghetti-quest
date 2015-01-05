@@ -113,8 +113,6 @@ logs_print(Logs* l)
 
 		link = link->next;
 	}
-
-	printf("\n");
 }
 
 int

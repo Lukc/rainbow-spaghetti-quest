@@ -241,24 +241,24 @@ parser_get_attack(ParserElement* element, Logs* logs)
 			element = list->data;
 
 			if (!strcmp(element->name, "damage"))
-				attack->damage =
-					parser_get_integer(element, logs);
+				attack->damage = parser_get_integer(element, logs);
 			else if (!strcmp(element->name, "strikes"))
-				attack->strikes =
-					parser_get_integer(element, logs);
+				attack->strikes = parser_get_integer(element, logs);
 			else if (!strcmp(element->name, "mana"))
-				attack->mana_cost =
-					parser_get_integer(element, logs);
+				attack->mana_cost =	parser_get_integer(element, logs);
 			else if (!strcmp(element->name, "name"))
-				attack->name =
-					parser_get_string(element, logs);
+				attack->name = parser_get_string(element, logs);
 			else if (!strcmp(element->name, "cures"))
 				list_add(&attack->cures_status_names,
 					parser_get_string(element, logs));
 			else if (!strcmp(element->name, "health on use"))
 				attack->gives_health = parser_get_integer(element, logs);
+			else if (!strcmp(element->name, "mana on use"))
+				attack->mana_cost = - parser_get_integer(element, logs);
 			else if (!strcmp(element->name, "inflicts"))
 				attack->inflicts_status_name = parser_get_string(element, logs);
+			else if (!strcmp(element->name, "self inflicts"))
+				attack->self_inflicts_status_name = parser_get_string(element, logs);
 			else if (!strcmp(element->name, "type"))
 			{
 				char* type = parser_get_string(element, logs);
@@ -278,6 +278,13 @@ parser_get_attack(ParserElement* element, Logs* logs)
 						return NULL;
 					}
 				}
+			}
+			else
+			{
+				char* log = (char*) malloc(sizeof(char) * 128);
+				snprintf(log, 128, "[Attack:%i] Unknown field ignored: %s.",
+					element->lineno, element->name);
+				logs_add(logs, log);
 			}
 		}
 	}
@@ -400,6 +407,19 @@ update_attack(Game* game, Attack* attack)
 		{
 			fprintf(stderr, "[Attack:%s] Inflicts unknown status: %s!\n",
 				attack->name, attack->inflicts_status_name);
+		}
+	}
+
+	if (attack->self_inflicts_status_name)
+	{
+		attack->self_inflicts_status =
+			get_status_by_name(game->statuses,
+				attack->self_inflicts_status_name);
+
+		if (!attack->self_inflicts_status)
+		{
+			fprintf(stderr, "[Attack:%s] Self inflicts unknown status: %s!\n",
+				attack->name, attack->self_inflicts_status_name);
 		}
 	}
 
