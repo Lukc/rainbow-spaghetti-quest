@@ -32,6 +32,7 @@ struct Attack* parser_get_attack(ParserElement*, Logs*);
 Drop* parser_get_drop(ParserElement*, Logs*);
 
 void load_game(Game*, char*);
+void unload_game(Game*);
 
 #endif
 

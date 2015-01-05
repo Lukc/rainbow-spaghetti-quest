@@ -342,4 +342,13 @@ remove_items(Entity* player, Item* item, int quantity)
 	return 0;
 }
 
+void
+free_item(void* ptr)
+{
+	Item* i = ptr;
+
+	free(i->name);
+	free(i);
+}
+
 /* vim: set ts=4 sw=4 cc=80 : */

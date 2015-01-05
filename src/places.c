@@ -325,4 +325,13 @@ has_visited(Game* game, Place* place)
 	return 0;
 }
 
+void
+free_place(void* ptr)
+{
+	Place* p = ptr;
+
+	free(p->name);
+	free(p);
+}
+
 /* vim: set ts=4 sw=4 cc=80 : */

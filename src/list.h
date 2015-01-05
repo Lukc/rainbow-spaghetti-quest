@@ -13,7 +13,7 @@ int list_size(List*);
 
 List* list_rev_and_free(List*);
 
-void list_free(List*);
+void list_free(List*, void(void*));
 
 #endif
 

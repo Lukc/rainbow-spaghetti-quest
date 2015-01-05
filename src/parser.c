@@ -138,7 +138,7 @@ parser_free(ParserElement* element)
 			parser_free(list->data);
 		}
 
-		list_free(list);
+		list_free(list, NULL);
 	}
 	else if (element->type == PARSER_STRING)
 	{
@@ -371,11 +371,13 @@ import_dir(Game* game, char* dirname)
 				parser_free(element);
 			}
 
-			list_free(parsed_file);
+			list_free(parsed_file, NULL);
 		}
 
 		free(filename);
 	}
+
+	closedir(dir);
 }
 
 /**
@@ -597,6 +599,14 @@ load_game(Game* game, char* dirname)
 			}
 		}
 	}
+}
+
+void
+unload_game(Game* game)
+{
+	list_free(game->places, free_place);
+	list_free(game->items, free_item);
+	/* FIXME: Not complete. */
 }
 
 /* vim: set ts=4 sw=4 cc=80 : */

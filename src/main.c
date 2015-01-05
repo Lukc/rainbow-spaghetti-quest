@@ -356,6 +356,8 @@ main(int argc, char* argv[])
 	/* Saving game here? */
 	save(&game, "rsq.save");
 
+	unload_game(&game);
+
 	return 0;
 }
 

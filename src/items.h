@@ -43,6 +43,7 @@ typedef struct ItemStack {
 #include "entities.h"
 
 void load_item(Game*, List*);
+void free_item(void*);
 
 Item* get_item_by_name(List*, char*);
 int get_count_from_inventory(ItemStack*, Item*);

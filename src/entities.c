@@ -453,7 +453,8 @@ remove_statuses(Entity* e)
 	for (list = e->statuses; list; list = list->next)
 		;
 
-	list_free(e->statuses);
+	/* FIXME: callback to free the StatusData*s */
+	list_free(e->statuses, NULL);
 
 	e->statuses = (List*) NULL;
 }

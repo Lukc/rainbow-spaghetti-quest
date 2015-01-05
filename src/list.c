@@ -77,19 +77,31 @@ list_rev_and_free(List* list)
 /**
  * Frees a list.
  *
- * Make sure you freed its content before! (that is, all ->data elements)
+ * @param cb: A callback to use on each list->data when freeing the list.
  */
 void
-list_free(List* list)
+list_free(List* l, void cb(void*))
 {
-	List* t;
+	List* next;
 
-	while (list)
+	if (cb)
 	{
-		t = list;
-		list = list->next;
+		for (; l; l = next)
+		{
+			next = l->next;
 
-		free(t);
+			cb(l->data);
+
+			free(l);
+		}
+	}
+	else
+	{
+		for (; l; l = next)
+		{
+			next = l->next;
+			free(l);
+		}
 	}
 }
 

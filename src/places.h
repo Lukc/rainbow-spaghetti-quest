@@ -28,5 +28,7 @@ Place* get_place_by_name(List*, char*);
 
 int has_visited(Game*, Place*);
 
+void free_place(void*);
+
 #endif
 

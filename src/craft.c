@@ -126,7 +126,7 @@ craft(Game* game)
 						selected_recipe->output->name
 					);
 
-					list_free(recipes);
+					list_free(recipes, NULL);
 					recipes = available_recipes(game);
 
 					if (recipes)
@@ -262,7 +262,7 @@ craft(Game* game)
 		input = getch();
 	}
 
-	list_free(recipes);
+	list_free(recipes, NULL);
 
 	system("clear");
 }
