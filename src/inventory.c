@@ -83,7 +83,7 @@ inventory(Game* game)
 		printf("\n");
 
 		back_to_top();
-		for (i = 0; i < 8; i++)
+		for (i = 0; i < 7; i++)
 		{
 			move(40);
 			printf("│");
@@ -125,11 +125,11 @@ inventory(Game* game)
 					Item* item = player->inventory[i + k * 9].item;
 					int quantity = player->inventory[i + k * 9].quantity;
 
-					/* FIXME: Make sure item’s name isn’t too long. */
 					if (item->slot >= 0)
 						printed = printf("  %s", strcut(item->name, 24));
 					else
-						printed = printf("  %ix %s", quantity, strcut(item->name, 22));
+						printed = printf("  %ix %s", quantity,
+							strcut(item->name, quantity < 10 ? 22 : 21));
 				}
 				else
 					printed = printf("  (empty)");

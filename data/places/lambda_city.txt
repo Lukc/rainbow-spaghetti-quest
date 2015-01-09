@@ -1,0 +1,9 @@
+Place: [
+	Name: Lambda City
+	Leads to: Land of the Apocalisp
+	image: land_of_the_apocalisp
+
+	Shop Item: Small Healing Potion
+	Shop Item: String
+	Shop Item: Living Wood
+]

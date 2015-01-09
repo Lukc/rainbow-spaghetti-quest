@@ -4,7 +4,7 @@
 
 typedef struct Destination {
 	char* name;
-	List* needed_items;
+	List* needed_items; /* List* of Item* */
 	Place* place;
 } Destination;
 

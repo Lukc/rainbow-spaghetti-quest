@@ -47,6 +47,7 @@ void free_item(void*);
 
 Item* get_item_by_name(List*, char*);
 int get_count_from_inventory(ItemStack*, Item*);
+int possesses_item(struct Entity*, Item*);
 
 int give_item(struct Entity*, Item*);
 int remove_items(struct Entity*, Item*, int);

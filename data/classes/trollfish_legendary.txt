@@ -5,7 +5,7 @@ Class: [
 	Mana on focus: 8
 	Health on focus: 100
 	Attack bonus: 2
-	Defense bonus: 2
+	Defense bonus: 5
 	Attack: [
 		Name: Bite
 		Type: slashing
@@ -43,31 +43,23 @@ Class: [
 		Rarity: 10
 	]
 	Drop: [
-		Item: Small Healing Potion
-		Rarity: 8
-	]
-	Drop: [
 		Item: Trollfish Meat
 		Rarity: 3
-	]
-	Drop: [
-		Item: Trollfish Meat
-		Rarity: 3
-	]
-	Drop: [
-		Item: Trollfish Meat
-		Rarity: 3
+		Quantity: 4
 	]
 	Drop: [
 		Item: Trollfish Meat
 		Rarity: 2
-	]
-	Drop: [
-		Item: Trollfish Meat
-		Rarity: 2
+		Quantity: 3
 	]
 	Drop: [
 		Item: Trollfish Meat
 		Rarity: 1
+		Quantity: 2
+	]
+	Drop: [
+		Item: Troll Scale
+		Rarity: 5
+		Quantity: 12
 	]
 ]

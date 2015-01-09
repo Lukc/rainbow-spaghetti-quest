@@ -64,9 +64,8 @@ parse_destination(Game* game, List* elements, Logs* logs)
 		}
 		else if (!strcmp(field, "needs item"))
 		{
-			/* FIXME: Check type == string and corresponding item exist... */
 			list_add(&destination->needed_items,
-				get_item_by_name(game->items, element->value));
+				parser_get_string(element, logs));
 		}
 		else
 		{
@@ -286,6 +285,8 @@ load_place (Game* game, List* elements)
 
 		exit(1);
 	}
+
+	place->shop_item_names = list_rev_and_free(place->shop_item_names);
 
 	list_add(&game->places, place);
 }

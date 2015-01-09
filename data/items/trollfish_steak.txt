@@ -1,0 +1,15 @@
+Item: [
+	Name: Trollfish Steak
+	On use: [
+		Health on use: 18
+		Mana: 5
+	]
+	Consumable: 1
+	Price: 30
+]
+Recipe: [
+	Output: Trollfish Steak
+	Ingredient: [
+		Item: Trollfish Meat
+	]
+]

@@ -5,6 +5,10 @@ Place: [
 	Image: kawai_plains
 
 	Random Enemy: [
+		Class: White Kitten
+		Frequency: 4
+	]
+	Random Enemy: [
 		Class: Black Kitten
 		Frequency: 4
 	]

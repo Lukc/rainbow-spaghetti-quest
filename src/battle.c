@@ -190,7 +190,7 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 		damage_inflicted = damage_inflicted < 0 ? 0 : damage_inflicted;
 
 		/* Taking the number of strikes into account now */
-		damage_inflicted = damage_inflicted * attack->strikes;
+		damage_inflicted = damage_inflicted * strikes;
 
 		defender->health -= damage_inflicted;
 
@@ -198,7 +198,8 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 			RED " >>>" WHITE " %s " RED "-%iHP " WHITE "<%i-%i %s>",
 			defender->name,
 			damage_inflicted,
-			attack->damage, attack->strikes, type_to_string(attack->type)
+			get_attack_bonus(attacker) + attack->damage,
+			strikes, type_to_string(attack->type)
 		);
 	}
 

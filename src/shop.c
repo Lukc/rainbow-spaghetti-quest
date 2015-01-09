@@ -53,7 +53,7 @@ print_item(Item* item)
 
 		if (item->on_use->mana_cost)
 			printf("    %s%+i MP\n" NOCOLOR,
-				stat_color(item->on_use->mana_cost), item->on_use->mana_cost);
+				stat_color(-item->on_use->mana_cost), -item->on_use->mana_cost);
 	}
 
 	if (item->health_bonus)
@@ -332,7 +332,7 @@ enter_shop(Game* game)
 					 * as “disabled black”.*/
 					printf(YELLOW);
 				else
-					printf(BLACK);
+					fg(1, 1, 1);
 
 				printed = printf("  - %-48s (%s)",
 					item->name, equipment_string(item->slot));

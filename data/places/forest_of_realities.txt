@@ -6,7 +6,15 @@ Place: [
 	Random Enemy: Evil Kitten
 	Random Enemy: [
 		Class: Black Kitten
+		Frequency: 7
+	]
+	Random Enemy: [
+		Class: Living Tree
 		Frequency: 3
+	]
+	Random Enemy: [
+		Class: Dead Living Tree
+		Frequency: 1
 	]
 
 	Woodcutting: [
@@ -17,18 +25,12 @@ Place: [
 		Drop: [
 			Item: Reality Branch
 			Rarity: 2
-		]
-		Drop: [
-			Item: Reality Branch
-			Rarity: 2
-		]
-		Drop: [
-			Item: Reality Branch
-			Rarity: 3
+			Quantity: 2
 		]
 		Drop: [
 			Item: Reality Branch
 			Rarity: 3
+			Quantity: 2
 		]
 	]
 	Gathering: [
@@ -39,10 +41,7 @@ Place: [
 		Drop: [
 			Item: Inter-dimensional Fruit
 			Rarity: 2
-		]
-		Drop: [
-			Item: Inter-dimensional Fruit
-			Rarity: 2
+			Quantity: 2
 		]
 	]
 ]

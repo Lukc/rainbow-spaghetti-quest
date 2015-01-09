@@ -1,6 +1,17 @@
 Place: [
 	Name: Land of the Apocalisp
 	Leads to: Electrical Ocean
+	Leads to: Lambda City
 	image: land_of_the_apocalisp
 	# FIXME: Add a temple in which the player is given some plot on entry.
+
+	Random Enemy: [
+		Class: Apocalisp Fighter
+		Frequency: 3
+	]
+
+	Random Enemy: [
+		Class: Apocalisp Raider
+		Frequency: 2
+	]
 ]

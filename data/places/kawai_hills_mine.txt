@@ -1,0 +1,53 @@
+Place: [
+	Name: Kawai Hills Mine
+	Leads to: Eastern Kawai Plains
+	Image: fixme
+
+	Random Enemy: [
+		Class: Rocky Kitten
+		Frequency: 6
+	]
+	Random Enemy: [
+		Class: Black Kitten
+		Frequency: 2
+	]
+	Random Enemy: [
+		Class: Evil Kitten
+		Frequency: 1
+	]
+	Random Enemy: [
+		Class: Slime
+		Frequency: 2
+	]
+
+	Mining: [
+		Drop: [
+			Item: Living Rock
+			Rarity: 3
+		]
+		Drop: [
+			Item: Living Rock
+			Rarity: 3
+		]
+		Drop: [
+			Item: Living Rock
+			Rarity: 3
+		]
+		Drop: [
+			Item: Living Rock
+			Rarity: 3
+		]
+		Drop: [
+			Item: Living Rock
+			Rarity: 3
+		]
+		Drop: [
+			Item: Living Rock
+			Rarity: 3
+		]
+		Drop: [
+			Item: Living Rock
+			Rarity: 3
+		]
+	]
+]

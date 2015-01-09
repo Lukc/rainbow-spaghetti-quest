@@ -64,7 +64,7 @@ can_travel_to(Game* game, Destination* destination)
 	{
 		item = list->data;
 
-		if (!get_count_from_inventory(game->player->inventory, item))
+		if (!possesses_item(game->player, item))
 			return 0;
 	}
 
@@ -130,12 +130,15 @@ travel(Game* game)
 						"<" BRIGHT GREEN "sh" NOCOLOR WHITE ">" : "    ",
 					destination->place->random_enemies ?
 						"<" BRIGHT RED "en" NOCOLOR WHITE ">" : "    ",
-					has_visited(game, destination->place) ?
-						"" : "<" BRIGHT YELLOW "unvisited" NOCOLOR WHITE ">"
+					has_visited(game, destination->place) ? "" :
+						"<" BRIGHT YELLOW "unvisited" NOCOLOR WHITE ">"
 				);
 			else
-				printf(BLACK "  (%i)  %s\n" NOCOLOR,
+			{
+				fg(1, 1, 1);
+				printf("  (%i)  %s\n" NOCOLOR,
 					i + 1, destination->name);
+			}
 
 			i++;
 		}

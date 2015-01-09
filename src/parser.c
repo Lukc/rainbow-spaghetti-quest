@@ -201,6 +201,7 @@ parser_get_drop(ParserElement* element, Logs* logs)
 	else
 	{
 		memset(drop, 0, sizeof(Drop));
+		drop->quantity = 1;
 
 		for (list = element->value; list; list = list->next)
 		{
@@ -213,6 +214,11 @@ parser_get_drop(ParserElement* element, Logs* logs)
 			}
 			else if (!strcmp(element->name, "rarity"))
 				drop->rarity = parser_get_integer(element, logs);
+			else if (!strcmp(element->name, "quantity"))
+				drop->quantity = parser_get_integer(element, logs);
+			else
+				fprintf(stderr, "[Drop:%i] Unknown element: %s.\n",
+					element->lineno, element->name);
 		}
 
 		return drop;
@@ -525,7 +531,31 @@ load_game(Game* game, char* dirname)
 			Place* place = get_place_by_name(game->places, dest->name);
 
 			if (place)
+			{
+				List* ssl;
+
 				dest->place = place;
+
+				for (ssl = dest->needed_items; ssl; ssl = ssl->next)
+				{
+					char* name;
+					Item* item;
+
+					name = ssl->data;
+					item = get_item_by_name(game->items, name);
+
+					if (item)
+					{
+						ssl->data = item;
+						free(name);
+					}
+					else
+					{
+						fprintf(stderr, "Unknown item: %s\n", name);
+						exit(1);
+					}
+				}
+			}
 			else
 			{
 				fprintf(stderr, "Unknown place: %s\n", dest->name);

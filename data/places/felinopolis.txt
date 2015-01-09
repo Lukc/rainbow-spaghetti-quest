@@ -1,16 +1,21 @@
 Place: [
 	# The capital of Cats, near the Electrical Ocean. (makes sense, right?)
 	Name: Felinopolis
-	
-	Shop Item: Small Healing Potion
-	Shop Item: Knife
-	Shop Item: Staff
-	Shop Item: Tiger Cloak
-	Shop Item: Light Cat Armor
+
+	Shop Item: Kitten Claws
+	Shop Item: Kitten Armor
+	Shop Item: Kitten Shield
+	Shop Item: Kitten Amulet
+	Shop Item: Kitten Hairball
 	Shop Item: Cat Claws
+	Shop Item: Cat Armor
+	Shop Item: Cat Amulet
+	Shop Item: Cat Shield
 	Shop Item: Cat Hyper-Claws
+	Shop Item: Tiger Cloak
+	Shop Item: Small Healing Potion
 	Shop Item: String
-	
+
 	Leads to: Electrical Ocean
 	Leads to: Eastern Kawai Plains
 	Leads to: Forest of Realities

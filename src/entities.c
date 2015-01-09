@@ -423,7 +423,7 @@ get_all_attacks(Entity* e)
 	Item* item;
 	List* result = NULL, * list;
 
-	for (i = 0; i < EQ_MAX; i++)
+	for (i = EQ_MAX - 1; i >= 0; i--)
 	{
 		if((item = e->equipment[i]))
 		{

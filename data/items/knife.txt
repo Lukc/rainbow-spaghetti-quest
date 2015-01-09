@@ -1,7 +1,7 @@
 Item: [
 	Name: Knife
 	Attack: [
-		Damage: 1
+		Damage: 3
 		Strikes: 3
 		Type: slashing
 		Name: Slash

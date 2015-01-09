@@ -9,7 +9,7 @@ Class: [
 	Attack: [
 		Name: Bite
 		Type: slashing
-		Damage: 6
+		Damage: 5
 		Strikes: 3
 		Inflicts: bleeding
 	]
@@ -34,6 +34,7 @@ Class: [
 	# Well... they gotta have some weakness, right?
 	Poison Resistance: -80
 	Gold on kill: 30
+
 	Drop: [
 		Item: Troll Staff
 		Rarity: 20
@@ -41,13 +42,16 @@ Class: [
 	Drop: [
 		Item: Trollfish Meat
 		Rarity: 4
+		Quantity: 3
 	]
 	Drop: [
 		Item: Trollfish Meat
-		Rarity: 4
+		Rarity: 7
+		Quantity: 4
 	]
 	Drop: [
-		Item: Trollfish Meat
-		Rarity: 4
+		Item: Troll Scale
+		Rarity: 15
+		Quantity: 7
 	]
 ]

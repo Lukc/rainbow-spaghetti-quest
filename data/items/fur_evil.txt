@@ -1,4 +1,0 @@
-Item: [
-	Name: Evil Fur
-	Price: 13
-]

@@ -1,0 +1,61 @@
+Class: [
+	Name: Apocalisp Raider
+	Health: 60
+	Mana: 16
+	Mana on focus: 8
+	Health on focus: 20
+	Attack bonus: 2
+	Defense bonus: 2
+	Attack: [
+		Name: Brackets
+		Type: impact
+		Damage: 17
+		Strikes: 2
+		Mana: 8
+	]
+	Attack: [
+		Name: Burning Parenthesis
+		Type: fire
+		Damage: 17
+		Strikes: 2
+		Inflicts: burn
+		Mana: 8
+	]
+	Attack: [
+		Name: Plus
+		Type: piercing
+		Damage: 25
+		Strikes: 1
+		Cures: bleeding
+		Health on use: 8
+		Mana: 16
+	]
+	Attack: [
+		Name: Minus
+		Type: piercing
+		Damage: 25
+		Strikes: 1
+		Inflicts: bleeding
+		Mana: 16
+	]
+	Electric Resistance: -25
+	Cold Resistance: -25
+	Gold on kill: 30
+
+	Drop: [
+		Item: Character Shard
+		Rarity: 16
+	]
+	Drop: [
+		Item: Character Shard
+		Rarity: 32
+	]
+	Drop: [
+		Item: Plus
+		Rarity: 64
+	]
+	Drop: [
+		Item: Minus
+		Rarity: 64
+	]
+]

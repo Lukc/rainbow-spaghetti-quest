@@ -1,0 +1,4 @@
+Item: [
+	Name: Living Rock
+	Price: 20
+]

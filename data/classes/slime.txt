@@ -1,0 +1,39 @@
+Class: [
+	Name: Slime
+	Health: 145
+	Mana: 3
+	Defense Bonus: 2
+	Attack Bonus: 1
+	Mana on focus: 6
+	Health on focus: 16
+	Attack: [
+		Damage: 16
+		Strikes: 1
+		Type: impact
+		Mana: 2
+		Name: Ensliming
+	]
+	Attack: [
+		Damage: 3
+		Strikes: 7
+		Type: impact
+		Mana: 1
+		Name: Slime Bubbles
+	]
+	Slashing resistance: 50
+	Piercing resistance: 50
+	Electric resistance: 50
+	Poison resistance: 50
+
+	Cold resistance: -50
+	Impact resistance: -50
+	Arcane resistance: -50
+	Fire resistance: -50
+
+	Gold on kill: 75
+
+	Drop: [
+		Item: Slime Gelatine
+		Rarity: 1
+	]
+]

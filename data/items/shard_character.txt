@@ -1,0 +1,4 @@
+Item: [
+	Name: Character Shard
+	Price: 150
+]

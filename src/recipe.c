@@ -59,15 +59,15 @@ load_recipe(Game* game, List* elements)
 		{
 			Ingredient* ingredient;
 
-			if (element->type != PARSER_LIST)
+			if (element->type == PARSER_STRING)
 			{
-				fprintf(
-					stderr, "[Recipe:%s:%i] Ingredient defined improperly.\n",
-					recipe->output ? (char*) recipe->output : "??",
-					element->lineno
-				);
+				ingredient = malloc(sizeof(Ingredient));
+				ingredient->quantity = 1;
+				ingredient->item = (Item*) parser_get_string(element, NULL);
+
+				list_add(&recipe->ingredients, ingredient);
 			}
-			else
+			else if (element->type == PARSER_LIST)
 			{
 				ingredient = malloc(sizeof(Ingredient));
 
@@ -76,6 +76,14 @@ load_recipe(Game* game, List* elements)
 					ingredient, element->value, logs);
 
 				list_add(&recipe->ingredients, ingredient);
+			}
+			else
+			{
+				fprintf(
+					stderr, "[Recipe:%s:%i] Ingredient defined improperly.\n",
+					recipe->output ? (char*) recipe->output : "??",
+					element->lineno
+				);
 			}
 		}
 		else

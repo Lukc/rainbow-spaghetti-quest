@@ -148,6 +148,8 @@ load_item(Game* game, List* list)
 		logs_free(logs);
 	}
 
+	item->attacks = list_rev_and_free(item->attacks);
+
 	list_add(&game->items, item);
 }
 
@@ -170,6 +172,29 @@ get_item_by_name(List* list, char* name)
 	}
 
 	return NULL;
+}
+
+/**
+ * Checks whether or not an Entity* has an Item* in its inventory or equipment.
+ */
+int
+possesses_item(Entity* e, Item* item)
+{
+	int i;
+
+	for (i = 0; i < INVENTORY_SIZE; i++)
+	{
+		ItemStack* s = e->inventory + i;
+
+		if (s && s->item == item)
+			return 1;
+	}
+
+	for (i = 0; i < EQ_MAX; i++)
+		if (e->equipment[i] == item)
+			return 1;
+
+	return 0;
 }
 
 /**

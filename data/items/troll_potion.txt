@@ -1,0 +1,16 @@
+Item: [
+	Name: Troll Potion
+	On use: [
+		Health on use: -8
+		Mana: -24
+	]
+	Consumable: 1
+	Price: 60
+]
+Recipe: [
+	Output: Troll Potion
+	Ingredient: [
+		Item: Trollfish Meat
+		Quantity: 8
+	]
+]

@@ -1,0 +1,4 @@
+Item: [
+	Name: Troll Scale
+	Price: 90
+]

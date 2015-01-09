@@ -1,20 +1,20 @@
 Class: [
 	Name: Trollfish
-	Health: 42
+	Health: 38
 	Mana: 5
 	Mana on focus: 3
 	Health on focus: 21
 	Attack: [
 		Name: Bite
 		Type: slashing
-		Damage: 6
+		Damage: 4
 		Strikes: 3
 		Inflicts: bleeding
 	]
 	Attack: [
 		Name: Troll
 		Type: arcane
-		Damage: 4
+		Damage: 3
 		Strikes: 4
 		Mana: 2
 		Inflicts: confusion
@@ -39,5 +39,18 @@ Class: [
 	Drop: [
 		Item: Trollfish Meat
 		Rarity: 7
+	]
+	Drop: [
+		Item: Trollfish Meat
+		Rarity: 7
+	]
+	Drop: [
+		Item: Trollfish Meat
+		Rarity: 7
+	]
+	Drop: [
+		Item: Troll Scale
+		Rarity: 16
+		Quantity: 7
 	]
 ]

@@ -2,3 +2,10 @@ Item: [
 	Name: String
 	Price: 35
 ]
+Recipe: [
+	Output: String
+	Ingredient: [
+		Item: Seaweed
+		Quantity: 1
+	]
+]

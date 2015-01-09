@@ -1,0 +1,27 @@
+Item: [
+	Name: Rocky Armor
+	Max health: 30
+	Defense bonus: 3
+	Price: 6000
+	Slot: armor
+
+	Attack: [
+		Name: Charge
+		Type: impact
+		Damage: 10
+		Strikes: 1
+		Inflicts: confusion
+	]
+]
+Recipe: [
+	Output: Rocky Armor
+
+	Ingredient: [
+		Item: Rocky Fur
+		Quantity: 12
+	]
+	Ingredient: [
+		Item: Living Rock
+		Quantity: 4
+	]
+]

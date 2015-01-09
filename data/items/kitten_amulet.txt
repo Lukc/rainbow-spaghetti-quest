@@ -1,0 +1,27 @@
+Item: [
+	Max mana: 6
+	Attack: [
+		Name: Heal
+		Strikes: 0
+		Mana: 5
+		Cures: poison
+		Cures: burn
+		Cures: freeze
+		Cures: confusion
+		Health on use: 18
+	]
+	Name: Kitten Amulet
+	Price: 120
+	Slot: amulet
+]
+Recipe: [
+	Output: Kitten Amulet
+	Ingredient: [
+		Item: Ball of Fur
+		Quantity: 1
+	]
+	Ingredient: [
+		Item: String
+		Quantity: 4
+	]
+]

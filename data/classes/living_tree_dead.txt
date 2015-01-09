@@ -1,0 +1,63 @@
+Class: [
+	Name: Dead Living Tree
+	Health: 180
+	Mana: 6
+	Defense Bonus: 2
+	Attack Bonus: 0
+	Mana on focus: 6
+	Health on focus: 6
+	Attack: [
+		Damage: 18
+		Strikes: 1
+		Type: impact
+		Mana: 3
+		Name: Branch Hit
+	]
+	Attack: [
+		Damage: 4
+		Strikes: 2
+		Type: impact
+		Mana: 6
+		Name: Ensnare
+	]
+	Slashing resistance: -50
+	Piercing resistance: 15
+	Fire resistance: -80
+	Arcane resistance: -80
+	Impact resistance: 80
+	Electric resistance: 10
+	Poison resistance: 80
+	Gold on kill: 100
+
+	Drop: [
+		Item: Nightmare Fuel
+		Rarity: 30
+	]
+
+	Drop: [
+		Item: Living Wood
+		Rarity: 6
+		Quantity: 3
+	]
+	Drop: [
+		Item: Living Wood
+		Rarity: 7
+		Quantity: 2
+	]
+
+	Drop: [
+		Item: Reality Branch
+		Rarity: 2
+		Quantity: 2
+	]
+	Drop: [
+		Item: Reality Branch
+		Rarity: 3
+		Quantity: 2
+	]
+	Drop: [
+		Item: Reality Branch
+		Rarity: 4
+		Quantity: 2
+	]
+]

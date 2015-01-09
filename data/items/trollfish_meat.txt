@@ -1,8 +1,8 @@
 Item: [
 	Name: Trollfish Meat
 	On use: [
-		Health on use: 18
-		Mana on use: 2
+		Health on use: 4
+		Mana on use: 3
 	]
 	Consumable: 1
 	Price: 12

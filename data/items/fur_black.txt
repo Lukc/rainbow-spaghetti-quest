@@ -1,4 +1,0 @@
-Item: [
-	Name: Black Fur
-	Price: 7
-]

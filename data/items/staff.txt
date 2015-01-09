@@ -1,13 +1,13 @@
 Item: [
 	Max mana: 10
 	Attack: [
-		Damage: 0
+		Damage: 1
 		Strikes: 2
 		Type: impact
 		Name: Staff hit
 	]
 	Attack: [
-		Damage: 2
+		Damage: 4
 		Strikes: 4
 		Type: fire
 		Name: Fireball

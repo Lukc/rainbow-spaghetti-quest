@@ -23,4 +23,21 @@ Place: [
 	
 	Image: electrical_ocean
 	On first visit: electrical_ocean_first
+
+	Gathering: [
+		Drop: [
+			Item: Seaweed
+			Rarity: 1
+		]
+		Drop: [
+			Item: Seaweed
+			Rarity: 5
+			Quantity: 7
+		]
+		Drop: [
+			Item: Troll Scale
+			Rarity: 42
+			Quantity: 4
+		]
+	]
 ]

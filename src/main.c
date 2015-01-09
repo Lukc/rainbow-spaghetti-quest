@@ -195,11 +195,9 @@ print_menu(Game* game)
 
 	back(5);
 	move(40);
-	fg(2, 1, 0);
-	printf(" (c) <WIP> Craft items\n" NOCOLOR);
+	printf(WHITE " (c) Craft items\n" NOCOLOR);
 	move(40);
-	fg(2, 1, 0);
-	printf(" (k) <WIP> Use skills\n" NOCOLOR);
+	printf(WHITE " (k) Use skills\n" NOCOLOR);
 	move(40);
 	printf(BLACK " (q) Show quests\n" NOCOLOR);
 	printf("\n");
@@ -227,6 +225,7 @@ main(int argc, char* argv[])
 	srand(42);
 
 	init_entity_from_class(&player, get_class_by_name(game.classes, "Warrior"));
+	printf(" >> Player will be a %s!\n", get_class_by_name(game.classes, "Warrior")->name);
 
 	player.name = (char*) malloc(sizeof(char) * 80);
 	snprintf(

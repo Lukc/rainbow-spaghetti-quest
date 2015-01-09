@@ -1,0 +1,16 @@
+Item: [
+	Name: White Fur
+	Price: 10
+]
+Item: [
+	Name: Black Fur
+	Price: 20
+]
+Item: [
+	Name: Evil Fur
+	Price: 40
+]
+Item: [
+	Name: Rocky Fur
+	Price: 60
+]

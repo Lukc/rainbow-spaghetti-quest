@@ -1,0 +1,24 @@
+Item: [
+	Name: Trollscales Armor
+	Slot: armor
+	Max mana: 6
+	Price: 900
+	Mana on focus: 4
+	Attack bonus: 1
+	Defense bonus: 1
+	Arcane Resistance: -10
+	Fire Resistance: -10
+	Cold Resistance: -30
+	Poison Resistance: -80
+]
+Recipe: [
+	Output: Trollscales Armor
+	Ingredient: [
+		Item: Troll Scale
+		Quantity: 12
+	]
+	Ingredient: [
+		Item: Magical String
+		Quantity: 4
+	]
+]

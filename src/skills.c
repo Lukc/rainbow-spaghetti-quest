@@ -94,7 +94,6 @@ void
 skills(Game* game)
 {
 	int input = -42;
-	int default_cooldown = 6;
 	int selection = 0;
 	int i;
 	char* log;
@@ -131,8 +130,13 @@ skills(Game* game)
 				if (player->skills_cooldown[selection] == 0 &&
 				    game->location->skill_drop[selection])
 				{
-					give_drop(player, game->location->skill_drop[selection]);
-					player->skills_cooldown[selection] = default_cooldown;
+					int cooldown;
+					List* given;
+
+					given = give_drop(player, game->location->skill_drop[selection]);
+					cooldown = list_size(given) * 2;
+
+					player->skills_cooldown[selection] = cooldown;
 
 					log = strdup(
 						BRIGHT GREEN " >> " WHITE "Items collected." NOCOLOR);
