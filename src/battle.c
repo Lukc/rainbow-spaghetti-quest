@@ -705,60 +705,17 @@ battle(Game *game)
 				int j;
 
 				/* Clearing attacks/items area, line by line. */
-				for (j = 0; j < 40; j++)
+				for (j = 0; j < 80; j++)
 					printf(" ");
 				printf("\n");
 			}
 			back(5);
 
-			if (view == ATTACKS)
-			{
-				print_attacks(player, player_attacks);
-			}
-			else if (view == ITEMS)
-			{
-				print_items_menu(player, page);
-			}
-
-			back(5);
-			move(40);
-			printf(WHITE "  (f) focus\n" NOCOLOR);
-			move(40);
-			printf(WHITE "  (l) flee\n" NOCOLOR);
-
-			if (view == ITEMS)
-			{
-				move(40);
-				printf(WHITE "%-40s\n" NOCOLOR, "  (i) actions");
-				move(40);
-				printf(WHITE "%-40s\n" NOCOLOR, "  (+) next");
-				move(40);
-				printf(WHITE "%-40s\n" NOCOLOR, "  (-) previous");
-			}
-			else
-			{
-				move(40);
-				printf(WHITE "  (i) use item\n" NOCOLOR);
-				move(40);
-				printf("%40s\n", "");
-				move(40);
-				printf("%40s\n", "");
-			}
-
-			menu_separator();
-
-			for (i = 0; i < 80; i++)
-				printf(" ");
-			back(1);
-			printf("\n");
-			printf("%s", info);
-			back(1);
-			printf("\n");
-
+			/* FIXME: The info line is currently not updated when
+			 *        you flee/lose/win. */
 			if (game->flee)
 			{
-				system("clear");
-				printf("\nYou manage to get out of the battle without being "
+				printf("You manage to leave your fight without being "
 					"hurt too badly.\n");
 				printf("\nPress any key to continue...\n\n");
 				getch();
@@ -768,8 +725,7 @@ battle(Game *game)
 			{
 				player->gold /= 2;
 
-				system("clear");
-				printf("\nYou are DEAD.\n");
+				printf("You are DEAD.\n");
 				printf("\nYou lost half your gold.\n");
 				printf("\nPress any key to continue...\n\n");
 				getch();
@@ -781,12 +737,15 @@ battle(Game *game)
 
 				list = give_drop(player, enemy->class->drop);
 
-				system("clear");
-				printf("\nYou are VICTORIOUS.\n");
+				printf("You are VICTORIOUS.\n");
 				printf("\nYou gain %dgp!\n",
 					enemy->class->gold_on_kill);
+				printf("\nPress any key to continue...\n\n");
+
 				if (list)
 				{
+					getch();
+					system("clear");
 					printf("\nYou were able to loot the following items:\n");
 
 					for (; list; list = list->next)
@@ -803,12 +762,60 @@ battle(Game *game)
 
 						printf("  - %s\n" NOCOLOR, item->name);
 					}
+
+					printf("\nPress any key to continue...\n\n");
 				}
 
-				printf("\nPress any key to continue...\n\n");
 				getch();
 				return 1;
 			}
+			else
+			{
+				/* The battle continues! o/ */
+				if (view == ATTACKS)
+				{
+					print_attacks(player, player_attacks);
+				}
+				else if (view == ITEMS)
+				{
+					print_items_menu(player, page);
+				}
+
+				back(5);
+				move(40);
+				printf(WHITE "  (f) focus\n" NOCOLOR);
+				move(40);
+				printf(WHITE "  (l) flee\n" NOCOLOR);
+
+				if (view == ITEMS)
+				{
+					move(40);
+					printf(WHITE "%-40s\n" NOCOLOR, "  (i) actions");
+					move(40);
+					printf(WHITE "%-40s\n" NOCOLOR, "  (+) next");
+					move(40);
+					printf(WHITE "%-40s\n" NOCOLOR, "  (-) previous");
+				}
+				else
+				{
+					move(40);
+					printf(WHITE "  (i) use item\n" NOCOLOR);
+					move(40);
+					printf("%40s\n", "");
+					move(40);
+					printf("%40s\n", "");
+				}
+			}
+
+			menu_separator();
+
+			for (i = 0; i < 80; i++)
+				printf(" ");
+			back(1);
+			printf("\n");
+			printf("%s", info);
+			back(1);
+			printf("\n");
 
 			input = getch();
 		}
