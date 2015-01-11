@@ -72,38 +72,24 @@ save(Game* game, char* filename)
 		}
 	}
 
-	for (i = 0; i < SKILL_MAX; i++)
+	for (l = game->skills; l; l = l->next)
 	{
-		fprintf(f,
-			"%s cooldown: %i\n",
-			skill_to_string(i),
-			player->skills_cooldown[i]
-		);
+		Skill* skill = l->data;
+
+		fprintf(f, "Skill: [\n\tName: %s\n", skill->name);
+
+		if (skill->cooldown)
+			fprintf(f,
+				"\tCooldown: %i\n", skill->cooldown
+			);
+
+		if (skill->experience)
+			fprintf(f,
+				"\tExperience: %i\n", skill->experience
+			);
+
+		fprintf(f, "]\n");
 	}
-}
-
-static int
-load_cooldown(Game* game, ParserElement* element, Logs* logs)
-{
-	int i;
-
-	for (i = 0; i < SKILL_MAX; i++)
-	{
-		char* skill = skill_to_string(i);
-		size_t len = strlen(skill);
-
-		if (
-			!strncmp(element->name, skill, len) &&
-			!strcmp(element->name + len, " cooldown")
-		)
-		{
-			game->player->skills_cooldown[i] = parser_get_integer(element, logs);
-
-			return 1;
-		}
-	}
-
-	return 0;
 }
 
 static void
@@ -165,8 +151,45 @@ load(Game* game, char* filename)
 
 			game->player->equipment[item->slot] = item;
 		}
-		else if (load_cooldown(game, element, NULL))
-			;
+		else if (!strcmp(field, "skill"))
+		{
+			List* sl = element->value;
+			char* name;
+			int experience = 0;
+			int cooldown = 0;
+
+			for (; sl; sl = sl->next)
+			{
+				element = sl->data;
+
+				if (!strcmp(element->name, "name"))
+					name = parser_get_string(element, NULL);
+				else if (!strcmp(element->name, "experience"))
+					experience = parser_get_integer(element, NULL);
+				else if (!strcmp(element->name, "cooldown"))
+					cooldown = parser_get_integer(element, NULL);
+				else
+					fprintf(stderr, "[Skill:%i] Ignored property: %s.\n",
+						element->lineno, element->name);
+			}
+
+			if (name)
+			{
+				Skill* skill = get_skill_by_name(game->skills, name);
+
+				if (skill)
+				{
+					skill->experience = experience;
+					skill->cooldown = cooldown;
+				}
+				else
+					fprintf(stderr,
+						"Uh. Broken save file? (invalid Skill->Name)\n");
+			}
+			else
+				fprintf(stderr,
+					"Uh. Broken save file? (missing Skill->Name)\n");
+		}
 		else
 			fprintf(stderr, "Ignored field in save-file: %s\n", field);
 	}

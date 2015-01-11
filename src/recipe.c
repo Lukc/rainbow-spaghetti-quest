@@ -55,6 +55,10 @@ load_recipe(Game* game, List* elements)
 
 		if (!strcmp(field, "output"))
 			recipe->output = (Item*) parser_get_string(element, logs);
+		else if (!strcmp(field, "skill"))
+			recipe->skill = (Skill*) parser_get_string(element, logs);
+		else if (!strcmp(field, "level"))
+			recipe->level = parser_get_integer(element, logs);
 		else if (!strcmp(field, "ingredient"))
 		{
 			Ingredient* ingredient;

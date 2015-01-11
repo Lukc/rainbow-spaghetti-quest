@@ -8,59 +8,75 @@
 
 #include "skills.h"
 
-char*
-skill_to_string(int skill)
+List*
+get_skill_drops(Skill* skill, Place* place)
 {
-	switch (skill)
+	List* l;
+	SkillDrops* sd;
+
+	for (l = place->skill_drops; l; l = l->next)
 	{
-		case SKILL_WOODCUTTING:
-			return "woodcutting";
-		case SKILL_STONECUTTING:
-			return "stonecutting";
-		case SKILL_MINING:
-			return "mining";
-		case SKILL_GATHERING:
-			return "gathering";
+		sd = l->data;
 
-		case SKILL_COOKING:
-			return "cooking";
-		case SKILL_ALCHEMY:
-			return "alchemy";
-		case SKILL_WOODWORKING:
-			return "woodworking";
-		case SKILL_STONEWORKING:
-			return "stoneworking";
-		case SKILL_METALWORKING:
-			return "metalworking";
-		case SKILL_LEATHERWORKING:
-			return "leatherworking";
+		if (sd->skill == skill)
+			return sd->drops;
+	}
 
-		default:
-			return NULL;
+	return NULL;
+}
+
+void
+lower_skills_cooldown(Game* game)
+{
+	List* l;
+	Skill* skill;
+
+	for (l = game->skills; l; l = l->next)
+	{
+		skill = l->data;
+
+		if (skill->cooldown > 0)
+			skill->cooldown--;
 	}
 }
 
-void
-lower_skills_cooldown(Entity* player)
+int
+skill_level_to_experience(int level)
 {
+	int xp = 100;
 	int i;
 
-	for (i = 0; i < SKILL_MAX; i++)
-		if (player->skills_cooldown[i] > 0)
-			player->skills_cooldown[i]--;
+	/* Meh. Too linear for me. :| */
+	for (i = 1; i < level; i++)
+		xp = xp + 100;
+
+	return xp;
+}
+
+int
+get_skill_level(int experience)
+{
+	int level = 1;
+
+	while (skill_level_to_experience(level) < experience)
+		level++;
+
+	return level;
 }
 
 void
-print_skill(int skill, int x, int selected, int cooldown, int usable)
+print_skill(Skill* skill, Game* game, int selected)
 {
 	int c = selected ? '>' : ' ';
-	int i;
+	int i, max;
+	List* drops;
 
-	move(x);
+	drops = get_skill_drops(skill, game->location);
+
 	printf(BRIGHT WHITE " %c%c " NOCOLOR, c, c);
-	if (usable)
+	if (drops)
 	{
-		if (cooldown)
+		if (skill->cooldown)
 			printf(BRIGHT YELLOW);
 		else
 			printf(BRIGHT GREEN);
@@ -68,23 +84,49 @@ print_skill(int skill, int x, int selected, int cooldown, int usable)
 	else
 		fg(1, 1, 1);
 
-	printf(" %s", skill_to_string(skill));
+	printf(" %s", skill->name);
 	printf(NOCOLOR "\n");
 
-	move(x);
-	if (usable)
+	if (drops)
+		printf(WHITE);
+	else
+		fg(1, 1, 1);
+	printf("  cd: <");
+	if (drops)
 	{
-		if (cooldown)
+		if (skill->cooldown)
 			printf(YELLOW);
 		else
 			printf(BLUE);
 	}
 	else
 		fg(1, 1, 1);
+	for (i = 0; i < 68; i++)
+		printf("%c", i * 100 / 68 < (12 - skill->cooldown) * 100 / 12 ? '=' : ' ');
 
-	printf("      <");
-	for (i = 0; i < 28; i++)
-		printf("%c", i * 100 / 28 < (6 - cooldown) * 100 / 6 ? '=' : ' ');
+	if (drops)
+		printf(WHITE);
+	else
+		fg(1, 1, 1);
+
+	printf(">\n");
+
+	max = skill_level_to_experience(
+		get_skill_level(skill->experience) + 1
+	) - skill_level_to_experience(
+		get_skill_level(skill->experience)
+	);
+	if (drops)
+		printf(WHITE);
+	else
+		fg(1, 1, 1);
+	printf("  xp: <"BLUE);
+	for (i = 0; i < 68; i++)
+		printf("%c", i * 100 / 68 < skill->experience * 100 / max ? '=' : ' ');
+	if (drops)
+		printf(WHITE);
+	else
+		fg(1, 1, 1);
 	printf(">");
 
 	printf(NOCOLOR "\n");
@@ -97,6 +139,9 @@ skills(Game* game)
 	int selection = 0;
 	int i;
 	char* log;
+	Skill* skill;
+	List* drops;
+	List* l;
 	Entity* player = game->player;
 
 	system("clear");
@@ -111,32 +156,22 @@ skills(Game* game)
 			case KEY_CLEAR:
 				break;
 			case KEY_DOWN:
-				if (selection % 9 != 8)
-					selection = selection < SKILL_MAX - 1 ?
-						selection + 1 : SKILL_MAX - 1;
+				selection = selection < list_size(game->skills) - 1 ?
+					selection + 1 : list_size(game->skills) - 1;
 				break;
 			case KEY_UP:
-				if (selection % 9 != 0)
-					selection = selection > 0 ? selection - 1 : 0;
-				break;
-			case KEY_LEFT:
-				selection = selection >= 9 ? selection - 9 : selection;
-				break;
-			case KEY_RIGHT:
-				selection =
-					selection + 9 < SKILL_MAX ? selection + 9 : selection;
+				selection = selection > 0 ? selection - 1 : 0;
 				break;
 			case 'u':
-				if (player->skills_cooldown[selection] == 0 &&
-				    game->location->skill_drop[selection])
+				if (skill->cooldown == 0 && drops)
 				{
-					int cooldown;
 					List* given;
 
-					given = give_drop(player, game->location->skill_drop[selection]);
-					cooldown = list_size(given) * 2;
+					given = give_drop(player, drops);
+					skill->cooldown = list_size(given) * 2;
 
-					player->skills_cooldown[selection] = cooldown;
+					/* 10xp/item collected */
+					skill->experience += skill->cooldown * 5;
 
 					log = strdup(
 						BRIGHT GREEN " >> " WHITE "Items collected." NOCOLOR);
@@ -149,37 +184,41 @@ skills(Game* game)
 					BRIGHT RED " >> " WHITE "Unrecognized key!" NOCOLOR);
 		}
 
+		skill = list_nth(game->skills, selection);
+		drops = get_skill_drops(skill, game->location);
+
 		back_to_top();
 
-		for (i = 0; i < 9; i++)
-		{
-			if (i < SKILL_MAX)
-				print_skill(
-					i, 0, i == selection, player->skills_cooldown[i],
-					game->location->skill_drop[i] != NULL);
-			else
-				printf("\n\n");
+		l = game->skills;
+		for (i = 0; i < selection - selection % 6; i++)
+			l = l->next;
 
-			if (i + 9 < SKILL_MAX)
+		for (i = 0; i < 6; i++)
+		{
+			printf("%80s\n%80s\n%80s\n", "", "", "");
+			back(3);
+
+			if (l)
 			{
-				back(2);
-				print_skill(i + 9, 40, i + 9 == selection,
-					player->skills_cooldown[i + 9],
-					game->location->skill_drop[i + 9] != NULL);
+				print_skill(l->data, game, i == selection % 6);
+
+				l = l->next;
 			}
+			else
+				printf("\n\n\n");
 		}
 
 		menu_separator();
 
 		printf(WHITE);
 		printf("Cooldown:            ");
-		if (player->skills_cooldown[selection] > 4)
+		if (skill->cooldown > 4)
 			printf(BRIGHT RED);
-		else if (player->skills_cooldown[selection] > 0)
+		else if (skill->cooldown > 0)
 			printf(BRIGHT YELLOW);
 		else
 			printf(BRIGHT);
-		printf("%-5i\n", player->skills_cooldown[selection]);
+		printf("%-5i\n", skill->cooldown);
 		printf(NOCOLOR);
 
 		printf(WHITE "Possible drop here:  " YELLOW "<\?\?>\n" NOCOLOR);
@@ -187,10 +226,6 @@ skills(Game* game)
 		move(40);
 		printf(WHITE " (u)  Use skill\n" NOCOLOR);
 
-		printf(WHITE "Needed resources:    ");
-		fg(1, 1, 1);
-		printf("(none)\n" NOCOLOR);
-		back(1);
 		move(40);
 		printf(WHITE " (l)  Leave\n" NOCOLOR);
 
@@ -209,6 +244,48 @@ skills(Game* game)
 	}
 
 	system("clear");
+}
+
+void
+load_skill(Game* game, List* elements)
+{
+	List* l;
+	Skill* s;
+
+	s = malloc(sizeof(*s));
+	memset(s, 0, sizeof(*s));
+
+	for (l = elements; l; l = l->next)
+	{
+		ParserElement* element = l->data;
+
+		if (!strcmp(element->name, "name"))
+			s->name = parser_get_string(element, NULL);
+		else
+			fprintf(stderr, "[Skill:%i] Unrecognized element ignored: %s.\n",
+				element->lineno, element->name);
+	}
+
+	if (s->name)
+		list_add(&game->skills, s);
+	else
+		fprintf(stderr, "Invalid/Incomplete skill.\n");
+}
+
+Skill*
+get_skill_by_name(List* list, char* name)
+{
+	Skill* skill;
+
+	for (; list; list = list->next)
+	{
+		skill = list->data;
+
+		if (!strcasecmp(skill->name, name))
+			return skill;
+	}
+
+	return NULL;
 }
 
 /* vim: set ts=4 sw=4 : */

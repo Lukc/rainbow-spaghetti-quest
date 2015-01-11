@@ -13,6 +13,8 @@ Item: [
 
 Recipe: [
 	Output: White Cat Armor
+	Skill: Tailoring
+	Level: 3
 	Ingredient: [
 		Item: White Fur
 		Quantity: 12

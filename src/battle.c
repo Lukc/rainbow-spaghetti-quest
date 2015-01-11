@@ -888,7 +888,7 @@ enter_battle(Game* game)
 		player->kills++;
 	}
 
-	lower_skills_cooldown(player);
+	lower_skills_cooldown(game);
 
 	system("clear");
 

@@ -12,6 +12,8 @@ Item: [
 ]
 Recipe: [
 	Output: Black Cat Armor
+	Skill: Tailoring
+	Level: 3
 	Ingredient: [
 		Item: Black Fur
 		Quantity: 12

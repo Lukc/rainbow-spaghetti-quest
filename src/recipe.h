@@ -9,6 +9,8 @@
 typedef struct Recipe {
 	Item* output;
 	List* ingredients; /* List* of Ingredient* */
+	Skill* skill; /* char* before loading is complete */
+	int level;
 
 	/* Parser-loader data. */
 	List* ingredients_names; /* List* of char* */

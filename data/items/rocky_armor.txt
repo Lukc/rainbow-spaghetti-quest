@@ -16,6 +16,9 @@ Item: [
 Recipe: [
 	Output: Rocky Armor
 
+	Skill: Tailoring
+	Level: 4
+
 	Ingredient: [
 		Item: Rocky Fur
 		Quantity: 12

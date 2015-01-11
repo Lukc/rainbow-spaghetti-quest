@@ -29,20 +29,39 @@ recipe_craftable(Game* game, Recipe* recipe)
 /**
  * Assuming all necessary resources are in the player’s inventory.
  */
-static void
+static int
 craft_item(Game* game, Recipe* recipe)
 {
 	Entity* player = game->player;
 	List* l;
+	int experience = 0;
 
 	for (l = recipe->ingredients; l; l = l->next)
 	{
 		Ingredient* ig = l->data;
 
 		remove_items(player, ig->item, ig->quantity);
+
+		/* 10xp/consumed item */
+		experience += ig->quantity * 10;
+	}
+
+	if (recipe->skill)
+	{
+		Skill* skill = recipe->skill;
+		int current_level = get_skill_level(skill->experience);
+
+		skill->experience += experience;
+
+		/* Possible fail if level is too low. */
+		if (current_level < recipe->level)
+			if (rand() % recipe->level >= current_level)
+				return 0;
 	}
 
 	give_item(player, recipe->output);
+
+	return 1;
 }
 
 static List*
@@ -117,14 +136,21 @@ craft(Game* game)
 			case 'b':
 				if (selected_recipe)
 				{
-					craft_item(game, selected_recipe);
-
 					log = malloc(sizeof(char) * 128);
-					snprintf(log, 128,
-						BRIGHT GREEN " >> " WHITE
-							"Successfully crafted a %s!" NOCOLOR,
-						selected_recipe->output->name
-					);
+
+					if (craft_item(game, selected_recipe))
+						snprintf(log, 128,
+							BRIGHT GREEN " >> " WHITE
+								"Successfully crafted a %s!" NOCOLOR,
+							selected_recipe->output->name
+						);
+					else
+						snprintf(log, 128,
+							BRIGHT RED " >> " WHITE
+								"Your level is too low!"
+								" You failed to craft the item!" NOCOLOR
+						);
+
 
 					list_free(recipes, NULL);
 					recipes = available_recipes(game);
@@ -238,12 +264,21 @@ craft(Game* game)
 
 		menu_separator();
 
+		printf("%-40s\n", "");
+		back(1);
+		if (selected_recipe && selected_recipe->skill)
+			printf(WHITE "Related skill: %s", selected_recipe->skill->name);
 		move(40);
 		if (selected_item)
 			printf(WHITE);
 		else
 			printf(BLACK);
 		printf(" (b) Build\n" NOCOLOR);
+
+		printf("%-40s\n", "");
+		back(1);
+		if (selected_recipe && selected_recipe->skill)
+			printf(WHITE "Required level: %i", selected_recipe->level);
 		move(40);
 		printf(WHITE " (l) Leave\n" NOCOLOR);
 

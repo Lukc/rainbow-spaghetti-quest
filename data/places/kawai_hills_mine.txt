@@ -20,7 +20,8 @@ Place: [
 		Frequency: 2
 	]
 
-	Mining: [
+	Skill: [
+		Name: Mining
 		Drop: [
 			Item: Living Rock
 			Rarity: 3

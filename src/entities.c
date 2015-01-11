@@ -184,9 +184,6 @@ init_entity_from_class(Entity* e, Class* c)
 
 	e->statuses = NULL;
 
-	for (i = 0; i < SKILL_MAX; i++)
-		e->skills_cooldown[i] = 0;
-
 	return 42;
 }
 

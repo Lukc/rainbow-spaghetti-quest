@@ -10,6 +10,7 @@
 #include "destinations.h"
 #include "recipe.h"
 #include "enemies.h"
+#include "skills.h"
 #include "list.h"
 
 /**
@@ -377,6 +378,14 @@ import_dir(Game* game, char* dirname)
 						fprintf(stderr,
 							"Recipe is not a list of keys and values.\n");
 				}
+				else if (!strcmp(field, "skill"))
+				{
+					if (element->type == PARSER_LIST)
+						load_skill(game, element->value);
+					else
+						fprintf(stderr,
+							"Skill is not a list of keys and values.\n");
+				}
 				else
 					fprintf(stderr,
 						"Unknown top-level element: %s\n", field);
@@ -521,7 +530,6 @@ load_game(Game* game, char* dirname)
 	/* Places-related updates. And tons of them. */
 	for (l = game->places; l; l = l->next)
 	{
-		int i;
 		Place* place = l->data;
 		List* sl;
 
@@ -563,21 +571,44 @@ load_game(Game* game, char* dirname)
 			}
 		}
 
-		for (i = 0; i < SKILL_MAX; i++)
+		for (sl = place->skill_drops; sl; sl = sl->next)
 		{
-			for (sl = place->skill_drop[i]; sl; sl = sl->next)
+			char* name;
+			SkillDrops* sd = sl->data;
+
+			name = (char*) sd->skill;
+
+			sd->skill = get_skill_by_name(game->skills, name);
+
+			if (sd->skill)
 			{
-				Drop* drop = sl->data;
+				List* ssl;
 
-				drop->item = get_item_by_name(game->items, drop->item_name);
-
-				if (!drop->item)
+				for (ssl = sd->drops; ssl; ssl = ssl->next)
 				{
-					fprintf(stderr,
-						"Item “%s” does not exist!\n", drop->item_name);
+					char* name;
+					Drop* drop;
+					Item* item;
 
-					exit(1);
+					drop = ssl->data;
+					name = (char*) drop->item_name;
+					item = get_item_by_name(game->items, name);
+
+					if (item)
+						drop->item = item;
+					else
+					{
+						fprintf(stderr, "[Place/%s] Undefined item: %s.\n",
+							place->name, name);
+						exit(1);
+					}
 				}
+			}
+			else
+			{
+				fprintf(stderr, "[Place/%s] Undefined skill: %s.\n",
+					place->name, name);
+				exit(1);
 			}
 		}
 
@@ -631,6 +662,18 @@ load_game(Game* game, char* dirname)
 				"[Recipe:??] Item “%s” does not exist!\n", (char*) recipe->output);
 
 			exit(1);
+		}
+
+		if (recipe->skill)
+		{
+			char* name = (char*) recipe->skill;
+
+			if (!(recipe->skill = get_skill_by_name(game->skills, name)))
+			{
+				fprintf(stderr, "[Recipe/%s] Undefined skill: %s.\n",
+					recipe->output->name, name);
+				exit(1);
+			}
 		}
 
 		for (sl = recipe->ingredients; sl; sl = sl->next)

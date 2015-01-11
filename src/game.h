@@ -14,11 +14,12 @@ typedef struct Game {
 	List* items;
 	List* places;
 	struct Place* location;
-	List* images; /* List* of char* */
-	List* statuses; /* List* of StatusData* */
-	List* recipes; /* List* of Recipe* */
+	List* images;    /* List* of char* */
+	List* statuses;  /* List* of StatusData* */
+	List* recipes;   /* List* of Recipe* */
+	List* skills;    /* List* of Skill* */
 
-	List* visited; /* List* of Place* */
+	List* visited;   /* List* of Place* */
 
 	int flee;
 } Game;

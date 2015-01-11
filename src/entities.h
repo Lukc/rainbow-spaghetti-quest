@@ -30,8 +30,6 @@ typedef struct Entity {
 	unsigned int kills;
 	int gold;
 
-	int skills_cooldown[SKILL_MAX];
-
 	List* statuses; /* List* of StatusData* */
 
 	struct Class *class;

@@ -1,0 +1,22 @@
+Skill: [
+	Name: Woodcutting
+]
+Skill: [
+	Name: Mining
+]
+Skill: [
+	Name: Gathering
+]
+Skill: [
+	Name: Stonecutting
+]
+
+Skill: [
+	Name: Tailoring
+]
+Skill: [
+	Name: Alchemy
+]
+Skill: [
+	Name: Cooking
+]

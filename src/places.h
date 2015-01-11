@@ -13,7 +13,7 @@ typedef struct Place {
 	List* destinations;    /* List* of Destination* */
 	char** image;
 
-	List* skill_drop[SKILL_MAX]; /* List*s of Drop* */
+	List* skill_drops; /* List*s of SkillDrops* */
 
 	List* on_first_visit;  /* List* of char** (images) */
 

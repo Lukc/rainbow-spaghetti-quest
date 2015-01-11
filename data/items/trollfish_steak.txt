@@ -9,6 +9,8 @@ Item: [
 ]
 Recipe: [
 	Output: Trollfish Steak
+	Skill: Cooking
+	Level: 2
 	Ingredient: [
 		Item: Trollfish Meat
 	]

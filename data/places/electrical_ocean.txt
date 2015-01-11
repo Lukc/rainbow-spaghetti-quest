@@ -24,7 +24,8 @@ Place: [
 	Image: electrical_ocean
 	On first visit: electrical_ocean_first
 
-	Gathering: [
+	Skill: [
+		Name: Gathering
 		Drop: [
 			Item: Seaweed
 			Rarity: 1

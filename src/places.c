@@ -44,7 +44,7 @@ comas_to_list(char* input)
 }
 
 Destination*
-parse_destination(Game* game, List* elements, Logs* logs)
+parse_destination(List* elements, Logs* logs)
 {
 	ParserElement* element;
 	Destination* destination;
@@ -79,38 +79,46 @@ parse_destination(Game* game, List* elements, Logs* logs)
 }
 
 static int
-load_skill(Place* place, ParserElement* element, Logs* logs)
+_load_skill(Place* place, ParserElement* element, Logs* logs)
 {
-	char* skill_name;
+	char* name;
 	List* list;
-	int skill;
+	List* drops = NULL;
 
-	for (skill = 0; skill < SKILL_MAX; skill++)
+	for (list = element->value; list; list = list->next)
 	{
-		skill_name = skill_to_string(skill);
+		element = list->data;
 
-		if (!strcmp(element->name, skill_name))
+		if (!strcmp(element->name, "name"))
+			name = parser_get_string(element, logs);
+		else if (!strcmp(element->name, "drop"))
 		{
-			list = element->value;
-			element = list->data;
+			Drop* drop = parser_get_drop(element, logs);
 
-			while (list)
-			{
-				element = list->data;
-
-				if (!strcmp(element->name, "drop"))
-				{
-					Drop* drop = parser_get_drop(element, logs);
-
-					if (drop)
-						list_add(place->skill_drop + skill, drop);
-				}
-
-				list = list->next;
-			}
-
-			return 1;
+			if (drop)
+				list_add(&drops, drop);
 		}
+		else
+			fprintf(stderr,
+				"[Place:Skill:%i] Unrecognized element ignored: %s.\n",
+				element->lineno, element->name);
+	}
+
+	if (name)
+	{
+		SkillDrops* sd = malloc(sizeof(*sd));
+
+		sd->skill = (Skill*) name;
+		sd->drops = drops;
+
+		list_add(&place->skill_drops, sd);
+	}
+	else
+	{
+		for (list = drops; list; list = list->next)
+			free(list->data);
+
+		list_free(drops, NULL);
 	}
 
 	return 0;
@@ -140,8 +148,8 @@ load_place (Game* game, List* elements)
 
 		field = element->name;
 
-		if (load_skill(place, element, logs))
-			;
+		if (!strcmp(field, "skill"))
+			_load_skill(place, element, logs);
 		else if (!strcmp(field, "name"))
 			place->name = parser_get_string(element, logs);
 		else if (!strcmp(field, "shop item"))
@@ -174,7 +182,7 @@ load_place (Game* game, List* elements)
 			else if (element->type == PARSER_LIST)
 			{
 				list_add(&place->destinations,
-					parse_destination(game, element->value, logs));
+					parse_destination(element->value, logs));
 			}
 		}
 		else if (!strcmp(field, "random enemy"))

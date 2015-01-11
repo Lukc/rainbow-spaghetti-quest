@@ -2,31 +2,35 @@
 #ifndef SKILLS_H
 #define SKILLS_H
 
-/*
- * @fixme: Add more skills. Yeah, srsly.
- */
-enum SKILLS {
-	SKILL_WOODCUTTING,
-	SKILL_STONECUTTING,
-	SKILL_MINING,
-	SKILL_GATHERING,
+#include "parser.h"
+#include "game.h"
+#include "places.h"
 
-	SKILL_COOKING,
-	SKILL_ALCHEMY,
-	SKILL_WOODWORKING,
-	SKILL_STONEWORKING,
-	SKILL_METALWORKING,
-	SKILL_LEATHERWORKING,
+typedef struct Skill {
+	/* Static data. */
+	char* name;
 
-	SKILL_MAX
-};
+	/* Dynamic data. */
+	int cooldown;
+	int experience;
+} Skill;
+
+/* For exclusive use in Place*. */
+typedef struct {
+	Skill* skill;
+	List* drops; /* List* of Drop* */
+} SkillDrops;
 
 #include "game.h"
 #include "entities.h"
 
-char* skill_to_string(int);
+void load_skill(Game*, List*);
 
-void lower_skills_cooldown(struct Entity*);
+Skill* get_skill_by_name(List*, char*);
+List* get_skill_drops(Skill*, struct Place*);
+
+int get_skill_level(int);
+void lower_skills_cooldown(Game*);
 void skills(Game*);
 
 #endif

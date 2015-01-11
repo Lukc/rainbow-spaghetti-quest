@@ -17,7 +17,8 @@ Place: [
 		Frequency: 1
 	]
 
-	Woodcutting: [
+	Skill: [
+		Name: Woodcutting
 		Drop: [
 			Item: Reality Branch
 			Rarity: 1
@@ -33,7 +34,8 @@ Place: [
 			Quantity: 2
 		]
 	]
-	Gathering: [
+	Skill: [
+		Name: Gathering
 		Drop: [
 			Item: Inter-dimensional Fruit
 			Rarity: 1
