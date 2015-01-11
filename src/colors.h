@@ -15,6 +15,7 @@
 #define NOCOLOR  "\033[00m"
 
 void fg(int, int, int);
+void bg(int, int, int);
 
 #endif
 

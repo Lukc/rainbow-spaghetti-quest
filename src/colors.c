@@ -2,6 +2,16 @@
 
 #include "colors.h"
 
+static inline int
+t256code(int r, int g, int b)
+{
+	r = r > 5 ? 5 : r;
+	g = g > 5 ? 5 : g;
+	b = b > 5 ? 5 : b;
+
+	return 16 + r * 6 * 6 + g * 6 + b;
+}
+
 /**
  * Depends on a 256colors terminal.
  *
@@ -17,10 +27,16 @@
 void
 fg(int r, int g, int b)
 {
+	printf("\033[38;5;%im", t256code(r, g, b));
+}
+
+void
+bg(int r, int g, int b)
+{
 	r = r > 5 ? 5 : r;
 	g = g > 5 ? 5 : g;
 	b = b > 5 ? 5 : b;
 
-	printf("\033[38;5;%im", 16 + r * 6 * 6 + g * 6 + b);
+	printf("\033[48;5;%im", t256code(r, g, b));
 }
 

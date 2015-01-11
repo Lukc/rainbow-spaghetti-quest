@@ -26,6 +26,25 @@ recipe_craftable(Game* game, Recipe* recipe)
 	return 1;
 }
 
+static int
+recipe_visible(Game* game, Recipe* recipe)
+{
+	ItemStack* inventory = game->player->inventory;
+	List* l;
+
+	if (recipe->skill &&
+		recipe->level <= get_skill_level(recipe->skill->experience))
+		for (l = recipe->ingredients; l; l = l->next)
+		{
+			Ingredient* ig = l->data;
+
+			if (get_count_from_inventory(inventory, ig->item) > 0)
+				return 1;
+		}
+
+	return recipe_craftable(game, recipe);
+}
+
 /**
  * Assuming all necessary resources are in the player’s inventory.
  */
@@ -74,7 +93,7 @@ available_recipes(Game* game)
 	{
 		Recipe* recipe = l->data;
 
-		if (recipe_craftable(game, recipe))
+		if (recipe_visible(game, recipe))
 		{
 			list_add(&out, recipe);
 		}
@@ -138,7 +157,12 @@ craft(Game* game)
 				{
 					log = malloc(sizeof(char) * 128);
 
-					if (craft_item(game, selected_recipe))
+					if (!recipe_craftable(game, selected_recipe))
+						snprintf(log, 128,
+							BRIGHT RED " >> " WHITE
+							"You’re missing a few ingreidents to complete "
+							"this recipe!" NOCOLOR);
+					else if (craft_item(game, selected_recipe))
 						snprintf(log, 128,
 							BRIGHT GREEN " >> " WHITE
 								"Successfully crafted a %s!" NOCOLOR,
@@ -209,7 +233,17 @@ craft(Game* game)
 					Recipe* recipe = l->data;
 
 					if (i == selected_index % 8)
-						printf("\033[47m" BLACK);
+					{
+						if (recipe_craftable(game, recipe))
+							printf("\033[47m" BLACK);
+						else
+						{
+							bg(1, 1, 1);
+							fg(0, 0, 0);
+						}
+					}
+					else if (!recipe_craftable(game, recipe))
+						fg(1, 1, 1);
 					else
 						printf(WHITE);
 
@@ -234,7 +268,10 @@ craft(Game* game)
 				{
 					Ingredient* ig = l->data;
 
-					printf(WHITE);
+					if (get_count_from_inventory(game->player->inventory, ig->item) < ig->quantity)
+						printf(RED);
+					else
+						printf(WHITE);
 
 					if (ig->quantity == 1)
 						printf("%-38s\n", ig->item->name);
