@@ -338,7 +338,8 @@ enter_shop(Game* game)
 					fg(1, 1, 1);
 
 				printed = printf("  - %-48s (%s)",
-					item->name, equipment_string(item->slot));
+					item->name, item->slot == EQ_WEAPON_RANGED ?
+						"ranged" : equipment_string(item->slot));
 
 				for (j = 0; j < 68 - printed; j++)
 					printf(" ");
