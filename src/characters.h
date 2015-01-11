@@ -2,14 +2,20 @@
 #ifndef CHARACTERS_H
 #define CHARACTERS_H
 
-#include "parser.h"
 #include "game.h"
 
 enum EVENT_TYPE {
 	EVENT_MESSAGE,
-	EVENT_CHOICE
+	EVENT_CHOICE,
+	EVENT_CONDITION,
+	EVENT_GIVE_ITEM,
+	EVENT_REMOVE_ITEM,
+	EVENT_SET_VARIABLE
 };
 
+/* All Event structures must contain at least the following fields, in the
+ * following order. You could see this as some sort of manually-managed
+ * inheritance. */
 typedef struct {
 	int type;
 } Event;
@@ -30,6 +36,44 @@ typedef struct {
 	List* options; /* List* of ChoiceEventOption* */
 } ChoiceEvent;
 
+typedef struct {
+	char* name;
+	int value;
+} Variable;
+
+typedef struct {
+	enum {
+		VARIABLE_EXISTS,
+		VARIABLE_NOT_EQUALS
+	} condition;
+	char* variable;
+	int value;
+} VariableCondition;
+
+typedef struct {
+	int type;
+
+	List* items; /* List* of ItemStack* */
+	List* variables; /* List* of VariableCondition* */
+
+	List* then; /* List* of Event* */
+	List* _else; /* List* of Event* */
+} ConditionEvent;
+
+typedef struct {
+	int type;
+	Item* item;
+	int quantity;
+} GiveItemEvent;
+
+typedef GiveItemEvent RemoveItemEvent;
+
+typedef struct {
+	int type;
+	char* variable;
+	int value;
+} SetVariableEvent;
+
 typedef struct Character {
 	char* name;
 	char* description;
@@ -40,7 +84,7 @@ typedef struct Character {
 	short trader;
 } Character;
 
-Character* load_character(ParserElement*);
+Character* load_character(Game*, ParserElement*);
 void quests(Game*);
 
 #endif

@@ -7,6 +7,6 @@ Item: [
 		Type: slashing
 		Name: Slash
 	]
-	Price: 170
+	Price: 240
 	Slot: weapon
 ]

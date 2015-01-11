@@ -18,6 +18,8 @@ typedef struct Game {
 	List* statuses;  /* List* of StatusData* */
 	List* recipes;   /* List* of Recipe* */
 	List* skills;    /* List* of Skill* */
+	List* events;    /* List* of Event* */
+	List* variables; /* List* of Variable* */
 
 	List* visited;   /* List* of Place* */
 

@@ -20,6 +20,7 @@
 #include "craft.h"
 #include "skills.h"
 #include "parser.h"
+#include "characters.h"
 
 void
 save(Game* game, char* filename)
@@ -89,6 +90,19 @@ save(Game* game, char* filename)
 			);
 
 		fprintf(f, "]\n");
+	}
+
+	for (l = game->variables; l; l = l->next)
+	{
+		Variable* v = l->data;
+
+		fprintf(f, "Variable: [\n"
+			"\tName: %s\n"
+			"\tValue: %i\n"
+			"]\n",
+			v->name,
+			v->value
+		);
 	}
 }
 
@@ -189,6 +203,36 @@ load(Game* game, char* filename)
 			else
 				fprintf(stderr,
 					"Uh. Broken save file? (missing Skill->Name)\n");
+		}
+		else if (!strcmp(field, "variable"))
+		{
+			List* sl = element->value;
+			char* name = NULL;
+			int value = 0;
+
+			for (; sl; sl = sl->next)
+			{
+				element = sl->data;
+
+				if (!strcmp(element->name, "name"))
+					name = parser_get_string(element, NULL);
+				else if (!strcmp(element->name, "value"))
+					value = parser_get_integer(element, NULL);
+				else
+					fprintf(stderr, "[Variable:%i] Ignored property: %s.\n",
+						element->lineno, element->name);
+			}
+
+			if (name)
+			{
+				Variable* v;
+
+				v = malloc(sizeof(*v));
+				v->name = name;
+				v->value = value;
+
+				list_add(&game->variables, v);
+			}
 		}
 		else
 			fprintf(stderr, "Ignored field in save-file: %s\n", field);

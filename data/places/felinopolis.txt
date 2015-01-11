@@ -27,7 +27,6 @@ Place: [
 	Character: [
 		Name: Guard
 		Description: That guy looks bored.
-		Quester: 1
 		On Talk: [
 			Message: [
 				From: Guard
@@ -47,8 +46,6 @@ Place: [
 	Character: [
 		Name: Priest
 		Description: A priest from the temple.
-		Quester: 1
-		Trader: 1
 		On Talk: [
 			Message: [
 				From: Priest
@@ -66,6 +63,10 @@ Place: [
 							From: Priest
 							Text: Great! ... but I forgot what I was gonna ask...
 						]
+						Message: [
+							From: Priest
+							Text: Maybe another time!
+						]
 					]
 				]
 				Option: [
@@ -75,6 +76,88 @@ Place: [
 							From: Priest
 							Text: Oh, well... That’s too bad!
 						]
+					]
+				]
+			]
+		]
+	]
+
+	Character: [
+		Name: Old Man
+		Description: Someone that may actually need your help!
+		Quester: 1
+		On Talk: [
+			Condition: [
+				Variable: [
+					Name: Old Man is fed
+					Not equals: 1
+				]
+				Then: [
+					Message: [
+						From: Old Man
+						Text: It’s so sad. So depressing.
+					]
+					Message: [
+						From: Old Man
+						Text: It’s been so long since I’ve eaten trollfish steaks...
+					]
+					Condition: [
+						Requires Item: Trollfish Steak
+						Then: [
+							Message: [
+								From: Old Man
+								Text: Oh, but you do have some! Would you mind sharing some?
+							]
+							Choice: [
+								Option: [
+									Text: Give one Trollfish Steak
+									Events: [
+										Message: [
+											From: Old Man
+											Text: Thank you very much!
+										]
+										Message: [
+											From: Old Man
+											Text: Here, take this! I used to fight with this when I was younger.
+										]
+										Remove Item: Trollfish Steak
+										Give Item: Small Sword
+										Set Variable: [
+											Name: Old Man is fed
+											Value: 1
+										]
+										Message: [
+											From: Old Man
+											Text: I’m certain you’ll make good use of it.
+										]
+									]
+								]
+								Option: [
+									Text: Refuse
+									Events: [
+										Message: [
+											From: Old Man
+											Text: Too bad... Such hungry...
+										]
+									]
+								]
+							]
+						]
+						Else: [
+							Message: [
+								From: Old Man
+								Text: I really wish someone could bring me some...
+							]
+						]
+					]
+				]
+				Else: [
+					Message: [
+						From: Old Man
+						Text: Zzzz... Zzzz...
+					]
+					Message: [
+						Text: (the old man seems to be sleeping. Better leave him alone)
 					]
 				]
 			]

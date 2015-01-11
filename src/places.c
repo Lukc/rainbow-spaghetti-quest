@@ -12,6 +12,7 @@
 #include "destinations.h"
 #include "skills.h"
 #include "enemies.h"
+#include "characters.h"
 
 static List*
 comas_to_list(char* input)
@@ -276,7 +277,7 @@ load_place (Game* game, List* elements)
 		}
 		else if (!strcmp(field, "character"))
 		{
-			Character* c = load_character(element);
+			Character* c = load_character(game, element);
 
 			if (c)
 				list_add(&place->characters, c);

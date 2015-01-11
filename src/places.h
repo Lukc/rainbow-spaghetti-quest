@@ -5,7 +5,6 @@
 #include "list.h"
 #include "skills.h"
 #include "game.h"
-#include "characters.h"
 
 typedef struct Place {
 	char* name;

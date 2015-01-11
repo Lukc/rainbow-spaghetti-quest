@@ -11,6 +11,7 @@
 #include "recipe.h"
 #include "enemies.h"
 #include "skills.h"
+#include "characters.h"
 #include "list.h"
 
 /**
@@ -687,6 +688,51 @@ load_game(Game* game, char* dirname)
 			{
 				fprintf(stderr, "[Recipe:%s] Unknown item: %s\n",
 					recipe->output->name, ig->item->name);
+
+				exit(1);
+			}
+		}
+	}
+
+	/* Most important thing of any RPG. \o/ */
+	for (l = game->events; l; l = l->next)
+	{
+		Event* event = l->data;
+
+		if (event->type == EVENT_CONDITION)
+		{
+			ConditionEvent* e = (ConditionEvent*) event;
+			List* sl;
+			ItemStack* stack;
+
+			for (sl = e->items; sl; sl = sl->next)
+			{
+				char* name;
+
+				stack = sl->data;
+				name = (char*) stack->item;
+
+				stack->item = get_item_by_name(game->items, name);
+
+				if (!stack->item)
+				{
+					fprintf(stderr, "Non-existent item: %s\n", name);
+
+					exit(1);
+				}
+			}
+		}
+		else if (event->type == EVENT_GIVE_ITEM ||
+		         event->type == EVENT_REMOVE_ITEM)
+		{
+			GiveItemEvent* e = (GiveItemEvent*) event;
+			char* name = (char*) e->item;
+
+			e->item = get_item_by_name(game->items, name);
+
+			if (!e->item)
+			{
+				fprintf(stderr, "Non-existent item: %s\n", name);
 
 				exit(1);
 			}
