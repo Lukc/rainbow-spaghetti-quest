@@ -9,9 +9,9 @@ Status: [
 	Reduces physical strikes: 1
 ]
 Status: [
-	# FIXME: Not quite working.
 	Name: Poison
 	Affliction name: poisoned
+	Removes health: 12 # 1/12
 ]
 Status: [
 	Name: Burn

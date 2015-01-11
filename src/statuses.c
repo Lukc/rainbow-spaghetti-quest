@@ -41,6 +41,8 @@ load_status(Game* game, List* elements)
 			status->prevents_recovery = parser_get_integer(element, NULL);
 		else if (!strcmp(field, "removed on focus"))
 			status->removed_on_focus = parser_get_integer(element, NULL);
+		else if (!strcmp(field, "removes health"))
+			status->removes_health = parser_get_integer(element, NULL);
 		else
 		{
 			fprintf(stderr,

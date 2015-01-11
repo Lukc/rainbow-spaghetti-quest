@@ -17,6 +17,39 @@
  * @fixme: deduplicate (mostly, redundant string operations)
  */
 
+static void
+end_turn(Entity* e, Logs* logs)
+{
+	List* l;
+	StatusData* sd;
+	Status* status;
+	int health_lost = 0;
+
+	for (l = e->statuses; l; l = l->next)
+	{
+		sd = l->data;
+		status = sd->status;
+
+		if (status->removes_health)
+		{
+			health_lost += get_max_health(e) / status->removes_health;
+		}
+	}
+
+	if (health_lost)
+	{
+		char* log;
+
+		e->health -= health_lost;
+
+		log = malloc(sizeof(char) * 128);
+		snprintf(log, 128, BRIGHT MAGENTA " <<< " RED "%+iHP"
+			MAGENTA " (statuses)",
+			-health_lost);
+		logs_add(logs, log);
+	}
+}
+
 static int
 get_mana_cost(Entity* e, Attack* attack)
 {
@@ -433,30 +466,35 @@ ai_action(Game* game, Logs* logs)
 	player = game->player;
 	enemy = game->enemy;
 
-	available_attacks = get_all_attacks(enemy);
-	selected_attack = list_nth(
-		available_attacks,
-		rand() % list_size(available_attacks));
-
-	if (can_use_attack(enemy, selected_attack))
+	if (player->health > 0)
 	{
-		log = (char*) malloc(sizeof(char) * 128);
-		snprintf(log, 128,
-			BRIGHT WHITE "%s used “%s”",
-			enemy->name,
-			selected_attack->name
-		);
-		logs_add(logs, log);
+		available_attacks = get_all_attacks(enemy);
+		selected_attack = list_nth(
+			available_attacks,
+			rand() % list_size(available_attacks));
 
-		attack(
-			enemy,
-			selected_attack,
-			player,
-			logs
-		);
+		if (can_use_attack(enemy, selected_attack))
+		{
+			log = (char*) malloc(sizeof(char) * 128);
+			snprintf(log, 128,
+				BRIGHT WHITE "%s used “%s”",
+				enemy->name,
+				selected_attack->name
+			);
+			logs_add(logs, log);
+
+			attack(
+				enemy,
+				selected_attack,
+				player,
+				logs
+			);
+		}
+		else
+			focus(enemy, logs);
 	}
-	else
-		focus(enemy, logs);
+
+	end_turn(enemy, logs);
 }
 
 Logs*
@@ -467,6 +505,8 @@ command_use_item(Game* game, Entity* player, Item* item)
 	logs = logs_new();
 
 	use_item(player, item, game->enemy, logs);
+
+	end_turn(player, logs);
 
 	ai_action(game, logs);
 
@@ -521,6 +561,8 @@ command_attack(Game* game, Attack* player_attack)
 	}
 	else
 	{
+		end_turn(game->player, logs);
+
 		ai_action(game, logs);
 	}
 
@@ -535,6 +577,8 @@ command_focus(Game* game)
 	logs = logs_new();
 
 	focus(game->player, logs);
+
+	end_turn(game->player, logs);
 
 	ai_action(game, logs);
 

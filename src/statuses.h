@@ -5,17 +5,6 @@
 #include "list.h"
 #include "entities.h"
 
-enum STATUSES {
-	STATUS_CONFUSED,
-	STATUS_FROZEN,
-	STATUS_BURNED,
-	STATUS_POISONED,
-	STATUS_PARALYZED,
-	STATUS_BLEEDING,
-
-	STATUS_MAX
-};
-
 /* Container for a status’ effects. */
 typedef struct Status {
 	char* name;
@@ -27,6 +16,7 @@ typedef struct Status {
 	short reduces_magical_strikes;
 	short prevents_recovery;
 	short removed_on_focus;
+	short removes_health; /* 1/n of health lost per turn */
 } Status;
 
 /* Container for the duration and strength of a status on an Entity. */
