@@ -158,11 +158,17 @@ parser_get_string(ParserElement* element, Logs* logs)
 		return strdup(element->value);
 	else
 	{
-		int len;
-		char* log = (char*) malloc(sizeof(char) * 128);
-		len = snprintf(log, 128, "Element “%s” is no string!", element->name);
-		realloc(log, len + 1);
-		logs_add(logs, log);
+		if (logs)
+		{
+			int len;
+			char* log = (char*) malloc(sizeof(char) * 128);
+			len = snprintf(log, 128, "Element “%s” is no string!", element->name);
+			realloc(log, len + 1);
+			logs_add(logs, log);
+		}
+		else
+			fprintf(stderr, "[:%i] %s: String expected.\n",
+				element->lineno, element->name);
 
 		return NULL;
 	}
@@ -175,12 +181,18 @@ parser_get_integer(ParserElement* element, Logs* logs)
 		return (int) element->value;
 	else
 	{
-		int len;
-		char* log = (char*) malloc(sizeof(char) * 128);
-		len = snprintf(log, 128,
-			"Element “%s” element is no integer!", element->name);
-		realloc(log, len + 1);
-		logs_add(logs, log);
+		if (logs)
+		{
+			int len;
+			char* log = (char*) malloc(sizeof(char) * 128);
+			len = snprintf(log, 128,
+				"Element “%s” element is no integer!", element->name);
+			realloc(log, len + 1);
+			logs_add(logs, log);
+		}
+		else
+			fprintf(stderr, "[:%i] %s: Integer expected.\n",
+				element->lineno, element->name);
 
 		return 0;
 	}
