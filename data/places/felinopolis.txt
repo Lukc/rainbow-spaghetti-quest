@@ -51,12 +51,32 @@ Place: [
 		Trader: 1
 		On Talk: [
 			Message: [
-				From: Shop Owner
-				Text: Oh yeay, with this stuff, I’m gonna get rich.
+				From: Priest
+				Text: Welcome to this humbly grandiose temple.
 			]
 			Message: [
-				From: Shop Owner
-				Text: If somemone buys it, that is! Please buy it!
+				From: Priest
+				Text: How about running a negligible gargantuan errand for us?
+			]
+			Choice: [
+				Option: [
+					Text: Yes
+					Events: [
+						Message: [
+							From: Priest
+							Text: Great! ... but I forgot what I was gonna ask...
+						]
+					]
+				]
+				Option: [
+					Text: No
+					Events: [
+						Message: [
+							From: Priest
+							Text: Oh, well... That’s too bad!
+						]
+					]
+				]
 			]
 		]
 	]

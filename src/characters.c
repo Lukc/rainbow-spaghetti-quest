@@ -8,6 +8,22 @@
 #include "term.h"
 #include "colors.h"
 
+static void load_events(List**, List*);
+
+static void
+selection_color(int selected)
+{
+	if (selected)
+	{
+		bg(4, 4, 4);
+		fg(0, 0, 0);
+	}
+	else
+	{
+		printf(WHITE);
+	}
+}
+
 static void
 load_message_event(MessageEvent* event, List* elements)
 {
@@ -33,6 +49,59 @@ load_message_event(MessageEvent* event, List* elements)
 			else
 				event->text = parser_get_string(e, NULL);
 		}
+		else
+			fprintf(stderr, "[:%i] Unrecognized field “%s”.\n",
+				e->lineno, e->name);
+	}
+}
+
+static void
+load_choice_event(ChoiceEvent* event, List* elements)
+{
+	ParserElement* e;
+
+	for (; elements; elements = elements->next)
+	{
+		e = elements->data;
+
+		if (!strcmp(e->name, "option"))
+		{
+			ChoiceEventOption* option;
+			List* l;
+
+			if (e->type != PARSER_LIST)
+			{
+				fprintf(stderr, "[:%i] Option is not a list.\n", e->lineno);
+
+				continue;
+			}
+
+			option = malloc(sizeof(*option));
+			option->text = NULL;
+			option->events = NULL;
+
+			for (l = e->value; l; l = l->next)
+			{
+				ParserElement* e = l->data;
+
+				if (!strcmp(e->name, "text"))
+					option->text = parser_get_string(e, NULL);
+				else if (!strcmp(e->name, "events"))
+					load_events(&option->events, e->value);
+				else
+					fprintf(stderr, "[:%i] Unrecognized field “%s”.\n",
+						e->lineno, e->name);
+			}
+
+			if (option->text && option->events)
+				list_add(&event->options, option);
+			else
+				fprintf(stderr, "[:%i] Incomplete Option in Choice event.\n",
+					e->lineno);
+		}
+		else
+			fprintf(stderr, "[:%i] Unrecognized field “%s”.\n",
+				e->lineno, e->name);
 	}
 }
 
@@ -45,6 +114,15 @@ load_events(List** events, List* elements)
 	{
 		element = elements->data;
 
+		if (element->type != PARSER_LIST)
+		{
+			/* Everything here has to be a list. */
+			fprintf(stderr, "[:%i] Event “%s” is not a list.\n",
+				element->lineno, element->name);
+
+			continue;
+		}
+
 		if (!strcmp(element->name, "message"))
 		{
 			MessageEvent* event;
@@ -55,6 +133,18 @@ load_events(List** events, List* elements)
 			event->text = NULL;
 
 			load_message_event(event, element->value);
+
+			list_add(events, event);
+		}
+		else if (!strcmp(element->name, "choice"))
+		{
+			ChoiceEvent* event;
+
+			event = malloc(sizeof(*event));
+			event->type = EVENT_CHOICE;
+			event->options = NULL;
+
+			load_choice_event(event, element->value);
 
 			list_add(events, event);
 		}
@@ -135,17 +225,73 @@ fire_event(Event* event)
 		}
 
 		printf(NOCOLOR WHITE " %s\n", e->text);
+
+		printf(NOCOLOR "\nPress any key to continue...\n");
+		getch();
+		back(1);
+		for (i = 0; i < 80; i++)
+			printf(" ");
+		printf("\n");
+		back(1);
 	}
+	else if (event->type == EVENT_CHOICE)
+	{
+		ChoiceEvent* e = (ChoiceEvent*) event;
+		List* l;
+		ChoiceEventOption* option;
+		int input = KEY_CLEAR;
+		int selection = 0;
 
-	printf("\n");
+		while (1)
+		{
+			int i = 0;
 
-	printf(NOCOLOR "Press any key to continue...\n");
-	getch();
-	back(1);
-	for (i = 0; i < 80; i++)
-		printf(" ");
-	printf("\n");
-	back(1);
+			switch (input)
+			{
+				case KEY_CLEAR:
+				case ' ':
+					break;
+				case KEY_UP:
+					selection = selection > 0 ? selection - 1 : selection;
+					break;
+				case KEY_DOWN:
+					selection = selection < list_size(e->options) - 1 ?
+						selection + 1 : selection;
+					break;
+				case '\n':
+				case KEY_ENTER:
+					back(1);
+					for (i = 0; i < 80; i++)
+						printf(" ");
+					printf("\n");
+					back(1);
+
+					option = list_nth(e->options, selection);
+					for (l = option->events; l; l = l->next)
+						fire_event(l->data);
+
+					return;
+			}
+
+			if (input != KEY_CLEAR)
+				back(list_size(e->options) + 2);
+
+			for (l = e->options; l; l = l->next)
+			{
+				ChoiceEventOption* option = l->data;
+
+				selection_color(selection == i);
+				printf("    - %-74s\n", option->text);
+				printf(NOCOLOR);
+
+				i++;
+			}
+
+			printf("\n  Press (Enter) to select and continue.\n");
+
+			input = getch();
+		}
+	}
 }
 
 static void
@@ -164,20 +310,6 @@ fire_events(List* l)
 	}
 
 	system("clear");
-}
-
-static void
-selection_color(int selected)
-{
-	if (selected)
-	{
-		bg(4, 4, 4);
-		fg(0, 0, 0);
-	}
-	else
-	{
-		printf(WHITE);
-	}
 }
 
 void

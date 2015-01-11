@@ -14,6 +14,7 @@ void back(int);
 #define KEY_RIGHT (-67)
 #define KEY_LEFT  (-68)
 #define KEY_CLEAR  (12)
+#define KEY_ENTER  (13)
 
 #endif
 

@@ -6,7 +6,8 @@
 #include "game.h"
 
 enum EVENT_TYPE {
-	EVENT_MESSAGE
+	EVENT_MESSAGE,
+	EVENT_CHOICE
 };
 
 typedef struct {
@@ -18,6 +19,16 @@ typedef struct {
 	char* from;
 	char* text;
 } MessageEvent;
+
+typedef struct {
+	char* text;
+	List* events; /* List* of Event* */
+} ChoiceEventOption;
+
+typedef struct {
+	int type;
+	List* options; /* List* of ChoiceEventOption* */
+} ChoiceEvent;
 
 typedef struct Character {
 	char* name;
