@@ -43,11 +43,11 @@ lower_skills_cooldown(Game* game)
 int
 skill_level_to_experience(int level)
 {
-	int xp = 100;
+	int xp = 0;
 	int i;
 
 	/* Meh. Too linear for me. :| */
-	for (i = 1; i < level; i++)
+	for (i = 0; i < level; i++)
 		xp = xp + 100;
 
 	return xp;
@@ -68,7 +68,7 @@ void
 print_skill(Skill* skill, Game* game, int selected)
 {
 	int c = selected ? '>' : ' ';
-	int i, max;
+	int i, max, threshold;
 	List* drops;
 
 	drops = get_skill_drops(skill, game->location);
@@ -116,13 +116,15 @@ print_skill(Skill* skill, Game* game, int selected)
 	) - skill_level_to_experience(
 		get_skill_level(skill->experience)
 	);
+	threshold = skill->experience - skill_level_to_experience(
+		get_skill_level(skill->experience) - 1);
 	if (drops)
 		printf(WHITE);
 	else
 		fg(1, 1, 1);
 	printf("  xp: <"BLUE);
 	for (i = 0; i < 68; i++)
-		printf("%c", i * 100 / 68 < skill->experience * 100 / max ? '=' : ' ');
+		printf("%c", i * 100 / 68 < threshold * 100 / max ? '=' : ' ');
 	if (drops)
 		printf(WHITE);
 	else
@@ -211,7 +213,7 @@ skills(Game* game)
 		menu_separator();
 
 		printf(WHITE);
-		printf("Cooldown:            ");
+		printf("%-20s", "Cooldown:");
 		if (skill->cooldown > 4)
 			printf(BRIGHT RED);
 		else if (skill->cooldown > 0)
@@ -221,11 +223,20 @@ skills(Game* game)
 		printf("%-5i\n", skill->cooldown);
 		printf(NOCOLOR);
 
-		printf(WHITE "Possible drop here:  " YELLOW "<\?\?>\n" NOCOLOR);
+		back(1);
+		move(40);
+		printf(YELLOW " (d)  See drop\n" NOCOLOR);
+
+		printf(WHITE "%-20s%-5i\n" NOCOLOR,
+			"Skill Level:", get_skill_level(skill->experience));
 		back(1);
 		move(40);
 		printf(WHITE " (u)  Use skill\n" NOCOLOR);
 
+		printf(WHITE "%-20s%i/%-5i\n" NOCOLOR,
+			"Experience:", skill->experience,
+			skill_level_to_experience(get_skill_level(skill->experience) + 1));
+		back(1);
 		move(40);
 		printf(WHITE " (l)  Leave\n" NOCOLOR);
 
