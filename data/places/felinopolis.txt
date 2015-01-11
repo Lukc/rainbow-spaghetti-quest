@@ -23,4 +23,41 @@ Place: [
 	
 	# Yeay, events. o////
 	On First Visit: intro, intro2, intro3, intro4
+
+	Character: [
+		Name: Guard
+		Description: That guy looks bored.
+		Quester: 1
+		On Talk: [
+			Message: [
+				From: Guard
+				Text: Hi there! Feel free to wander around in the city.
+			]
+			Message: [
+				From: Guard
+				Text: I’m sure you’ll find whatever you’re looking for, here.
+			]
+			Message: [
+				From: Guard
+				Text: Oh, and don’t forget to visit the temple!
+			]
+		]
+	]
+
+	Character: [
+		Name: Priest
+		Description: A priest from the temple.
+		Quester: 1
+		Trader: 1
+		On Talk: [
+			Message: [
+				From: Shop Owner
+				Text: Oh yeay, with this stuff, I’m gonna get rich.
+			]
+			Message: [
+				From: Shop Owner
+				Text: If somemone buys it, that is! Please buy it!
+			]
+		]
+	]
 ]

@@ -274,6 +274,13 @@ load_place (Game* game, List* elements)
 
 			place->on_first_visit = list_rev_and_free(names);
 		}
+		else if (!strcmp(field, "character"))
+		{
+			Character* c = load_character(element);
+
+			if (c)
+				list_add(&place->characters, c);
+		}
 		else
 		{
 			char* log = (char*) malloc(sizeof(char) * 128);

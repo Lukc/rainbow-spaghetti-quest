@@ -5,6 +5,7 @@
 #include "list.h"
 #include "skills.h"
 #include "game.h"
+#include "characters.h"
 
 typedef struct Place {
 	char* name;
@@ -16,6 +17,7 @@ typedef struct Place {
 	List* skill_drops; /* List*s of SkillDrops* */
 
 	List* on_first_visit;  /* List* of char** (images) */
+	List* characters; /* List* of Character* */
 
 	/* Stuff required at load-time */
 	List* random_enemy_names; /* List* of char* */

@@ -202,19 +202,21 @@ print_menu(Game* game)
 
 	menu_separator();
 
-	printf(
-		WHITE
-		"%s  (b) Random battle\n" NOCOLOR
-		"%s  (s) Enter shop\n" NOCOLOR
-		WHITE "  (i) Open inventory\n"
-		BLACK
-			"  (d) Enter dungeon\n"
-		WHITE
-		"  (t) Travel\n"
-		NOCOLOR,
-		location->random_enemies ? WHITE : BLACK,
-		location->shop_items ? WHITE : BLACK
-	);
+	if (location->random_enemies)
+		printf(WHITE);
+	else
+		fg(1, 1, 1);
+	printf("  (b) Random battle\n" NOCOLOR);
+
+	if (location->shop_items)
+		printf(WHITE);
+	else
+		fg(1, 1, 1);
+	printf("  (s) Enter shop\n" NOCOLOR);
+	printf(WHITE "  (i) Open inventory\n");
+	fg(1, 1, 1);
+	printf("  (d) Enter dungeon\n" NOCOLOR);
+	printf(WHITE "  (t) Travel\n" NOCOLOR);
 
 	back(5);
 	move(40);
@@ -222,10 +224,15 @@ print_menu(Game* game)
 	move(40);
 	printf(WHITE " (k) Use skills\n" NOCOLOR);
 	move(40);
-	printf(BLACK " (q) Show quests\n" NOCOLOR);
+	if (location->characters)
+		printf(WHITE);
+	else
+		fg(1, 1, 1);
+	printf(" (q) Show quests\n" NOCOLOR);
 	printf("\n");
 	move(40);
-	printf(BLACK " (S) Save game\n" NOCOLOR);
+	fg(1, 1, 1);
+	printf(" (S) Save game\n" NOCOLOR);
 
 	menu_separator();
 }
@@ -303,11 +310,14 @@ main(int argc, char* argv[])
 				logs = NULL;
 				skills(&game);
 				break;
+			case 'q':
+				logs = NULL;
+				quests(&game);
+				break;
 
 			/* Unimplemented stuff */
 			case 'S':
 			case 'd':
-			case 'q':
 				logs = NULL;
 				break;
 			case -42:
