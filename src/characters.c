@@ -64,7 +64,9 @@ load_choice_event(Game* game, ChoiceEvent* event, List* elements)
 	{
 		e = elements->data;
 
-		if (!strcmp(e->name, "option"))
+		if (!strcmp(e->name, "name"))
+			event->name = parser_get_string(e, NULL);
+		else if (!strcmp(e->name, "option"))
 		{
 			ChoiceEventOption* option;
 			List* l;
@@ -114,7 +116,9 @@ load_condition_event(Game* game, ConditionEvent* event, List* elements)
 	{
 		e = elements->data;
 
-		if (!strcmp(e->name, "then"))
+		if (!strcmp(e->name, "name"))
+			event->name = parser_get_string(e, NULL);
+		else if (!strcmp(e->name, "then"))
 		{
 			if (e->type == PARSER_LIST)
 				load_events(game, &event->then, e->value);
@@ -254,6 +258,7 @@ load_events(Game* game, List** events, List* elements)
 
 			event = malloc(sizeof(*event));
 			event->type = EVENT_MESSAGE;
+			event->name = NULL;
 			event->from = NULL;
 			event->text = NULL;
 
@@ -275,6 +280,7 @@ load_events(Game* game, List** events, List* elements)
 
 			event = malloc(sizeof(*event));
 			event->type = EVENT_CHOICE;
+			event->name = NULL;
 			event->options = NULL;
 
 			load_choice_event(game, event, element->value);
@@ -315,6 +321,8 @@ load_events(Game* game, List** events, List* elements)
 			else
 				event->type = EVENT_REMOVE_ITEM;
 
+			event->name = NULL;
+
 			if (element->type == PARSER_STRING)
 				event->item = (Item*) parser_get_string(element, NULL);
 			else if (element->type == PARSER_LIST)
@@ -325,7 +333,9 @@ load_events(Game* game, List** events, List* elements)
 				{
 					ParserElement* element = l->data;
 
-					if (!strcmp(element->name, "item"))
+					if (!strcmp(element->name, "name"))
+						event->name = parser_get_string(element, NULL);
+					else if (!strcmp(element->name, "item"))
 						event->item = (Item*) parser_get_string(element, NULL);
 					else if (!strcmp(element->name, "quantity"))
 						event->quantity = parser_get_integer(element, NULL);
@@ -346,6 +356,7 @@ load_events(Game* game, List** events, List* elements)
 			SetVariableEvent* e;
 			int value = 0;
 			char* varname = NULL;
+			char* name = NULL;
 
 			if (element->type == PARSER_STRING)
 				varname = parser_get_string(element, NULL);
@@ -358,6 +369,9 @@ load_events(Game* game, List** events, List* elements)
 					ParserElement* elem = l->data;
 
 					if (!strcmp(elem->name, "name"))
+						name = parser_get_string(elem, NULL);
+					else if (!strcmp(elem->name, "variable name") ||
+					    !strcmp(elem->name, "variable"))
 						varname = parser_get_string(elem, NULL);
 					else if (!strcmp(elem->name, "value"))
 						value = parser_get_integer(elem, NULL);
@@ -374,9 +388,53 @@ load_events(Game* game, List** events, List* elements)
 			if (varname)
 			{
 				e = malloc(sizeof(*e));
+				e->name = name;
 				e->type = EVENT_SET_VARIABLE;
 				e->variable = varname;
 				e->value = value;
+
+				list_add(events, e);
+			}
+			else
+				fprintf(stderr, "[:%i] “Set Variable” with no Name field.\n",
+					element->lineno);
+		}
+		else if (!strcmp(element->name, "fire event"))
+		{
+			FireEvent* e;
+			char* name = NULL;
+			char* event = NULL;
+
+			if (element->type == PARSER_STRING)
+				event = parser_get_string(element, NULL);
+			else if (element->type == PARSER_LIST)
+			{
+				List* l;
+
+				for (l = element->value; l; l = l->next)
+				{
+					ParserElement* elem = l->data;
+
+					if (!strcmp(elem->name, "name"))
+						name = parser_get_string(elem, NULL);
+					else if (!strcmp(elem->name, "event"))
+						event = parser_get_string(elem, NULL);
+					else
+						fprintf(stderr, "[:%i] Unrecognized field: %s.\n",
+							elem->lineno, elem->name);
+				}
+			}
+			else
+				fprintf(stderr,
+					"[:%i] “Fire Event” event is not a list or string.\n",
+					element->lineno);
+
+			if (event)
+			{
+				e = malloc(sizeof(*e));
+				e->name = name;
+				e->type = EVENT_FIRE;
+				e->event = event;
 
 				list_add(events, e);
 			}
@@ -455,7 +513,20 @@ fire_event(Game* game, Event* event)
 {
 	int i;
 
-	if (event->type == EVENT_MESSAGE)
+	if (event->type == EVENT_FIRE)
+	{
+		FireEvent* self = (FireEvent*) event;
+		List* l;
+
+		for (l = game->events; l; l = l->next)
+		{
+			Event* e = l->data;
+
+			if (e->name && !strcmp(e->name, self->event))
+				fire_event(game, e);
+		}
+	}
+	else if (event->type == EVENT_MESSAGE)
 	{
 		MessageEvent* e = (MessageEvent*) event;
 

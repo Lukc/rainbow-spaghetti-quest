@@ -10,7 +10,8 @@ enum EVENT_TYPE {
 	EVENT_CONDITION,
 	EVENT_GIVE_ITEM,
 	EVENT_REMOVE_ITEM,
-	EVENT_SET_VARIABLE
+	EVENT_SET_VARIABLE,
+	EVENT_FIRE
 };
 
 /* All Event structures must contain at least the following fields, in the
@@ -18,10 +19,13 @@ enum EVENT_TYPE {
  * inheritance. */
 typedef struct {
 	int type;
+	char* name;
 } Event;
 
 typedef struct {
 	int type;
+	char* name;
+
 	char* from;
 	char* text;
 } MessageEvent;
@@ -33,6 +37,8 @@ typedef struct {
 
 typedef struct {
 	int type;
+	char* name;
+
 	List* options; /* List* of ChoiceEventOption* */
 } ChoiceEvent;
 
@@ -52,6 +58,7 @@ typedef struct {
 
 typedef struct {
 	int type;
+	char* name;
 
 	List* items; /* List* of ItemStack* */
 	List* variables; /* List* of VariableCondition* */
@@ -62,6 +69,8 @@ typedef struct {
 
 typedef struct {
 	int type;
+	char* name;
+
 	Item* item;
 	int quantity;
 } GiveItemEvent;
@@ -70,9 +79,18 @@ typedef GiveItemEvent RemoveItemEvent;
 
 typedef struct {
 	int type;
+	char* name;
+
 	char* variable;
 	int value;
 } SetVariableEvent;
+
+typedef struct {
+	int type;
+	char* name;
+
+	char* event;
+} FireEvent;
 
 typedef struct Character {
 	char* name;

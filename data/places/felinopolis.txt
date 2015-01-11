@@ -53,28 +53,44 @@ Place: [
 			]
 			Message: [
 				From: Priest
-				Text: How about running a negligible gargantuan errand for us?
+				Text: How about exchanging some faith for useful items?
 			]
 			Choice: [
+				Name: Priest Menu
 				Option: [
-					Text: Yes
+					Text: (10 faith)  Buy a Small Healing Potion
 					Events: [
 						Message: [
 							From: Priest
-							Text: Great! ... but I forgot what I was gonna ask...
+							Text: Hey, you don’t have enough faith! That won’t do!
 						]
 						Message: [
 							From: Priest
 							Text: Maybe another time!
 						]
+						Fire Event: Priest Menu
 					]
 				]
 				Option: [
-					Text: No
+					Text: (100 faith) Buy a Divine Dagger
 					Events: [
 						Message: [
 							From: Priest
-							Text: Oh, well... That’s too bad!
+							Text: Hey, you don’t have enough faith! That won’t do!
+						]
+						Message: [
+							From: Priest
+							Text: Maybe another time!
+						]
+						Fire Event: Priest Menu
+					]
+				]
+				Option: [
+					Text: Leave
+					Events: [
+						Message: [
+							From: Priest
+							Text: See you later. And remember, have faith!
 						]
 					]
 				]
@@ -123,7 +139,7 @@ Place: [
 										Remove Item: Trollfish Steak
 										Give Item: Small Sword
 										Set Variable: [
-											Name: Old Man is fed
+											Variable Name: Old Man is fed
 											Value: 1
 										]
 										Message: [
