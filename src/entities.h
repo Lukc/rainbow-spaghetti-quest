@@ -10,7 +10,7 @@
 #include "skills.h"
 
 /* Why? Because! */
-#define INVENTORY_SIZE 27
+#define INVENTORY_SIZE 30
 
 enum EQUIPMENT_SLOTS {
 	EQ_WEAPON,

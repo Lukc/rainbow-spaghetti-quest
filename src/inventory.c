@@ -15,6 +15,7 @@ inventory(Game* game)
 	char* error;
 	int input = -42;
 	int selection = 0;
+	int viewing_item = 0;
 	int printed;
 	int i, j, k;
 
@@ -23,6 +24,9 @@ inventory(Game* game)
 	while (input != 'l')
 	{
 		error = NULL;
+
+		if (viewing_item)
+			viewing_item = 0;
 
 		if (input == 'e')
 		{
@@ -47,6 +51,11 @@ inventory(Game* game)
 			{
 				error = "No item to equip!";
 			}
+		}
+		else if (input == 'v')
+		{
+			if (player->inventory[selection].item)
+				viewing_item = 1;
 		}
 		else if (input == 's')
 		{
@@ -73,11 +82,11 @@ inventory(Game* game)
 			selection = selection % (INVENTORY_SIZE / 3) == 0 ?
 				selection : selection - 1;
 		else if (input == KEY_RIGHT)
-			selection = selection < INVENTORY_SIZE - 9 ?
-				selection + 9 : selection;
+			selection = selection < INVENTORY_SIZE - 10 ?
+				selection + 10 : selection;
 		else if (input == KEY_LEFT)
-			selection = selection >= 9 ?
-				selection - 9 : selection;
+			selection = selection >= 10 ?
+				selection - 10 : selection;
 
 		print_equipment(player);
 		printf("\n");
@@ -110,35 +119,46 @@ inventory(Game* game)
 		back(1);
 		printf("┴\n");
 
-		for (i = 0; i < INVENTORY_SIZE / 3; i++)
+		if (viewing_item)
 		{
-			/* Alignment. Ah ah! */
-			printf(" ");
+			print_item(player->inventory[selection].item);
 
-			for (k = 0; k < 3; k++)
+			back_to_top();
+			/* This function is total bullshit… how much work does each use
+			 * require?*/
+			for (i = 0; i < 18; i++)
+				printf("\n");
+		}
+		else
+			for (i = 0; i < INVENTORY_SIZE / 3; i++)
 			{
-				if (selection == i + k * 9)
-					printf("\033[47m");
+				/* Alignment. Ah ah! */
+				printf(" ");
 
-				if (player->inventory[i + k * 9].item)
+				for (k = 0; k < 3; k++)
 				{
-					Item* item = player->inventory[i + k * 9].item;
-					int quantity = player->inventory[i + k * 9].quantity;
+					if (selection == i + k * 10)
+						printf("\033[47m");
 
-					if (item->slot >= 0)
-						printed = printf("  %s", strcut(item->name, 24));
+					if (player->inventory[i + k * 10].item)
+					{
+						Item* item = player->inventory[i + k * 10].item;
+						int quantity = player->inventory[i + k * 10].quantity;
+
+						if (item->slot >= 0)
+							printed = printf("  %s", strcut(item->name, 24));
+						else
+							printed = printf("  %ix %s", quantity,
+								strcut(item->name, quantity < 10 ? 22 : 21));
+					}
 					else
-						printed = printf("  %ix %s", quantity,
-							strcut(item->name, quantity < 10 ? 22 : 21));
+						printed = printf("  (empty)");
+
+					for (j = 0; j < 26 - printed; j++)
+						printf(" ");
+
+					printf(NOCOLOR);
 				}
-				else
-					printed = printf("  (empty)");
-
-				for (j = 0; j < 26 - printed; j++)
-					printf(" ");
-
-				printf(NOCOLOR);
-			}
 
 			printf("\n");
 
@@ -152,7 +172,7 @@ inventory(Game* game)
 
 		back(1);
 		move(40);
-		printf(WHITE " Money:     %-8i\n" NOCOLOR, player->gold);
+		printf(WHITE "Money:     %-8i\n" NOCOLOR, player->gold);
 
 		if (!game->location->shop_items)
 			printf(BLACK);
@@ -164,7 +184,7 @@ inventory(Game* game)
 		move(40);
 		if (game->location->shop_items && player->inventory[selection].item)
 		{
-			printf(WHITE " Sell price %-8i\n" NOCOLOR,
+			printf(WHITE "Sell price %-8i\n" NOCOLOR,
 				player->inventory[selection].item->price * 2 / 3);
 		}
 		else
@@ -174,9 +194,11 @@ inventory(Game* game)
 			printf("\n");
 		}
 
-		printf(YELLOW "  (v)  View item.\n" NOCOLOR);
-
 		printf(WHITE "  (l)  Leave\n" NOCOLOR);
+
+		back(1);
+		move(40);
+		printf(WHITE "  (v)  View item.\n" NOCOLOR);
 
 		printf(NOCOLOR);
 

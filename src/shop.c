@@ -41,8 +41,11 @@ print_item(Item* item)
 	{
 		Attack* attack = list->data;
 
-		printf(BRIGHT WHITE "    provides a %i-%i %s attack\n" NOCOLOR,
-			attack->damage, attack->strikes, type_to_string(attack->type));
+		if (attack->strikes > 0)
+			printf(BRIGHT WHITE "    provides a %i-%i %s attack\n" NOCOLOR,
+				attack->damage, attack->strikes, type_to_string(attack->type));
+		else
+			printf(BRIGHT WHITE "    provides a support attack\n" NOCOLOR);
 	}
 
 	if (item->on_use)
