@@ -227,6 +227,8 @@ load_condition_event(Game* game, ConditionEvent* event, List* elements)
 			is = malloc(sizeof(*is));
 			is->quantity = quantity;
 			is->item = (Item*) name;
+
+			list_add(&event->items, is);
 		}
 		else
 			fprintf(stderr, "[:%i] Unrecognized field: %s.\n",
@@ -621,7 +623,7 @@ fire_event(Game* game, Event* event)
 				failed = 1;
 		}
 
-		for (l = e->variables; l; l = l->next)
+		for (l = e->variables; l && !failed; l = l->next)
 		{
 			List* sl;
 			VariableCondition* c = l->data;
