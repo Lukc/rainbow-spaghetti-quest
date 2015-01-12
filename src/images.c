@@ -44,8 +44,7 @@ load_images(char* dirname)
 char**
 load_image(char* filename)
 {
-	size_t line_size;
-	char* line_buffer = NULL;
+	char* line_buffer;
 	size_t size = 0;
 	char** image = NULL;
 	FILE* f;
@@ -59,18 +58,18 @@ load_image(char* filename)
 		exit(1);
 	}
 
-	while (getline(&line_buffer, &line_size, f) > 0)
+	line_buffer = malloc(1024);
+	while (fgets(line_buffer, 1024, f) != NULL)
 	{
 		image = (char**) realloc(image, sizeof(char*) * (size + 1));
+		line_buffer = realloc(line_buffer, 1024);
 		line_buffer[strlen(line_buffer) - 1] = '\0'; /* No \n, because urk. */
 		image[size] = line_buffer;
 
-		line_buffer = NULL;
+		line_buffer = malloc(1024);
 
 		size += 1;
 	}
-
-	free(line_buffer);
 
 	fclose(f);
 

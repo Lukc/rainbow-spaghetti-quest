@@ -23,8 +23,7 @@ List*
 parse_file(char* filename)
 {
 	FILE* f = fopen(filename, "r");
-	char* str = NULL;
-	size_t n;
+	char str[1024];
 	int lineno = 0;
 	int i;
 	char* field;
@@ -37,7 +36,7 @@ parse_file(char* filename)
 	if (!f)
 		return NULL;
 
-	while (getline(&str, &n, f) > 0)
+	while (fgets(str, 1024, f) != NULL)
 	{
 		lineno++;
 
