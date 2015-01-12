@@ -46,9 +46,8 @@ skill_level_to_experience(int level)
 	int xp = 0;
 	int i;
 
-	/* Meh. Too linear for me. :| */
 	for (i = 0; i < level; i++)
-		xp = xp + 100;
+		xp = xp + xp + 100;
 
 	return xp;
 }
@@ -56,12 +55,12 @@ skill_level_to_experience(int level)
 int
 get_skill_level(int experience)
 {
-	int level = 1;
+	int level = 0;
 
-	while (skill_level_to_experience(level) < experience)
+	while (skill_level_to_experience(level) <= experience)
 		level++;
 
-	return level;
+	return level - 1;
 }
 
 void
@@ -117,7 +116,7 @@ print_skill(Skill* skill, Game* game, int selected)
 		get_skill_level(skill->experience)
 	);
 	threshold = skill->experience - skill_level_to_experience(
-		get_skill_level(skill->experience) - 1);
+		get_skill_level(skill->experience));
 	if (drops)
 		printf(WHITE);
 	else
@@ -233,7 +232,9 @@ skills(Game* game)
 		move(40);
 		printf(WHITE " (u)  Use skill\n" NOCOLOR);
 
-		printf(WHITE "%-20s%i/%-5i\n" NOCOLOR,
+		printf("%80s", "");
+		move(0);
+		printf(WHITE "%-20s%i/%i\n" NOCOLOR,
 			"Experience:", skill->experience,
 			skill_level_to_experience(get_skill_level(skill->experience) + 1));
 		back(1);
