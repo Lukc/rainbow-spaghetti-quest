@@ -121,9 +121,12 @@ main(int argc, char* argv[])
 			case KEY_CLEAR:
 				break;
 			case 'b':
+				enter_battle(&game);
 				break;
 			case 's':
-				if (!game.location->shop_items)
+				if (game.location->shop_items)
+					enter_shop(&game);
+				else
 					error = "There is no shop at your current location!";
 				break;
 			case 'i':
