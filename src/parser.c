@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <dirent.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 
 #include "parser.h"
@@ -318,6 +319,7 @@ import_dir(Game* game, char* dirname)
 	DIR* dir;
 	struct dirent* entry;
 	char* filename;
+	struct stat s;
 	List* parsed_file;
 	List* l;
 
@@ -332,8 +334,8 @@ import_dir(Game* game, char* dirname)
 			(strlen(dirname) + strlen(entry->d_name) + 2));
 		sprintf(filename, "%s/%s", dirname, entry->d_name);
 
-		/* FIXME: Portability issue here. */
-		if (entry->d_type == DT_DIR)
+		stat(filename, &s);
+		if (S_ISDIR(s.st_mode))
 		{
 			import_dir(game, filename);
 		}
