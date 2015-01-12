@@ -30,7 +30,7 @@ give_drop(Entity* to, List* droplist)
 		for (i = 0; i < drop->quantity; i++)
 			if (rand() % drop->rarity == 0)
 			{
-				if (give_item(to, drop->item))
+				if (give_item(to, drop->item) >= 0)
 					list_add(&out, (void*) drop->item);
 				/* Maybe we should notify in the future if the items couldn’t
 				 * be given and have been destroyed? */
