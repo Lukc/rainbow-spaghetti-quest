@@ -50,7 +50,12 @@ typedef struct {
 typedef struct {
 	enum {
 		VARIABLE_EXISTS,
-		VARIABLE_NOT_EQUALS
+		VARIABLE_EQUALS,
+		VARIABLE_NOT_EQUALS,
+		VARIABLE_LOWER,
+		VARIABLE_GREATER,
+		VARIABLE_LOWER_OR_EQUAL,
+		VARIABLE_GREATER_OR_EQUAL
 	} condition;
 	char* variable;
 	int value;

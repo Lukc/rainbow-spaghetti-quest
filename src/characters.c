@@ -159,9 +159,39 @@ load_condition_event(Game* game, ConditionEvent* event, List* elements)
 
 					if (!strcmp(elem->name, "name"))
 						variable = parser_get_string(elem, NULL);
+					else if (!strcmp(elem->name, "equals"))
+					{
+						condition = VARIABLE_EQUALS;
+
+						value = parser_get_integer(elem, NULL);
+					}
 					else if (!strcmp(elem->name, "not equals"))
 					{
 						condition = VARIABLE_NOT_EQUALS;
+
+						value = parser_get_integer(elem, NULL);
+					}
+					else if (!strcmp(elem->name, "lower"))
+					{
+						condition = VARIABLE_LOWER;
+
+						value = parser_get_integer(elem, NULL);
+					}
+					else if (!strcmp(elem->name, "greater"))
+					{
+						condition = VARIABLE_GREATER;
+
+						value = parser_get_integer(elem, NULL);
+					}
+					else if (!strcmp(elem->name, "lower or equal"))
+					{
+						condition = VARIABLE_LOWER_OR_EQUAL;
+
+						value = parser_get_integer(elem, NULL);
+					}
+					else if (!strcmp(elem->name, "greater or equal"))
+					{
+						condition = VARIABLE_GREATER_OR_EQUAL;
 
 						value = parser_get_integer(elem, NULL);
 					}
@@ -647,6 +677,35 @@ fire_event(Game* game, Event* event)
 				if (variable)
 					failed = ! c->value != variable->value;
 				/* NULL has to be different from everything, right? */
+			}
+			else
+			{
+				if (variable)
+					switch (c->condition)
+					{
+						case VARIABLE_EQUALS:
+							failed = ! variable->value == c->value;
+							break;
+						case VARIABLE_LOWER:
+							failed = ! variable->value < c->value;
+							break;
+						case VARIABLE_GREATER:
+							failed = ! variable->value > c->value;
+							break;
+						case VARIABLE_LOWER_OR_EQUAL:
+							failed = ! variable->value <= c->value;
+							break;
+						case VARIABLE_GREATER_OR_EQUAL:
+							failed = ! variable->value >= c->value;
+							break;
+						default:
+							/* To avoid cc warning, but shouldn’t happen. */
+							break;
+					}
+				else
+					/* Can’t compare with non-existant values. Also, maybe
+					 * we should print an error or something. */
+					failed = 1;
 			}
 		}
 
