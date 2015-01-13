@@ -3,8 +3,6 @@ Place: [
 
 	Image: felinopolis
 
-	Shop Item: Small Healing Potion
-
 	@include felinopolis
 
 	Character: [
@@ -74,21 +72,47 @@ Place: [
 				From: Head Priest
 				Text: Welcome to this temple, young one.
 			]
-			Message: [
-				From: Head Priest
-				Text: What is that? You want to become a great hero of this land?
-			]
-			Message: [
-				From: Head Priest
-				Text: Well, I can only offer you my prayers and hope that luck will be on your side.
-			]
-			Message: [
-				From: Head Priest
-				Text: What is that? You want to go on a quest for me? I wonder if there is something the Temple could ask of you...
-			]
-			Message: [
-				From: Head Priest
-				Text: Well, we don’t really need your help right now, but maybe the people of Maru’s shrine will. Oh, right, that shrine is North of the city, beyond the hills.
+			Condition: [
+				If: [
+					Variable: shopkeeper told about the sewers
+				]
+				Then: [
+					Message: [
+						From: Head Priest
+						Text: Oh? You wanna clean the sewers? That’s good!
+					]
+					Message: [
+						From: Head Priest
+						Text: Those mice are everywhere. They’re becoming a problem.
+					]
+					Message: [
+						From: Head Priest
+						Text: Of course, as cats, we would under normal circumstances eat them. But they’re SEWER mice. They taste like garbage, really. That, and people tend to get lost in that place. It’s a real maze.
+					]
+					Message: [
+						From: Head Priest
+						Text: Bring their tails back as proof. I might be willing to give you something if you manage to kill enough!
+					]
+					Set Variable: Felinopolis Sewers Unlocked
+				]
+				Else: [
+					Message: [
+						From: Head Priest
+						Text: What is that? You want to become a great hero of this land?
+					]
+					Message: [
+						From: Head Priest
+						Text: Well, I can only offer you my prayers and hope that luck will be on your side.
+					]
+					Message: [
+						From: Head Priest
+						Text: What is that? You want to go on a quest for me? I wonder if there is something the Temple could ask of you...
+					]
+					Message: [
+						From: Head Priest
+						Text: Well, we don’t really need your help right now, but maybe the people of Maru’s shrine will. Oh, right, that shrine is North of the city, beyond the hills.
+					]
+				]
 			]
 		]
 	]

@@ -4,6 +4,8 @@
 
 #include "game.h"
 
+#include "conditions.h"
+
 enum EVENT_TYPE {
 	EVENT_MESSAGE,
 	EVENT_CHOICE,
@@ -43,30 +45,10 @@ typedef struct {
 } ChoiceEvent;
 
 typedef struct {
-	char* name;
-	int value;
-} Variable;
-
-typedef struct {
-	enum {
-		VARIABLE_EXISTS,
-		VARIABLE_EQUALS,
-		VARIABLE_NOT_EQUALS,
-		VARIABLE_LOWER,
-		VARIABLE_GREATER,
-		VARIABLE_LOWER_OR_EQUAL,
-		VARIABLE_GREATER_OR_EQUAL
-	} condition;
-	char* variable;
-	int value;
-} VariableCondition;
-
-typedef struct {
 	int type;
 	char* name;
 
-	List* items; /* List* of ItemStack* */
-	List* variables; /* List* of VariableCondition* */
+	Condition condition;
 
 	List* then; /* List* of Event* */
 	List* _else; /* List* of Event* */

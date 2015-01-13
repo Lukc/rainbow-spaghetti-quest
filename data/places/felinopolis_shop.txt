@@ -1,20 +1,64 @@
 Place: [
 	Name: Felinopolis - Shop
 
-	Shop Item: Kitten Claws
-	Shop Item: Kitten Armor
-	Shop Item: Kitten Shield
-	Shop Item: Kitten Amulet
-	Shop Item: Kitten Hairball
-	Shop Item: Cat Claws
-	Shop Item: Cat Armor
-	Shop Item: Cat Amulet
-	Shop Item: Cat Shield
-	Shop Item: Cat Hyper-Claws
-	Shop Item: Small Healing Potion
-	Shop Item: String
-
 	@include felinopolis
 
 	Image: felinopolis
+
+	Character: [
+		Name: Shopkeeper
+		Description: Maybe he has an errand for you?
+		On Talk: [
+			Message: [
+				From: Shopkeeper
+				Text: Howdy! Welcome to my shop, Awesomeness 9000.
+			]
+			Condition: [
+				If: [
+					Variable: Felinopolis Sewers Unlocked
+				]
+				Then: [
+					Message: [
+						From: Shopkeeper
+						Text: I heard you got authorized to go in the sewers!
+					]
+					Message: [
+						From: Shopkeeper
+						Text: You must be pretty crazy to do that.
+					]
+					Message: [
+						From: Shopkeeper
+						Text: By the way, I heard there’s a village of mutants. Yes, in the sewers. YES, of MUTANTS!
+					]
+					Message: [
+						From: Shopkeeper
+						Text: Isn’t that one of the biggest clichés ever? It is SO cliché that I doubt it is true, but… could you check anyway?
+					]
+				]
+				Else: [
+					Message: [
+						From: Shopkeeper
+						Text: Uh? You want me to give you a quest? I’m sorry, but nothing comes to mind.
+					]
+					Message: [
+						From: Shopkeeper
+						Text: Rats? Why would you want to fight rats? What do you mean, “All great heroes started by fighting rats”?
+					]
+					Message: [
+						From: Shopkeeper
+						Text: Well, if you’re so insistent on fighting rats, I suppose you could go in the sewers.
+					]
+					Message: [
+						From: Shopkeeper
+						Text: Unless they’re mice? I could never tell the difference.
+					]
+					Message: [
+						From: Shopkeeper
+						Text: Hum. You may need a key, though. Maybe you should ask the head priest at the temple about it.
+					]
+					Set Variable: shopkeeper told about the sewers
+				]
+			]
+		]
+	]
 ]

@@ -3,8 +3,49 @@ Place: [
 	Name: Cat River - North
 
 	Leads to: Cat Hills - South
-	Leads to: Cat Hills - North
+	Leads to: [
+		Name: Cat Hills - North
+		If: [
+			Variable: Cat River North bridge repaired
+		]
+	]
 	Leads to: Cat Lake - South
-	Leads to: Cat Lake - North
+	Leads to: [
+		Name: Cat Lake - North
+		If: [
+			Variable: Cat River North bridge repaired
+		]
+	]
+
+	Character: [
+		Name: Worker
+		Description: I suppose he is working on the maintainance of this old bridge.
+		On Talk: [
+			Message: [
+				From: Worker
+				Text: Halt! This bridge isn’t safe! You can’t use it!
+			]
+			Message: [
+				From: Worker
+				Text: Uh? The head priest wants you to go to Maru’s shrine?
+			]
+			Message: [
+				From: Worker
+				Text: Well, that’s too bad, because no-one’s going through that bridge until we finished the repairs.
+			]
+			Message: [
+				From: Worker
+				Text: What’s that? You want to help? I guess we could repair the bridge right away if we had the right materials.
+			]
+			Message: [
+				From: Worker
+				Text: How about you bring us 10 wooden planks? There’s plenty of wood in the forest, West of the city.
+			]
+			Message: [
+				From: Worker
+				Text: Shouldn’t be a problem for someone with your motivation and energy, and courage, and determination, and... and... Maybe you should just get the planks already.
+			]
+		]
+	]
 ]
 

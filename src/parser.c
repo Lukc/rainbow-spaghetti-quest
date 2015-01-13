@@ -653,7 +653,7 @@ load_game(Game* game, char* dirname)
 
 				dest->place = place;
 
-				for (ssl = dest->needed_items; ssl; ssl = ssl->next)
+				for (ssl = dest->condition.items; ssl; ssl = ssl->next)
 				{
 					char* name;
 					Item* item;
@@ -815,7 +815,7 @@ load_game(Game* game, char* dirname)
 			List* sl;
 			ItemStack* stack;
 
-			for (sl = e->items; sl; sl = sl->next)
+			for (sl = e->condition.items; sl; sl = sl->next)
 			{
 				char* name;
 

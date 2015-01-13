@@ -63,10 +63,13 @@ parse_destination(List* elements, Logs* logs)
 		{
 			destination->name = parser_get_string(element, logs);
 		}
-		else if (!strcmp(field, "needs item"))
+		else if (!strcmp(field, "if"))
 		{
-			list_add(&destination->needed_items,
-				parser_get_string(element, logs));
+			if (element->type == PARSER_LIST)
+				load_condition(&destination->condition, element->value);
+			else
+				fprintf(stderr, "[:%i] “if” field is not a list.\n",
+					element->lineno);
 		}
 		else
 		{

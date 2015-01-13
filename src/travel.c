@@ -57,18 +57,7 @@ check_first_visit(Game* game)
 int
 can_travel_to(Game* game, Destination* destination)
 {
-	List* list;
-	Item* item;
-
-	for (list = destination->needed_items; list; list = list->next)
-	{
-		item = list->data;
-
-		if (!possesses_item(game->player, item))
-			return 0;
-	}
-
-	return 1;
+	return condition_check(game, &destination->condition);
 }
 
 void

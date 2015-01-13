@@ -15,4 +15,13 @@ Class: [
 	Mana on focus: 2
 
 	Gold on kill: 2
+
+	Drop: [
+		Item: Sewer Tail
+		Rarity: 2
+	]
+	Drop: [
+		Item: Sewer Tail
+		Rarity: 64
+	]
 ]

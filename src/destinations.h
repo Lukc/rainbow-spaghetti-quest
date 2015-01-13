@@ -2,10 +2,12 @@
 #ifndef DESTINATIONS_H
 #define DESTINATIONS_H
 
+#include "conditions.h"
+
 typedef struct Destination {
 	char* name;
-	List* needed_items; /* List* of Item* */
 	Place* place;
+	Condition condition;
 } Destination;
 
 #endif
