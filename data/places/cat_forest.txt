@@ -1,0 +1,7 @@
+
+Place: [
+	Name: Cat Forest
+
+	Leads to: Felinopolis - West Gate
+]
+

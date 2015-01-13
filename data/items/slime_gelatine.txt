@@ -1,4 +1,0 @@
-Item: [
-	Name: Slime Gelatine
-	Price: 30
-]

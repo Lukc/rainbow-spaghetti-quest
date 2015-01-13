@@ -1,7 +1,0 @@
-Item: [
-	Name: Kitten Shield
-	Max health: 2
-	Defense bonus: 1
-	Price: 200
-	Slot: shield
-]

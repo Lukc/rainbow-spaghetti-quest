@@ -1,4 +1,0 @@
-Item: [
-	Name: Living Wood
-	Price: 60
-]

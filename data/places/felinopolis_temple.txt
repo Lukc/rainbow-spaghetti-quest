@@ -6,4 +6,90 @@ Place: [
 	Shop Item: Small Healing Potion
 
 	@include felinopolis
+
+	Character: [
+		Name: Old Priest
+		Description: Always in the mood to answer questions.
+		On Talk: [
+			Message: [
+				From: Old Priest
+				Text: Hi there!
+			]
+			Message: [
+				From: Old Priest
+				Text: Maybe you need some help swinging your sword or something...
+			]
+			Message: [
+				From: Old Priest
+				Text: That’s why I’m here! I can teach you how the world works! What is it you want to know?
+			]
+			Choice: [
+				Name: Tutorial Menu
+				Option: [
+					Text: How do I battle? (NOT WRITTEN)
+					Events: [
+						Fire Event: Tutorial Menu
+					]
+				]
+				Option: [
+					Text: How do I craft objects? (NOT WRITTEN)
+					Events: [
+						Fire Event: Tutorial Menu
+					]
+				]
+				Option: [
+					Text: How can I become a great warrior? (NOT WRITTEN)
+					Events: [
+						Fire Event: Tutorial Menu
+					]
+				]
+				Option: [
+					Text: Who is the lich and why is it so evil? (NOT WRITTEN)
+					Events: [
+						Fire Event: Tutorial Menu
+					]
+				]
+				Option: [
+					Text: Nyah, I’m fine!
+					Events: [
+						Message: [
+							From: Old Priest
+							Text: Ok then. Good luck on your quest!
+						]
+						Message: [
+							From: Old Priest
+							Text: I’ll stay in the temple in case you need me.
+						]
+					]
+				]
+			]
+		]
+	]
+
+	Character: [
+		Name: Head Priest
+		Description: Someone who looks important.
+		On Talk: [
+			Message: [
+				From: Head Priest
+				Text: Welcome to this temple, young one.
+			]
+			Message: [
+				From: Head Priest
+				Text: What is that? You want to become a great hero of this land?
+			]
+			Message: [
+				From: Head Priest
+				Text: Well, I can only offer you my prayers and hope that luck will be on your side.
+			]
+			Message: [
+				From: Head Priest
+				Text: What is that? You want to go on a quest for me? I wonder if there is something the Temple could ask of you...
+			]
+			Message: [
+				From: Head Priest
+				Text: Well, we don’t really need your help right now, but maybe the people of Maru’s shrine will. Oh, right, that shrine is North of the city, beyond the hills.
+			]
+		]
+	]
 ]

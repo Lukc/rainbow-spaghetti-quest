@@ -1,4 +1,0 @@
-Item: [
-	Name: Seaweed
-	Price: 2
-]

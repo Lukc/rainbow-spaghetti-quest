@@ -1,9 +1,0 @@
-Item: [
-	Name: Inter-dimensional Fruit
-	On use: [
-		Health on use: -12
-		Mana on use: 47
-	]
-	Consumable: 1
-	Price: 30
-]

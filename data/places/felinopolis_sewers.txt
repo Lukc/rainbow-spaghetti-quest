@@ -4,4 +4,7 @@ Place: [
 	@include felinopolis
 
 	Image: felinopolis
+
+	Random Enemy: Small Sewer Mouse
+	Random Enemy: Sewer Mouse
 ]

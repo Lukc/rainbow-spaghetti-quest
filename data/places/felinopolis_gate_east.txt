@@ -3,7 +3,7 @@ Place: [
 
 	@include felinopolis
 
-	Leads to: Eastern Kawai Plains
+	Leads to: Cat Plains - West
 
 	Image: felinopolis
 ]

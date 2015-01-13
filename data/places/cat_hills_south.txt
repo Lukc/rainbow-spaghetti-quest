@@ -1,0 +1,9 @@
+
+Place: [
+	Name: Cat Hills - South
+
+	Leads to: Felinopolis - North Gate
+	Leads to: Cat River - North
+	Leads to: Cat Lake - South
+]
+

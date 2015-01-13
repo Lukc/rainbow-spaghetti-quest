@@ -1,0 +1,8 @@
+
+Place: [
+	Name: Cat Plains - West
+
+	Leads to: Felinopolis - East Gate
+	Leads to: Cat River - East
+]
+

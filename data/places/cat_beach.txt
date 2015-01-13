@@ -1,0 +1,8 @@
+
+Place: [
+	Name: Cat Beach
+
+	Leads to: Cat River - East
+	Leads to: Cat Plains - East
+]
+

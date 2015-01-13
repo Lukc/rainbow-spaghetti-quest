@@ -1,0 +1,18 @@
+Class: [
+	Name: Small Sewer Mouse
+	Health: 12
+	Mana: 2
+	Attack: [
+		Damage: 2
+		Strikes: 1
+		Type: impact
+		Name: Bite
+		Mana: 1
+	]
+	Attack bonus: 1
+	Defense bonus: 0
+	Health on focus: 2
+	Mana on focus: 1
+
+	Gold on kill: 1
+]

@@ -1,7 +1,0 @@
-Item: [
-	Name: Maru's Box
-	Unique: 1
-	Slot: ears
-	Attack bonus: 1
-	Defense bonus: 1
-]

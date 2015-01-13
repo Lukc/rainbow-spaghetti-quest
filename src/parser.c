@@ -731,7 +731,7 @@ load_game(Game* game, char* dirname)
 			if (item)
 				list_add(&place->shop_items, item);
 			else
-				fprintf(stderr, "[Place:%s/Shop Items] Unknown item: %s",
+				fprintf(stderr, "[Place:%s/Shop Items] Unknown item: %s.\n",
 					place->name, name);
 		}
 
@@ -749,7 +749,7 @@ load_game(Game* game, char* dirname)
 			}
 			else
 			{
-				fprintf(stderr, "[Place:%s/Enemies] Unknown class: %s",
+				fprintf(stderr, "[Place:%s/Enemies] Unknown class: %s.\n",
 					place->name, name);
 
 				free(name);

@@ -1,8 +1,0 @@
-Item: [
-	Name: Small Healing Potion
-	On use: [
-		Health on use: 30
-	]
-	Consumable: 1
-	Price: 20
-]

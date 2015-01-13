@@ -1,7 +1,0 @@
-Item: [
-	Name: Cat Armor
-	Max health: 18
-	Defense bonus: 2
-	Price: 1200
-	Slot: armor
-]

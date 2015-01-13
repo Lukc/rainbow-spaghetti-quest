@@ -3,7 +3,7 @@ Place: [
 
 	@include felinopolis
 
-	Leads to: Forest of Realities
+	Leads to: Cat Forest
 
 	Image: felinopolis
 ]

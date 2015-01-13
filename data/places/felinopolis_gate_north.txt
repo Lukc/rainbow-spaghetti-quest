@@ -5,6 +5,8 @@ Place: [
 
 	@include felinopolis
 
+	Leads to: Cat Hills - South
+
 	Character: [
 		Name: Guard
 		Description: That guy looks bored.

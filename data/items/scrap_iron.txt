@@ -1,4 +1,0 @@
-Item: [
-	Name: Iron Scrap
-	Price: 50
-]

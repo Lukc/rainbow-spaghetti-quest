@@ -1,7 +1,0 @@
-Item: [
-	Name: Kitten Armor
-	Max health: 10
-	Defense bonus: 1
-	Price: 400
-	Slot: armor
-]

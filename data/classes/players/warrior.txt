@@ -1,16 +1,15 @@
 Class: [
-	Name: Warrior
+	Name: Warrior Cat
 	Health: 30
 	Mana: 10
 	Attack: [
 		Damage: 0
 		Strikes: 2
 		Type: impact
-		Name: Hands
+		Name: Paws
 	]
 	Attack bonus: 1
 	Defense bonus: 1
-	Mana on focus: 1
 	Health on focus: 4
-	Gold on kill: 35
+	Mana on focus: 1
 ]

@@ -1,9 +1,0 @@
-Item: [
-	Name: Trollfish Meat
-	On use: [
-		Health on use: 4
-		Mana on use: 3
-	]
-	Consumable: 1
-	Price: 12
-]

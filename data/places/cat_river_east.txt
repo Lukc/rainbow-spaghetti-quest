@@ -1,0 +1,10 @@
+
+Place: [
+	Name: Cat River - East
+
+	Leads to: Cat Plains - East
+	Leads to: Cat Plains - West
+	Leads to: Cat Beach
+	Leads to: The Tree
+]
+

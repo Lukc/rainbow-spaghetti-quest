@@ -1,0 +1,9 @@
+
+Place: [
+	Name: Cat Hills - North
+
+	Leads to: Cat River - North
+	Leads to: Cat Lake - North
+	Leads to: Maru’s Shrine
+]
+

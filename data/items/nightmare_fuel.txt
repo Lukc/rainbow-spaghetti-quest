@@ -1,4 +1,0 @@
-Item: [
-	Name: Nightmare Fuel
-	Price: 60
-]

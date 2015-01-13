@@ -87,13 +87,15 @@ main(int argc, char* argv[])
 	/* For now, repeatability would be useful */
 	srand(42);
 
-	init_entity_from_class(&player, get_class_by_name(game.classes, "Warrior"));
-	printf(" >> Player will be a %s!\n", get_class_by_name(game.classes, "Warrior")->name);
+	init_entity_from_class(&player, get_class_by_name(game.classes, "Warrior Cat"));
+	printf(" >> Player will be a %s!\n", player.class->name);
 
 	player.name = (char*) malloc(sizeof(char) * 80);
 	snprintf(
-		player.name, 14, "%s the Cat",
-		argc > 1 ? argv[1] : "Joe"
+		player.name, 80, "%s the %s",
+		/* Why Thor? Because someone told me Asgards used their eyes the same
+		 * way cats do. And because I had no imagination, too. */
+		"Thor", player.class->name
 	);
 
 	game.player = &player;
@@ -181,6 +183,10 @@ main(int argc, char* argv[])
 		}
 		else
 		{
+			printf("DIS LOKATION HAS NO IMG\n");
+			printf("YUR STATS WILL BE DISPLAYD INSTEAD\n");
+			printf("\n");
+
 			print_entity_basestats(&player);
 			printf("\n");
 
@@ -193,7 +199,7 @@ main(int argc, char* argv[])
 
 			printf("Current location: %s\n\n", game.location->name);
 
-			for (i = 0; i < 8; i++)
+			for (i = 0; i < 5; i++)
 				printf("\n");
 		}
 

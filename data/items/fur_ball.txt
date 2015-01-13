@@ -1,4 +1,0 @@
-Item: [
-	Name: Ball of Fur
-	Price: 18
-]

@@ -1,7 +1,0 @@
-Item: [
-	Name: Cat Shield
-	Max health: 5
-	Defense bonus: 2
-	Price: 800
-	Slot: shield
-]

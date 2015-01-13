@@ -1,0 +1,7 @@
+
+Place: [
+	Name: Maru’s Shrine
+
+	Leads to: Cat Hills - North
+]
+
