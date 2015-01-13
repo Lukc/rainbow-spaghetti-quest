@@ -56,7 +56,7 @@ print_menu(Game* game)
 		printf(WHITE);
 	else
 		fg(1, 1, 1);
-	printf(" (q) Show quests\n" NOCOLOR);
+	printf(" (p) Talk to people\n" NOCOLOR);
 	printf("\n");
 	move(40);
 	printf(WHITE);
@@ -120,16 +120,24 @@ main(int argc, char* argv[])
 
 		switch(input)
 		{
+			case ' ':
+				error = NULL;
+				break;
 			case KEY_CLEAR:
 				break;
 			case 'b':
-				enter_battle(&game);
+				if (game.location->random_enemies)
+					enter_battle(&game);
+				else
+					error = BRIGHT RED " >> " WHITE
+						"This is a peaceful place, with no-one to fight.";
 				break;
 			case 's':
 				if (game.location->shop_items)
 					enter_shop(&game);
 				else
-					error = "There is no shop at your current location!";
+					error = BRIGHT RED " >> " WHITE
+						"There is no shop at your current location!";
 				break;
 			case 'i':
 				inventory(&game);
@@ -143,7 +151,7 @@ main(int argc, char* argv[])
 			case 'k':
 				skills(&game);
 				break;
-			case 'q':
+			case 'p':
 				quests(&game);
 				break;
 
