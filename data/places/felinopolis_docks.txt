@@ -1,0 +1,7 @@
+Place: [
+	Name: Felinopolis - Docks
+
+	@include felinopolis
+
+	Image: felinopolis
+]

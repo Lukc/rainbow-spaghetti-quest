@@ -1,0 +1,9 @@
+Place: [
+	Name: Felinopolis - East Gate
+
+	@include felinopolis
+
+	Leads to: Eastern Kawai Plains
+
+	Image: felinopolis
+]

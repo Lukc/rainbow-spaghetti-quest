@@ -1,0 +1,20 @@
+Place: [
+	Name: Felinopolis - Shop
+
+	Shop Item: Kitten Claws
+	Shop Item: Kitten Armor
+	Shop Item: Kitten Shield
+	Shop Item: Kitten Amulet
+	Shop Item: Kitten Hairball
+	Shop Item: Cat Claws
+	Shop Item: Cat Armor
+	Shop Item: Cat Amulet
+	Shop Item: Cat Shield
+	Shop Item: Cat Hyper-Claws
+	Shop Item: Small Healing Potion
+	Shop Item: String
+
+	@include felinopolis
+
+	Image: felinopolis
+]

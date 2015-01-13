@@ -99,7 +99,7 @@ main(int argc, char* argv[])
 	game.player = &player;
 	game.enemy = &enemy;
 
-	game.location = get_place_by_name(game.places, "Felinopolis");
+	game.location = get_place_by_name(game.places, "Felinopolis - Temple");
 	game.visited = NULL;
 
 	load(&game, 0);

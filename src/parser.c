@@ -47,6 +47,77 @@ parse_file(char* filename)
 		/* Removing whatever’s after the first '#' encountered. */
 		line = strtok(str, "#");
 
+		while (line[0] == ' ' || line[0] == '\t')
+			line = line + 1;
+
+		if (line[0] == '@')
+		{
+			field = strtok(line, " \n");
+			if (!strcmp(field, "@include"))
+			{
+				List* included;
+				List* last;
+				char* relative_filename;
+				char* nfilename; /* new file name */
+				int i;
+
+				relative_filename = strtok(NULL, " \n");
+
+				if (relative_filename)
+				{
+					/* Getting the relative path first. */
+					for (i = strlen(filename); i >= 0 && filename[i] != '/'; i--)
+						;
+
+					if (i < 0)
+						nfilename = relative_filename;
+					else
+					{
+						i += 1;
+
+						nfilename =
+							malloc(i + strlen(relative_filename) + 1);
+
+						strncpy(nfilename, filename, i);
+						strcpy(nfilename + i, relative_filename);
+					}
+				}
+				else
+				{
+					fprintf(stderr, "[:%i] @include with no filename given.\n",
+						lineno);
+
+					continue;
+				}
+
+				included = parse_file(nfilename);
+				if (included)
+				{
+					for (last = included; last->next; last = last->next)
+						;
+
+					if (parent)
+					{
+						last->next = parent->value;
+						parent->value = included;
+					}
+					else
+					{
+						last->next = list;
+						list = included;
+					}
+				}
+
+				free(nfilename);
+			}
+			else
+				fprintf(stderr,
+					"[:%i] Unrecognized preprocessor command: %s.\n",
+					lineno, field);
+
+			continue;
+		}
+
 		field = strtok(line, ":\n");
 
 		if (!field)
@@ -81,12 +152,12 @@ parse_file(char* filename)
 
 			continue;
 		}
-		else
+		else if (value)
 		{
 			/* Ignoring leading whitespace, again? */
 			for (i = 0; value[i] && isblank(value[i]); i++)
 				;;
-			value = value + i;
+			value = value + 1;
 
 			/* Same for the end of string, I guess. */
 			for (i = strlen(value); i >= 0 && isblank(value[i]); i--)
@@ -108,6 +179,12 @@ parse_file(char* filename)
 				element->type = PARSER_STRING;
 				element->value = (void*) strdup(value);
 			}
+		}
+		else
+		{
+			fprintf(stderr, "[:%i] Syntax error.\n", lineno);
+
+			continue;
 		}
 
 		element->name = strdup(field);
@@ -546,11 +623,29 @@ load_game(Game* game, char* dirname)
 	{
 		Place* place = l->data;
 		List* sl;
+		List* next;
+		List** prev;
 
-		for (sl = place->destinations; sl; sl = sl->next)
+		prev = &place->destinations;
+		for (sl = place->destinations; sl; sl = next)
 		{
-			Destination* dest = sl->data;
-			Place* place = get_place_by_name(game->places, dest->name);
+			Destination* dest;
+			Place* place;
+
+			next = sl->next;
+
+			dest = sl->data;
+			if (!strcmp(dest->name, ((Place*) l->data)->name))
+			{
+				*prev = sl->next;
+
+				free(dest->name);
+				free(dest);
+
+				continue;
+			}
+
+			place = get_place_by_name(game->places, dest->name);
 
 			if (place)
 			{
@@ -583,6 +678,8 @@ load_game(Game* game, char* dirname)
 				fprintf(stderr, "Unknown place: %s\n", dest->name);
 				exit(1);
 			}
+
+			prev = &sl->next;
 		}
 
 		for (sl = place->skill_drops; sl; sl = sl->next)

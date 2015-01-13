@@ -1,0 +1,9 @@
+Place: [
+	Name: Felinopolis - Temple
+
+	Image: felinopolis
+
+	Shop Item: Small Healing Potion
+
+	@include felinopolis
+]

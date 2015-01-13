@@ -1,0 +1,7 @@
+Place: [
+	Name: Felinopolis - Sewers
+
+	@include felinopolis
+
+	Image: felinopolis
+]

@@ -1,0 +1,9 @@
+Place: [
+	Name: Felinopolis - West Gate
+
+	@include felinopolis
+
+	Leads to: Forest of Realities
+
+	Image: felinopolis
+]

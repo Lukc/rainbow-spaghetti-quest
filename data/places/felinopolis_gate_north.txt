@@ -1,0 +1,26 @@
+Place: [
+	Name: Felinopolis - North Gate
+
+	Image: felinopolis
+
+	@include felinopolis
+
+	Character: [
+		Name: Guard
+		Description: That guy looks bored.
+		On Talk: [
+			Message: [
+				From: Guard
+				Text: Hi there! Feel free to wander around in the city.
+			]
+			Message: [
+				From: Guard
+				Text: I’m sure you’ll find whatever you’re looking for, here.
+			]
+			Message: [
+				From: Guard
+				Text: Oh, and don’t forget to visit the temple!
+			]
+		]
+	]
+]

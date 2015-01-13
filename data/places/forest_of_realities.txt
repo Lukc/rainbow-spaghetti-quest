@@ -1,6 +1,6 @@
 Place: [
 	Name: Forest of Realities
-	Leads to: Felinopolis
+	Leads to: Felinopolis - West Gate
 	image: forest_of_realities.out
 
 	Random Enemy: Evil Kitten

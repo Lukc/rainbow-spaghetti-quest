@@ -1,6 +1,6 @@
 Place: [
 	Name: Electrical Ocean
-	Leads to: Felinopolis
+	Leads to: Felinopolis - Docks
 	Leads to: [
 		Name: Land of the Apocalisp
 		Needs item: Maru's Box
