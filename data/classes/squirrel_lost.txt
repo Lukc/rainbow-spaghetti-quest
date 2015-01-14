@@ -5,7 +5,7 @@ Class: [
 	Attack: [
 		Damage: 5
 		Strikes: 3
-		Type: slash
+		Type: slashing
 		Mana: -3
 		Inflicts: burn
 		Name: Slash

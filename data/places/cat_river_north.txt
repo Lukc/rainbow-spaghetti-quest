@@ -21,29 +21,94 @@ Place: [
 		Name: Worker
 		Description: I suppose he is working on the maintainance of this old bridge.
 		On Talk: [
-			Message: [
-				From: Worker
-				Text: Halt! This bridge isn’t safe! You can’t use it!
-			]
-			Message: [
-				From: Worker
-				Text: Uh? The head priest wants you to go to Maru’s shrine?
-			]
-			Message: [
-				From: Worker
-				Text: Well, that’s too bad, because no-one’s going through that bridge until we finished the repairs.
-			]
-			Message: [
-				From: Worker
-				Text: What’s that? You want to help? I guess we could repair the bridge right away if we had the right materials.
-			]
-			Message: [
-				From: Worker
-				Text: How about you bring us 10 wooden planks? There’s plenty of wood in the forest, West of the city.
-			]
-			Message: [
-				From: Worker
-				Text: Shouldn’t be a problem for someone with your motivation and energy, and courage, and determination, and... and... Maybe you should just get the planks already.
+			Condition: [
+				If: [
+					Variable: Cat River North bridge repaired
+				]
+				Then: [
+					Message: [
+						From: Worker
+						Text: Halt! Hurm... I mean, go ahead!
+					]
+					Message: [
+						From: Worker
+						Text: Thanks to you, the bridge has been repaired!
+					]
+				]
+				Else: [
+					Message: [
+						From: Worker
+						Text: Halt! This bridge isn’t safe! You can’t use it!
+					]
+					Message: [
+						From: Worker
+						Text: Uh? The head priest wants you to go to Maru’s shrine?
+					]
+					Message: [
+						From: Worker
+						Text: Well, that’s too bad, because no-one’s going through that bridge until we finished the repairs.
+					]
+					Message: [
+						From: Worker
+						Text: What’s that? You want to help? I guess we could repair the bridge right away if we had the right materials.
+					]
+					Message: [
+						From: Worker
+						Text: How about you bring us 12 wood logs? There’s plenty of wood in the forest, West of the city.
+					]
+					Condition: [
+						If: [
+							Requires Item: [
+								Item: Log
+								Quantity: 12
+							]
+						]
+						Then: [
+							Message: [
+								From: Worker
+								Text: Oh, but you already have those logs!
+							]
+							Message: [
+								From: Worker
+								Text: Would you mind graciously giving them so that we might repair the bridge?
+							]
+							Choice: [
+								Option: [
+									Text: Yes
+									Events: [
+										Message: [
+											From: Worker
+											Text: Thank you very much!
+										]
+										Remove Item: [
+											Item: Log
+											Quantity: 12
+										]
+										Set Variable: Cat River North bridge repaired
+										Message: [
+											Text: The wooden bridge of the river has been repaired and can now be crossed!
+										]
+									]
+								]
+								Option: [
+									Text: No
+									Events: [
+										Message: [
+											From: Worker
+											Text: That’s too bad... I hope you’ll change your mind, because we really need that wood!
+										]
+									]
+								]
+							]
+						]
+						Else: [
+							Message: [
+								From: Worker
+								Text: Shouldn’t be a problem for someone with your motivation and energy, and courage, and determination, and... and... Maybe you should just get the planks already.
+							]
+						]
+					]
+				]
 			]
 		]
 	]
