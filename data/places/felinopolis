@@ -1,0 +1,14 @@
+
+Leads to: Felinopolis - Temple
+Leads to: Felinopolis - Shop
+Leads to: Felinopolis - North Gate
+Leads to: Felinopolis - East Gate
+Leads to: Felinopolis - West Gate
+Leads to: Felinopolis - Docks
+Leads to: [
+	Name: Felinopolis - Sewers
+	If: [
+		Variable: Felinopolis Sewers Unlocked
+	]
+]
+
