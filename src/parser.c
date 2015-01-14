@@ -18,192 +18,263 @@
 /**
  * Opens and reads a file and returns a List* of ParserElement* representing
  * the content of the file, assuming it was a valid Spaghetti Quest file.
+ *
+ * Try not to mess with this. That code hates everyone.
  */
-List*
-parse_file(char* filename)
+#define IDENTIFIER 0
+#define VALUE 1
+static int
+ignore_comments(int c, FILE* f)
 {
-	FILE* f = fopen(filename, "r");
-	char str[1024];
-	int lineno = 0;
-	int i;
-	char* field;
-	char* value;
-	char* line;
+	if (c == '#')
+	{
+		/* Comment? Let’s ignore everything after it. */
+		while ((c = getc(f)) > 0 && c != '\n')
+			;
+	}
+
+	return c;
+}
+
+static List*
+parser_helper(FILE* f, char* filename, int* lineno, int has_parent)
+{
 	List* list = NULL;
 	ParserElement* element;
-	ParserElement* parent = NULL;
+	int expecting = IDENTIFIER;
+	char buffer[4096];
+	int buffer_index = 0;
+	int c;
 
-	if (!f)
-		return NULL;
-
-	while (fgets(str, 1024, f) != NULL)
+	while ((c = getc(f)) > 0)
 	{
-		lineno++;
+		if (c == '\n')
+			(*lineno)++;
 
-		/* Whole line is a comment? Let’s go to the next one. */
-		if (str[0] == '#')
-			continue;
+		c = ignore_comments(c, f);
 
-		/* Removing whatever’s after the first '#' encountered. */
-		line = strtok(str, "#");
-
-		while (line[0] == ' ' || line[0] == '\t')
-			line = line + 1;
-
-		if (line[0] == '@')
+		if (expecting == IDENTIFIER)
 		{
-			field = strtok(line, " \n");
-			if (!strcmp(field, "@include"))
+			if (c == ']')
 			{
-				List* included;
-				List* last;
-				char* relative_filename;
-				char* nfilename; /* new file name */
-				int i;
-
-				relative_filename = strtok(NULL, " \n");
-
-				if (relative_filename)
+				if (has_parent)
+					return list;
+				else
 				{
-					/* Getting the relative path first. */
-					for (i = strlen(filename); i >= 0 && filename[i] != '/'; i--)
-						;
+					fprintf(stderr,
+						"<%s:%i> Syntax error: unexpected character ']'\n",
+						filename, *lineno);
+				}
+			}
+			else if (isalnum(c))
+			{
+				buffer_index = 0;
+				buffer[buffer_index++] = c;
 
-					if (i < 0)
-						nfilename = relative_filename;
+				while ((c = getc(f)) && (isalnum(c) || c == ' '))
+				{
+					buffer[buffer_index++] = c;
+				}
+
+				c = ignore_comments(c, f);
+
+				if (c == '\n')
+					(*lineno)++;
+
+				if (!isalnum(c) && c != ' ' && c != ':')
+				{
+					printf(" <<<%c>>>\n", c);
+				}
+
+				buffer[buffer_index] = '\0';
+
+				element = malloc(sizeof(*element));
+				element->lineno = *lineno;
+				element->filename = strdup(filename);
+				element->name = strdup(buffer);
+				for (int i = 0; element->name[i]; i++)
+					element->name[i] = tolower(element->name[i]);
+
+				expecting = VALUE;
+			}
+			else if (c == '@')
+			{
+				char* instruction;
+
+				buffer_index = 0;
+				while ((c = buffer[buffer_index++] = getc(f)) > 0)
+					if (c == '\n')
+					{
+						(*lineno)++;
+						buffer[buffer_index] = '\0';
+						break;
+					}
+
+				instruction = strtok(buffer, " ");
+				if (!strcmp(instruction, "include"))
+				{
+					char* relative_filename;
+					char* complete_filename;
+					int i;
+					
+					relative_filename = strtok(NULL, " \n");
+
+					if (relative_filename)
+					{
+						List* included;
+						List* last;
+
+						/* Getting the relative path first. */
+						for (i = strlen(filename); i >= 0 && filename[i] != '/'; i--)
+							;
+
+						if (i < 0)
+							complete_filename = relative_filename;
+						else
+						{
+							i += 1;
+
+							complete_filename =
+								malloc(i + strlen(relative_filename) + 1);
+
+							strncpy(complete_filename, filename, i);
+							strcpy(complete_filename + i, relative_filename);
+						}
+
+						included = parse_file(complete_filename);
+						if (included)
+						{
+							for (last = included; last->next;
+								 last = last->next)
+								;
+							last->next = list;
+							list = included;
+						}
+						else
+							; /* Empty include? Oh, well, whatever. */
+					}
 					else
 					{
-						i += 1;
-
-						nfilename =
-							malloc(i + strlen(relative_filename) + 1);
-
-						strncpy(nfilename, filename, i);
-						strcpy(nfilename + i, relative_filename);
+						fprintf(stderr, "<%s:%i> Syntax error: "
+							"expected filename in @include directive.\n",
+							filename, *lineno);
+						exit(1);
 					}
 				}
 				else
 				{
-					fprintf(stderr, "[:%i] @include with no filename given.\n",
-						lineno);
-
-					continue;
+					fprintf(stderr,
+						"<%s:%i> Unknown preprocessor directive: %s.\n",
+						filename, *lineno, instruction);
 				}
 
-				included = parse_file(nfilename);
-				if (included)
-				{
-					for (last = included; last->next; last = last->next)
-						;
-
-					if (parent)
-					{
-						last->next = parent->value;
-						parent->value = included;
-					}
-					else
-					{
-						last->next = list;
-						list = included;
-					}
-				}
-
-				free(nfilename);
+				buffer_index = 0;
 			}
-			else
-				fprintf(stderr,
-					"[:%i] Unrecognized preprocessor command: %s.\n",
-					lineno, field);
-
-			continue;
+			else if (!isblank(c) && c != '\n')
+			{
+				fprintf(stderr, "<%s:%i> Syntax error: character expected.\n", filename, *lineno);
+				exit(1);
+			}
 		}
-
-		field = strtok(line, ":\n");
-
-		if (!field)
-			continue;
-
-		/* Ignoring leading whitespace? */
-		for (i = 0; field[i] && isblank(field[i]); i++)
-			;;
-		field = field + i;
-
-		value = strtok(NULL, ":\n");
-
-		element = (ParserElement*) malloc(sizeof(ParserElement));
-		element->parent = parent;
-		element->lineno = lineno;
-
-		if (field[0] == ']')
+		else /* if (expecting == VALUE) */
 		{
-			free(element);
+			c = ignore_comments(c, f);
 
-			if (!parent)
-				fprintf(stderr, " [%s]> Line %i: unexpected ']'...\n",
-					filename, lineno);
-			else
-				parent = parent->parent;
-
-			continue;
-		}
-		else if (!strcmp(field, ""))
-		{
-			free(element);
-
-			continue;
-		}
-		else if (value)
-		{
-			/* Ignoring leading whitespace, again? */
-			for (i = 0; value[i] && isblank(value[i]); i++)
-				;;
-			value = value + 1;
-
-			/* Same for the end of string, I guess. */
-			for (i = strlen(value); i >= 0 && isblank(value[i]); i--)
-				;;
-			value[i+1] = '\0';
-
-			if (isdigit(value[0]) || value[0] == '-' || value[0] == '+')
+			if (isblank(c) || c == '\n')
+				;
+			else if (c == '[')
+			{
+				/* Entering sub-list. */
+				element->type = PARSER_LIST;
+				element->value = parser_helper(f, filename, lineno, 1);
+				list_add(&list, element);
+				expecting = IDENTIFIER;
+			}
+			else if (isdigit(c) || c == '+' || c == '-')
 			{
 				element->type = PARSER_INTEGER;
-				element->value = (void*) (long) atoi(value);
+				buffer_index = 0;
+				buffer[buffer_index++] = c;
+
+				while ((c = getc(f)) && isdigit(c))
+					buffer[buffer_index++] = c;
+
+				buffer[buffer_index] = '\0';
+
+				while (isblank(c))
+					c = getc(f);
+
+				c = ignore_comments(c, f);
+
+				if (c == '\n')
+					(*lineno)++;
+				else
+				{
+					fprintf(stderr, "<%s:%i> Syntax error: "
+						"unexpected character '%c'\n",
+						filename, *lineno, c);
+					exit(1);
+				}
+
+				element->value = (void*) atol(buffer);
+				list_add(&list, element);
+
+				expecting = IDENTIFIER;
 			}
-			else if (value[0] == '[')
+			else if (isalnum(c))
 			{
-				element->type = PARSER_LIST;
-				element->value = NULL;
+				int i;
+
+				buffer_index = 0;
+				element->type = PARSER_STRING;
+				buffer[buffer_index++] = c;
+
+				while ((c = getc(f)) && c != '\n')
+					buffer[buffer_index++] = c;
+
+
+				c = ignore_comments(c, f);
+				if (c == '\n')
+					(*lineno)++;
+
+				buffer[buffer_index] = '\0';
+
+				/* Trimming buffer content. */
+				for (i = strlen(buffer); i > 0 && isblank(buffer[i]); i--)
+					buffer[i] = '\0';
+
+				element->value = strdup(buffer);
+				list_add(&list, element);
+
+				expecting = IDENTIFIER;
 			}
 			else
 			{
-				element->type = PARSER_STRING;
-				element->value = (void*) strdup(value);
+				printf(" %i <%s>\n", has_parent, buffer);
+				fprintf(stderr, "<%s:%i> Syntax error: "
+					"unexpected character '%c'.\n",
+					filename, *lineno, c);
+				exit(1);
 			}
 		}
-		else
-		{
-			fprintf(stderr, "[:%i] Syntax error.\n", lineno);
-
-			continue;
-		}
-
-		element->name = strdup(field);
-
-		/* Case is ignored for keys, alright? */
-		for (i = 0; element->name[i]; i++)
-			element->name[i] = tolower(element->name[i]);
-
-		if (parent)
-			list_add((List**) &parent->value, element);
-		else
-			list_add(&list, element);
-
-		if (element->type == PARSER_LIST)
-			parent = element;
 	}
 
 	return list;
 }
+
+List*
+parse_file(char* filename)
+{
+	FILE* f;
+	int lineno = 1;
+
+	if (!(f = fopen(filename, "r")))
+		return NULL;
+
+	return parser_helper(f, filename, &lineno, 0);
+}
+#undef IDENTIFIER
+#undef VALUE
 
 void
 parser_free(ParserElement* element)
@@ -224,6 +295,7 @@ parser_free(ParserElement* element)
 		free(element->value);
 	}
 
+	free(element->filename);
 	free(element->name);
 	free(element);
 }

@@ -17,6 +17,7 @@ typedef struct ParserElement {
 	void* value;
 	struct ParserElement* parent;
 	int lineno;
+	char* filename;
 } ParserElement;
 
 #include "list.h"
