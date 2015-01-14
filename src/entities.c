@@ -6,6 +6,7 @@
 #include "types.h"
 #include "statuses.h"
 #include "colors.h"
+#include "term.h"
 #include "entities.h"
 
 int
@@ -267,39 +268,13 @@ print_resistance(Entity* e, int type)
 
 	printf(WHITE);
 	printed = printf("  %s: ", string);
-
-	for (i = printed; i < 14; i++)
-		printf(" ");
 	
 	resistance = get_type_resistance(e, type);
 
-	printed = 14 + printf(BRIGHT "%i%%", resistance);
-
-	for (i = printed; i < 24; i++)
+	for (i = printed; i < 16; i++)
 		printf(" ");
 
-	printf(YELLOW "[");
-	for (i = 0; i < 46; i++)
-	{
-		if (((float) i) / 46 <= ((float) resistance + 50) / 100)
-		{
-			if (((float) i / 46) <= .1)
-				printf(BLACK);
-			else if (((float) i / 46) <= .25)
-				printf(RED);
-			else if (((float) i / 46) > 0.5)
-				printf(GREEN);
-			else if (((float) i / 46) > 0.75)
-				printf(WHITE);
-			else
-				printf(YELLOW);
-
-			printf("|");
-		}
-		else
-			printf(" ");
-	}
-	printf(YELLOW "]\n" NOCOLOR);
+	printf(BRIGHT "%i\n" NOCOLOR, resistance);
 }
 
 static void
@@ -308,19 +283,22 @@ print_attacks(Entity* e)
 	List* list;
 	Attack* attack;
 	List* attacks;
-	int has_attacks = 0;
 
 	attacks = get_all_attacks(e);
 
+	move(40);
 	printf(BRIGHT WHITE "  Attacks:\n" NOCOLOR);
 	for (list = attacks; list; list = list->next)
 	{
-		has_attacks = 1;
 		attack = list->data;
 
-		printf(WHITE "    %i - %i  %s\n" NOCOLOR,
-			attack->damage + get_attack_bonus(e), attack->strikes,
-			type_to_string(attack->type));
+		move(40);
+		if (attack->strikes)
+			printf(WHITE "    %i-%i  %s\n" NOCOLOR,
+				attack->damage + get_attack_bonus(e), attack->strikes,
+				type_to_string(attack->type));
+		else
+			printf(WHITE "    support attack\n" NOCOLOR);
 	}
 }
 
@@ -343,10 +321,6 @@ print_entity_basestats(Entity* e)
 				((StatusData*) e->statuses->data)->status->affliction_name);
 
 		printf(">" NOCOLOR);
-
-		/* Easier than cleaning, I suppose. */
-		/* FIXME: Horrible way of keeping things clean. */
-		printf("        ");
 	}
 
 	printf("\n");
@@ -380,15 +354,20 @@ print_entity(Entity *e)
 		get_attack_bonus(e)
 	);
 
-	print_attacks(e);
-
 	printf("\n");
 
-	printf("Resistances:\n");
+	printf(WHITE "Resistances:\n" NOCOLOR);
 	for (int i = 0; i < TYPE_MAX; i++)
 	{
 		print_resistance(e, i);
 	}
+
+	back(TYPE_MAX + 1);
+	print_attacks(e);
+
+	back_to_top();
+	for (int i = 0; i < 16; i++)
+		printf("\n");
 }
 
 char*

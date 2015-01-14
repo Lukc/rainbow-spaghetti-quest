@@ -54,8 +54,6 @@ int remove_items(struct Entity*, Item*, int);
 
 int is_item_usable(Item*);
 
-void print_items_menu(struct Entity*, int);
-
 #endif
 
 /* vim: set ts=4 sw=4 cc=80 : */

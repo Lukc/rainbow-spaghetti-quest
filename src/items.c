@@ -285,52 +285,6 @@ give_item(Entity* player, Item* item)
 }
 
 /**
- * Prints the items’ selection menu of the battle interface.
- * @param page: Integer representing the “page” of the inventory to display.
- *  Each “page” is a group of 5 successive entries from the inventory.
- *
- * @todo: Print the effects of using the item somewhere...
- */
-void
-print_items_menu(Entity* player, int page)
-{
-	int i;
-
-	for (i = 0; i < 5; i++)
-	{
-		int index = i + page * 5;
-
-		if (index < INVENTORY_SIZE)
-		{
-			Item* item;
-
-			if ((item = player->inventory[index].item))
-			{
-				if (is_item_usable(item))
-				{
-					if (item->consumable)
-						printf(GREEN);
-					else
-						printf(WHITE);
-				}
-				else
-					printf(BLACK);
-
-				if (player->inventory[index].quantity > 1)
-					printf("  (%i) %ix %-9s\n" NOCOLOR, i + 1,
-						player->inventory[index].quantity, item->name);
-				else
-					printf("  (%i) %-9s\n" NOCOLOR, i + 1, item->name);
-			}
-			else
-				printf(BLACK "  (%i) --------- \n" NOCOLOR, i + 1);
-		}
-		else
-			printf("\n");
-	}
-}
-
-/**
  * @return 0 if no error occurred and the item was removed. 1 otherwise.
  * @return 1 no such item or quantity is greater than number of items found.
  *

@@ -17,6 +17,39 @@
  * @fixme: deduplicate (mostly, redundant string operations)
  */
 
+/**
+ * @param list: List* of Item*
+ */
+static void
+loot_screen(List* list)
+{
+	if (list)
+	{
+		getch();
+		system("clear");
+		printf("\nYou were able to loot the following items:\n");
+
+		for (; list; list = list->next)
+		{
+			Item* item = list->data;
+
+			printf(BRIGHT);
+			if (item->slot >= 0)
+				printf(WHITE);
+			else if (item->on_use && item->on_use->strikes > 0)
+				printf(YELLOW);
+			else if (is_item_usable(item))
+				printf(GREEN);
+
+			printf("  - %s\n" NOCOLOR, item->name);
+		}
+
+		printf("\nPress any key to continue...\n\n");
+	}
+
+	getch();
+}
+
 static void
 end_turn(Entity* e, Logs* logs)
 {
@@ -76,9 +109,15 @@ get_mana_cost(Entity* e, Attack* attack)
  * @param list: The List* of Attack* to display.
  */
 static void
-print_attacks(Entity* player, List* list)
+print_attacks(Entity* player, List* list, int selection)
 {
 	int i;
+	int begin;
+
+	begin = selection - selection % 5;
+
+	for (i = 0; i < begin; i++)
+		list = list->next;
 
 	for (i = 0; i < 5; i++)
 	{
@@ -88,7 +127,6 @@ print_attacks(Entity* player, List* list)
 		{
 			int mana_cost;
 			char* name;
-			char* color = WHITE;
 
 			attack = list->data;
 
@@ -99,30 +137,71 @@ print_attacks(Entity* player, List* list)
 			else
 				name = strdup(type_to_attack_name(attack->type));
 
-			if (strlen(name) > 10)
-				name[11] = '\0';
+			if (strlen(name) > 13)
+				name[14] = '\0';
 
-			if (mana_cost > player->mana)
-				color = BLACK;
+			if (i == selection % 5)
+			{
+				bg(4, 4, 4);
 
-			printf("%s", color);
-
-			if (attack->strikes)
-				printf("(%i) %-11s %3i-%i %-10s" NOCOLOR, i + 1,
-					name,
-					attack->damage + get_attack_bonus(player),
-					attack->strikes, type_to_string(attack->type));
+				if (mana_cost > player->mana)
+					fg(5, 5, 5);
+				else
+					fg(0, 0, 0);
+			}
 			else
 			{
-				printf("(%i) %-11s  ", i + 1, name);
-
-				if (attack->gives_health > 0)
-					printf(BRIGHT GREEN);
+				if (mana_cost > player->mana)
+					fg(1, 1, 1);
 				else
-					printf(BRIGHT RED);
-				
-				printf("%+3iHP %-9s" NOCOLOR,
-					attack->gives_health, "");
+					fg(4, 4, 4);
+			}
+
+
+			/* name   damage-strikes damage_type */
+			/*  ... OR ...  */
+			/* name */
+			if (attack->strikes)
+			{
+				char string[128];
+				char damage_string[7];
+				size_t len;
+
+				snprintf(string, 128, " %-20s", attack->name);
+
+				len = snprintf(damage_string, 7, "%i-%i",
+					attack->damage + get_attack_bonus(player), attack->strikes
+				);
+
+				string[21 - len] = ' ';
+				snprintf(string + 22 - len, 128 - 22 + len,
+					"%s", damage_string);
+
+				printf("%s %-10s" NOCOLOR,
+					string, type_to_string(attack->type));
+			}
+			else
+			{
+				printf(" %-14s   ", name);
+
+				if (attack->gives_health)
+				{
+					if (attack->gives_health > 0)
+						printf(BRIGHT GREEN);
+					else
+						printf(BRIGHT RED);
+					
+					printf("%+3iHP %-9s" NOCOLOR,
+						attack->gives_health, "");
+				}
+				else
+					printf("%15s" NOCOLOR, "");
+			}
+
+			if (i == selection % 5)
+			{
+				bg(4, 4, 4);
+				fg(1, 1, 1);
 			}
 
 			if (mana_cost > attack->mana_cost)
@@ -140,7 +219,104 @@ print_attacks(Entity* player, List* list)
 		}
 		else
 		{
-			printf(BLACK "  (%i) --------- \n" NOCOLOR, i + 1);
+			printf(BLACK " ------------ \n" NOCOLOR);
+		}
+	}
+}
+
+/**
+ * Prints the items’ selection menu of the battle interface.
+ *
+ * @todo: Print the effects of using the item somewhere...
+ */
+static void
+print_items_menu(Entity* player, int selection)
+{
+	int i;
+	int begin;
+
+	begin = selection - selection % 5;
+
+	for (i = begin; i < begin + 5; i++)
+	{
+		if (i < INVENTORY_SIZE)
+		{
+			Item* item;
+
+			if (i == selection)
+			{
+				bg(4, 4, 4);
+				fg(0, 0, 0);
+			}
+
+			if ((item = player->inventory[i].item))
+			{
+				if (is_item_usable(item))
+				{
+					if (item->consumable)
+						printf(GREEN);
+				}
+				else
+				{
+					if (i == selection)
+						fg(2, 2, 2);
+					else
+						fg(1, 1, 1);
+				}
+
+				if (player->inventory[i].quantity > 1)
+					printf(" %ix %-37s\n" NOCOLOR,
+						player->inventory[i].quantity, item->name);
+				else
+					printf(" %-39s\n" NOCOLOR, item->name);
+			}
+			else
+			{
+				int j;
+
+				printf(" ");
+				for (j = 0; j < 37; j++)
+					printf("-");
+				printf(" \n" NOCOLOR);
+			}
+		}
+		else
+			printf("\n");
+	}
+}
+
+static void
+print_battle_logs(Game* game, Logs* logs)
+{
+	List* list;
+	int i;
+
+	print_entity_basestats(game->player);
+	printf(BRIGHT RED "\n -- " WHITE "versus" RED " --\n\n" NOCOLOR);
+	print_entity_basestats(game->enemy);
+	printf("\n");
+
+	if (logs)
+		list = logs->head;
+	else
+		list = NULL;
+
+	for (i = 0; i < 6; i++)
+	{
+		int j;
+
+		/* Clearing each line of the logs area before using it. */
+		for (j = 0; j < 80; j++)
+			printf(" ");
+		printf("\n");
+
+		if (list)
+		{
+			back(1);
+
+			printf("%s\n", list->data);
+
+			list = list->next;
 		}
 	}
 }
@@ -588,6 +764,10 @@ command_focus(Game* game)
 #define ATTACKS 0
 #define ITEMS 1
 
+#define LOGS 0
+#define ENEMY 1
+#define PLAYER 2
+
 int
 battle(Game *game)
 {
@@ -598,8 +778,10 @@ battle(Game *game)
 	Entity *enemy = game->enemy;
 	List* player_attacks;
 	List* list;
-	int view = ATTACKS;
-	int page = 0; /* Related to view. */
+	int view = LOGS;
+	int menu = ATTACKS; /* Whether the player is choosing an attack or item. */
+	int attack_index = 0; /* Index of the selected attack in the list. */
+	int item_index = 0;   /* Index of the selected item in the inventory */
 	int i;
 
 	game->flee = 0;
@@ -635,54 +817,59 @@ battle(Game *game)
 
 					logs = command_flee(game);
 					break;
+				case 'd':
+					view =
+						view == LOGS ? ENEMY :
+						view == ENEMY ? PLAYER :
+						LOGS;
+					break;
 				case 'i':
-					view = !view;
+					menu = !menu;
+					break;
+				case KEY_UP:
+					if (menu == ATTACKS)
+						attack_index = attack_index > 0 ? attack_index - 1 : 0;
+					else
+						item_index = item_index > 0 ? item_index - 1 : 0; 
+					break;
+				case KEY_DOWN:
+					if (menu == ATTACKS)
+						attack_index =
+							attack_index < list_size(player_attacks) - 1 ?
+								attack_index + 1 : attack_index;
+					else
+						item_index = item_index < INVENTORY_SIZE - 1 ?
+							item_index + 1 : item_index;
+					break;
+				case 'u':
+					view = LOGS;
 
-					if (view == ITEMS)
-						page = 0;
-					break;
-				case '+':
-					page = page >= INVENTORY_SIZE / 5 ? page : page + 1;
-					break;
-				case '-':
-					page = page == 0 ? 0 : page - 1;
-					break;
-				default:
-					if (input > '0' && input <= '5')
+					if (menu == ATTACKS)
 					{
-						input = input - '1';
-						if (view == ATTACKS)
-							if (list_size(player_attacks) > input)
-							{
-								Attack* attack =
-									list_nth(player_attacks, input);
+						Attack* attack =
+							list_nth(player_attacks, attack_index);
 
-								if (!can_use_attack(player, attack))
-								{
-									snprintf(info, 128,
-										BRIGHT RED " >> " WHITE "Not enough mana...");
-								}
-								else
-								{
-									if (logs)
-										logs_free(logs);
-
-									logs = command_attack(game, attack);
-								}
-							}
-							else
-							{
-								snprintf(
-									info, 128, BRIGHT RED " >> " WHITE "No such attack..."
-								);
-							}
-						else if (view == ITEMS)
+						if (!can_use_attack(player, attack))
 						{
-							Item* item;
-							int index = input + page * 5;
+							snprintf(info, 128,
+								BRIGHT RED " >> " WHITE "Not enough mana...");
+						}
+						else
+						{
+							if (logs)
+								logs_free(logs);
 
-							if (index < INVENTORY_SIZE &&
-								(item = player->inventory[index].item))
+							logs = command_attack(game, attack);
+						}
+					}
+					else if (menu == ITEMS)
+					{
+						Item* item;
+
+						if (item_index < INVENTORY_SIZE &&
+							(item = player->inventory[item_index].item))
+						{
+							if (is_item_usable(item))
 							{
 								if (logs)
 									logs_free(logs);
@@ -691,64 +878,55 @@ battle(Game *game)
 
 								if (item->consumable)
 								{
-									player->inventory[index].quantity -= 1;
+									player->inventory[item_index].quantity -= 1;
 
-									/* FIXME: Okay, make a separate function
-									 * for items’ use. */
-									if (player->inventory[index].quantity <= 0)
-								   		player->inventory[index].item = NULL;
+									if (player->inventory[item_index].quantity <= 0)
+										player->inventory[item_index].item = NULL;
 								}
 							}
 							else
 								snprintf(
 									info, 128,
-									BRIGHT RED " >> " WHITE "No such item in inventory..."
+									BRIGHT RED " >> " WHITE
+										"Item cannot be used."
 								);
 						}
+						else
+							snprintf(
+								info, 128,
+								BRIGHT RED " >> " WHITE
+									"Inventory slot empty."
+							);
 					}
-					else
-						snprintf(
-							info, 128,
-							BRIGHT RED " >> " WHITE "Unrecognized key..."
-						);
+					break;
+				default:
+					snprintf(
+						info, 128,
+						BRIGHT RED " >> " WHITE "Unrecognized key..."
+					);
 			}
 
-			print_entity_basestats(player);
-			printf(BRIGHT RED "\n -- " WHITE "versus" RED " --\n\n" NOCOLOR);
-			print_entity_basestats(enemy);
-			printf("\n");
-
-			if (logs)
-				list = logs->head;
-			else
-				list = NULL;
-
-			for (i = 0; i < 6; i++)
+			for (i = 0; i < 16; i++)
 			{
 				int j;
-
-				/* Clearing logs area, line by line. */
 				for (j = 0; j < 80; j++)
 					printf(" ");
 				printf("\n");
-
-				if (list)
-				{
-					back(1);
-
-					printf("%s\n", list->data);
-
-					list = list->next;
-				}
 			}
+			back(16);
+
+			if (view == LOGS)
+				print_battle_logs(game, logs);
+			else if (view == ENEMY)
+				print_entity(game->enemy);
+			else if (view == PLAYER)
+				print_entity(game->player);
 
 			menu_separator();
 
 			for (i = 0; i < 5; i++)
 			{
 				int j;
-
-				/* Clearing attacks/items area, line by line. */
 				for (j = 0; j < 80; j++)
 					printf(" ");
 				printf("\n");
@@ -786,69 +964,45 @@ battle(Game *game)
 					enemy->class->gold_on_kill);
 				printf("\nPress any key to continue...\n\n");
 
-				if (list)
-				{
-					getch();
-					system("clear");
-					printf("\nYou were able to loot the following items:\n");
+				loot_screen(list);
 
-					for (; list; list = list->next)
-					{
-						Item* item = list->data;
-
-						printf(BRIGHT);
-						if (item->slot >= 0)
-							printf(WHITE);
-						else if (item->on_use && item->on_use->strikes > 0)
-							printf(YELLOW);
-						else if (is_item_usable(item))
-							printf(GREEN);
-
-						printf("  - %s\n" NOCOLOR, item->name);
-					}
-
-					printf("\nPress any key to continue...\n\n");
-				}
-
-				getch();
 				return 1;
 			}
 			else
 			{
 				/* The battle continues! o/ */
-				if (view == ATTACKS)
-				{
-					print_attacks(player, player_attacks);
-				}
-				else if (view == ITEMS)
-				{
-					print_items_menu(player, page);
-				}
+				if (menu == ATTACKS)
+					print_attacks(player, player_attacks, attack_index);
+				else if (menu == ITEMS)
+					print_items_menu(player, item_index);
 
 				back(5);
 				move(40);
-				printf(WHITE "  (f) focus\n" NOCOLOR);
+				printf(WHITE "  (u) %-14s" NOCOLOR,
+					menu == ATTACKS ? "attack" : "use item");
+				move(60);
+				fg(4, 3, 0);
+				printf("  (v) %-14s\n",
+					menu == ATTACKS ? "view attack" : "view items");
 				move(40);
-				printf(WHITE "  (l) flee\n" NOCOLOR);
+				printf(WHITE "  (f) focus" NOCOLOR);
+				move(60);
+				printf(WHITE "  (d) view %-9s\n",
+					view == LOGS ? "enemy" :
+					view == ENEMY ? "player" : "battle");
 
-				if (view == ITEMS)
-				{
-					move(40);
-					printf(WHITE "%-40s\n" NOCOLOR, "  (i) actions");
-					move(40);
-					printf(WHITE "%-40s\n" NOCOLOR, "  (+) next");
-					move(40);
-					printf(WHITE "%-40s\n" NOCOLOR, "  (-) previous");
-				}
+				move(40);
+				if (menu == ITEMS)
+					printf(WHITE "%-40s" NOCOLOR, "  (i) view actions");
 				else
-				{
-					move(40);
-					printf(WHITE "  (i) use item\n" NOCOLOR);
-					move(40);
-					printf("%40s\n", "");
-					move(40);
-					printf("%40s\n", "");
-				}
+					printf(WHITE "  (i) view items" NOCOLOR);
+				move(60);
+				printf(WHITE "  (l) flee\n");
+
+				move(40);
+				printf("%40s\n", "");
+				move(40);
+				printf("%40s\n", "");
 			}
 
 			menu_separator();
@@ -871,6 +1025,9 @@ battle(Game *game)
 
 	return 0;
 }
+
+#undef LOGS
+#undef ENEMY
 
 #undef ITEMS
 #undef ATTACKS
