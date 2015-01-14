@@ -1,0 +1,41 @@
+Class: [
+	Name: Living Bush
+	Health: 60
+	Mana: 5
+	Defense Bonus: 0
+	Attack Bonus: 0
+	Mana on focus: 5
+	Health on focus: 5
+	Attack: [
+		Damage: 6
+		Strikes: 1
+		Type: impact
+		Mana: -2
+		Name: Branch Hit
+	]
+	Attack: [
+		Damage: 1
+		Strikes: 6
+		Type: impact
+		Mana: -2
+		Name: Twigs hit
+	]
+	Slashing resistance: -50
+	Piercing resistance: 50
+	Fire resistance: -100
+	Impact resistance: 0
+	Electric resistance: 50
+	Poison resistance: 15
+	Gold on kill: 30
+
+	Drop: [
+		Item: Branch
+		Rarity: 5
+		Quantity: 9
+	]
+	Drop: [
+		Item: Twigs
+		Rarity: 4
+		Quantity: 9
+	]
+]

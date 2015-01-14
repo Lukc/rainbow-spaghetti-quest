@@ -1,0 +1,21 @@
+Item: [
+	Name: Leather Cloak
+	Max mana: 6
+	Mana on focus: 1
+	Health on focus: 1
+	Price: 400
+	Slot: armor
+]
+Recipe: [
+	Output: Leather Cloak
+	Skill: Tailoring
+	Level: 2
+	Ingredient: [
+		Item: Leather Patch
+		Quantity: 8
+	]
+	Ingredient: [
+		Item: String
+		Quantity: 3
+	]
+]

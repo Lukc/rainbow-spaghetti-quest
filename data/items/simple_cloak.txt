@@ -1,0 +1,20 @@
+Item: [
+	Name: Simple Cloak
+	Health on focus: 1
+	Mana on focus: 1
+	Price: 100
+	Slot: armor
+]
+Recipe: [
+	Output: Simple Cloak
+	Skill: Tailoring
+	Level: 1
+	Ingredient: [
+		Item: Mouse Skin Chunk
+		Quantity: 6
+	]
+	Ingredient: [
+		Item: String
+		Quantity: 2
+	]
+]

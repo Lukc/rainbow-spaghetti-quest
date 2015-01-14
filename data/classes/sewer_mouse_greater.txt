@@ -1,0 +1,51 @@
+Class: [
+	Name: Greater Sewer Mouse
+	Health: 24
+	Mana: 4
+	Attack: [
+		Damage: 2
+		Strikes: 1
+		Type: impact
+		Name: Bite
+		Mana: -1
+	]
+	Attack: [
+		Damage: 3
+		Strikes: 1
+		Type: poison
+		Name: Poisonous Bite
+		Mana: -2
+		Inflicts: poison
+	]
+	Attack bonus: 1
+	Defense bonus: 1
+	Health on focus: 3
+	Mana on focus: 3
+
+	Poison resistance: 66
+
+	Gold on kill: 3
+
+	Drop: [
+		Item: Sewer Tail
+		Rarity: 2
+	]
+	Drop: [
+		Item: Sewer Tail
+		Rarity: 3
+	]
+	Drop: [
+		Item: Sewer Tail
+		Rarity: 64
+	]
+	Drop: [
+		Item: Rotten Meat
+		Rarity: 2
+		Quantity: 2
+	]
+	Drop: [
+		Item: Mouse Skin Chunk
+		Rarity: 5
+		Quantity: 6
+	]
+]

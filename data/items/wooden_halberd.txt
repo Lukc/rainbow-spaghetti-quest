@@ -1,0 +1,28 @@
+Item: [
+	Name: Wooden Halberd
+	Attack bonus: 0
+	Attack: [
+		Name: Slash
+		Damage: 2
+		Strikes: 2
+		Type: slashing
+	]
+	Attack: [
+		Name: Pierce
+		Damage: 4
+		Strikes: 1
+		Type: piercing
+	]
+	Price: 220
+	Slot: weapon
+]
+Recipe: [
+	Output: Wooden Halberd
+	Skill: Woodworking
+	Level: 2
+	Ingredient: [
+		Item: Branch
+		Quantity: 2
+	]
+	Ingredient: Wooden Spear
+]

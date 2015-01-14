@@ -1,0 +1,13 @@
+Item: [
+	Name: Leather Patch
+	Price: 40
+]
+Recipe: [
+	Output: Leather Patch
+	Skill: Leatherworking
+	Level: 3
+	Ingredient: [
+		Item: Mouse Skin Chunk
+		Quantity: 6
+	]
+]

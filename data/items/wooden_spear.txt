@@ -1,0 +1,22 @@
+Item: [
+	Name: Wooden Spear
+	Attack bonus: 0
+	Attack: [
+		Name: Spear
+		Damage: 4
+		Strikes: 1
+		Type: piercing
+	]
+	Price: 120
+	Slot: weapon
+]
+Recipe: [
+	Output: Wooden Spear
+	# FIXME: Not sure about that choice of skill.
+	Skill: Woodworking
+	Level: 1
+	Ingredient: [
+		Item: Branch
+		Quantity: 4
+	]
+]

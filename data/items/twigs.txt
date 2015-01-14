@@ -1,0 +1,21 @@
+Item: [
+	Name: Twigs
+	Price: 0
+]
+Item: [
+	Name: Burning Twigs
+	On use: [
+		Damage: 1
+		Strikes: 3
+		Type: fire
+	]
+	Consumable: 1
+	Price: 0
+]
+Recipe: [
+	Output: Burning Twigs
+	Ingredient: [
+		Item: Twigs
+		Quantity: 3
+	]
+]

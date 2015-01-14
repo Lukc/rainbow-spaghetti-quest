@@ -1,0 +1,18 @@
+Item: [
+	Name: Rotten Bomb
+	On use: [
+		Damage: 8
+		Strikes: 1
+		Type: poison
+		Health: -2
+	]
+	Consumable: 1
+]
+Recipe: [
+	Output: Rotten Bomb
+	Ingredient: [
+		Item: Sewer Tail
+		Quantity: 2
+	]
+	Ingredient: Rotten Meat
+]

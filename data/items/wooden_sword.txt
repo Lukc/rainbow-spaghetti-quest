@@ -1,0 +1,22 @@
+Item: [
+	Name: Wooden Sword
+	Attack bonus: 0
+	Attack: [
+		Name: Slash
+		Damage: 0
+		Strikes: 3
+		Type: slashing
+	]
+	Price: 120
+	Slot: weapon
+]
+Recipe: [
+	Output: Wooden Sword
+	# FIXME: Not sure about that choice of skill.
+	Skill: Woodworking
+	Level: 1
+	Ingredient: [
+		Item: Branch
+		Quantity: 4
+	]
+]

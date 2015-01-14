@@ -1,0 +1,20 @@
+Item: [
+	Name: Leather Armor
+	Max health: 6
+	Defense bonus: 1
+	Price: 400
+	Slot: armor
+]
+Recipe: [
+	Output: Leather Armor
+	Skill: Tailoring
+	Level: 2
+	Ingredient: [
+		Item: Leather Patch
+		Quantity: 8
+	]
+	Ingredient: [
+		Item: String
+		Quantity: 3
+	]
+]

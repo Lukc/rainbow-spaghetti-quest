@@ -1,0 +1,54 @@
+Class: [
+	Name: Mutant Sewer Mouse
+	Health: 32
+	Mana: 5
+	Attack: [
+		Damage: 2
+		Strikes: 2
+		Type: impact
+		Name: Bite
+		Mana: -1
+	]
+	Attack: [
+		Damage: 3
+		Strikes: 2
+		Type: poison
+		Name: Poisonous Bite
+		Mana: -2
+		Inflicts: poison
+	]
+	Attack bonus: 2
+	Defense bonus: 2
+	Health on focus: 4
+	Mana on focus: 4
+
+	Poison resistance: 75
+	Arcane resistance: -25 # Mutant -> less arcane resistance
+
+	Gold on kill: 3
+
+	# A four-tailed Mutant Mouse? Urk. Kill it with fire.
+	Drop: [
+		Item: Sewer Tail
+		Rarity: 2
+	]
+	Drop: [
+		Item: Sewer Tail
+		Rarity: 3
+		Quantity: 2
+	]
+	Drop: [
+		Item: Sewer Tail
+		Rarity: 64
+	]
+	Drop: [
+		Item: Rotten Meat
+		Rarity: 2
+		Quantity: 3
+	]
+	Drop: [
+		Item: Mouse Skin Chunk
+		Rarity: 5
+		Quantity: 12
+	]
+]

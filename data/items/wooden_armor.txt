@@ -1,0 +1,25 @@
+Item: [
+	Name: Wooden Armor
+	Max health: 6
+	Attack bonus: -1
+	Defense bonus: 2
+	Price: 400
+	Slot: armor
+]
+Recipe: [
+	Output: Wooden Armor
+	Skill: Woodworking
+	Level: 2
+	Ingredient: [
+		Item: Log
+		Quantity: 8
+	]
+	Ingredient: [
+		Item: Branch
+		Quantity: 2
+	]
+	Ingredient: [
+		Item: String
+		Quantity: 6
+	]
+]

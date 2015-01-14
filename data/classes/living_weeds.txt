@@ -1,0 +1,29 @@
+Class: [
+	Name: Living Weeds
+	Health: 20
+	Mana: 3
+	Defense Bonus: 0
+	Attack Bonus: 0
+	Mana on focus: 3
+	Health on focus: 12
+	Attack: [
+		Damage: 0
+		Strikes: 5
+		Type: impact
+		Mana: -2
+		Name: Ensnare
+	]
+	Slashing resistance: 50
+	Piercing resistance: 50
+	Fire resistance: -100
+	Impact resistance: 50
+	Electric resistance: 50
+	Poison resistance: -50
+	Gold on kill: 3
+
+	Drop: [
+		Item: String
+		Rarity: 6
+		Quantity: 3
+	]
+]

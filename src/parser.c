@@ -341,17 +341,15 @@ parser_get_attack(ParserElement* element, Logs* logs)
 				attack->damage = parser_get_integer(element, logs);
 			else if (!strcmp(element->name, "strikes"))
 				attack->strikes = parser_get_integer(element, logs);
-			else if (!strcmp(element->name, "mana"))
-				attack->mana_cost =	parser_get_integer(element, logs);
 			else if (!strcmp(element->name, "name"))
 				attack->name = parser_get_string(element, logs);
 			else if (!strcmp(element->name, "cures"))
 				list_add(&attack->cures_status_names,
 					parser_get_string(element, logs));
-			else if (!strcmp(element->name, "health on use"))
-				attack->gives_health = parser_get_integer(element, logs);
-			else if (!strcmp(element->name, "mana on use"))
-				attack->mana_cost = - parser_get_integer(element, logs);
+			else if (!strcmp(element->name, "health"))
+				attack->health = parser_get_integer(element, logs);
+			else if (!strcmp(element->name, "mana"))
+				attack->mana = parser_get_integer(element, logs);
 			else if (!strcmp(element->name, "inflicts"))
 				attack->inflicts_status_name = parser_get_string(element, logs);
 			else if (!strcmp(element->name, "self inflicts"))
@@ -797,7 +795,7 @@ load_game(Game* game, char* dirname)
 			else
 			{
 				fprintf(stderr, "[Recipe:%s] Unknown item: %s\n",
-					recipe->output->name, ig->item->name);
+					recipe->output->name, (char*) ig->item);
 
 				exit(1);
 			}

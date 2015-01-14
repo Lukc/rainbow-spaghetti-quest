@@ -1,0 +1,29 @@
+Item: [
+	Name: Small Red Fruit
+	On Use: [
+		Health: 8
+	]
+	Consumable: 1
+]
+Item: [
+	Name: Red Fruit
+	On Use: [
+		Health: 24
+	]
+	Consumable: 1
+]
+Item: [
+	Name: Big Red Fruit
+	On Use: [
+		Health: 72
+	]
+	Consumable: 1
+]
+
+Item: [
+	Name: Small Blue Fruit
+	On Use: [
+		Mana: 8
+	]
+	Consumable: 1
+]

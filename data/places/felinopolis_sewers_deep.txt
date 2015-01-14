@@ -1,0 +1,15 @@
+Place: [
+	Name: Felinopolis - Sewers (Deep)
+
+	Leads to: Felinopolis - Sewers
+
+	Image: felinopolis
+
+	Random Enemy: Small Sewer Mouse
+	Random Enemy: [
+		Class: Sewer Mouse
+		Frequency: 2
+	]
+	Random Enemy: Greater Sewer Mouse
+	Random Enemy: Mutant Sewer Mouse
+]

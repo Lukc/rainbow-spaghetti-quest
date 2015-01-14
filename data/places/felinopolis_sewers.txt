@@ -2,6 +2,7 @@ Place: [
 	Name: Felinopolis - Sewers
 
 	@include felinopolis
+	Leads to: Felinopolis - Sewers (Deep)
 
 	Image: felinopolis
 

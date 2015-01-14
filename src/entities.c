@@ -123,7 +123,9 @@ get_type_resistance(Entity* e, int type)
 {
 	Item* equipment;
 	int i;
-	int bonus = 0;
+	int bonus;
+
+	bonus = e->class->type_resistance[type];
 
 	for (i = 0; i < EQ_MAX; i++)
 	{

@@ -87,21 +87,29 @@ static int
 get_mana_cost(Entity* e, Attack* attack)
 {
 	List* l;
-	int cost = attack->mana_cost;
+	int mana = attack->mana;
 
-	if (cost < 0)
-		return e->mana - cost > get_max_mana(e) ?
-			- get_max_mana(e) + e->mana : cost;
-
-	for (l = e->statuses; l; l = l->next)
+	if (mana == 0)
+		return 0;
+	else if (mana > 0)
 	{
-		StatusData* status = l->data;
+		int max = get_max_mana(e);
 
-		if (status->status->increases_mana_costs)
-			cost *= 2;
+		return e->mana + mana > max ?
+			max - mana : mana;
 	}
+	else
+	{
+		for (l = e->statuses; l; l = l->next)
+		{
+			StatusData* status = l->data;
 
-	return cost;
+			if (status->status->increases_mana_costs)
+				mana *= 2;
+		}
+
+		return mana;
+	}
 }
 
 /**
@@ -144,14 +152,14 @@ print_attacks(Entity* player, List* list, int selection)
 			{
 				bg(4, 4, 4);
 
-				if (mana_cost > player->mana)
+				if (-mana_cost > player->mana)
 					fg(5, 5, 5);
 				else
 					fg(0, 0, 0);
 			}
 			else
 			{
-				if (mana_cost > player->mana)
+				if (-mana_cost > player->mana)
 					fg(1, 1, 1);
 				else
 					fg(4, 4, 4);
@@ -184,15 +192,15 @@ print_attacks(Entity* player, List* list, int selection)
 			{
 				printf(" %-14s   ", name);
 
-				if (attack->gives_health)
+				if (attack->health)
 				{
-					if (attack->gives_health > 0)
+					if (attack->health > 0)
 						printf(BRIGHT GREEN);
 					else
 						printf(BRIGHT RED);
 					
 					printf("%+3iHP %-9s" NOCOLOR,
-						attack->gives_health, "");
+						attack->health, "");
 				}
 				else
 					printf("%15s" NOCOLOR, "");
@@ -204,12 +212,12 @@ print_attacks(Entity* player, List* list, int selection)
 				fg(1, 1, 1);
 			}
 
-			if (mana_cost > attack->mana_cost)
+			if (mana_cost < attack->mana)
 				printf("%s", RED);
-			else if (mana_cost < 0)
+			else if (mana_cost > 0) /* Uh uh, not really a cost, uh? */
 				printf("%s", BLUE);
 
-			printf(" %+3iMP", -mana_cost);
+			printf(" %+3iMP", mana_cost);
 
 			printf("\n" NOCOLOR);
 
@@ -327,7 +335,7 @@ print_battle_logs(Game* game, Logs* logs)
 static int
 can_use_attack(Entity* attacker, Attack* attack)
 {
-	return attacker->mana >= get_mana_cost(attacker, attack);
+	return attacker->mana + get_mana_cost(attacker, attack) >= 0;
 }
 
 /**
@@ -377,7 +385,7 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 			StatusData* data = l->data;
 			Status* status = data->status;
 
-			if (mana_cost > 0)
+			if (mana_cost != 0)
 			{
 				if (status->reduces_magical_strikes)
 					strikes /= 2;
@@ -437,12 +445,12 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 		cure_string = BRIGHT WHITE " -" CYAN "Cured!" WHITE "-";
 	}
 
-	if (attack->gives_health)
+	if (attack->health)
 	{
 		List* l;
 		int can_recover = 1;
 
-		if (attack->gives_health > 0)
+		if (attack->health > 0)
 		{
 			for (l = attacker->statuses; l && can_recover; l = l->next)
 			{
@@ -455,12 +463,12 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 
 			if (can_recover)
 			{
-				give_health(attacker, attack->gives_health);
+				give_health(attacker, attack->health);
 
 				snprintf(
 					healing_string, 64,
 					GREEN " <<< +%iHP" WHITE,
-					attack->gives_health
+					attack->health
 				);
 			}
 			else
@@ -471,19 +479,19 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 		}
 		else
 		{
-			attacker->health += attack->gives_health;
+			attacker->health += attack->health;
 
 			snprintf(
 				injury_string, 64,
-				RED " <<< %+iHP", attack->gives_health
+				RED " <<< %+iHP", attack->health
 			);
 		}
 	}
 
 	snprintf(mana_string, 64, BLUE " <<< %s%+iMP",
-		mana_cost > 0 ? GRAY : "", -mana_cost);
+		mana_cost < 0 ? GRAY : "", mana_cost);
 
-	attacker->mana -= mana_cost;
+	attacker->mana += mana_cost;
 
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(log, 128,

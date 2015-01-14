@@ -1,0 +1,26 @@
+Item: [
+	Name: Wooden Torch
+	Attack bonus: 0
+	Attack: [
+		Name: Torch
+		Damage: 1
+		Strikes: 2
+		Type: fire
+	]
+	Price: 100
+	Slot: weapon
+]
+Recipe: [
+	Output: Wooden Torch
+	# FIXME: Not sure about that choice of skill.
+	Skill: Woodworking
+	Level: 1
+	Ingredient: [
+		Item: Branch
+		Quantity: 2
+	]
+	Ingredient: [
+		Item: Burning Twigs
+		Quantity: 4
+	]
+]

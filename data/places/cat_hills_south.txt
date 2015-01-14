@@ -5,5 +5,7 @@ Place: [
 	Leads to: Felinopolis - North Gate
 	Leads to: Cat River - North
 	Leads to: Cat Lake - South
+	Leads to: Cat Forest
+	Leads to: Cat Plains - West
 ]
 

@@ -1,0 +1,22 @@
+Item: [
+	Name: Sewer Amulet
+	Slot: amulet
+	Mana on focus: 1
+
+	Poison Resistance: 33
+
+	Price: 200
+]
+Recipe: [
+	Output: Sewer Amulet
+	Skill: Tailoring
+	Level: 5
+	Ingredient: [
+		Item: Sewer Tail
+		Quantity: 8
+	]
+	Ingredient: [
+		Item: String
+		Quantity: 4
+	]
+]

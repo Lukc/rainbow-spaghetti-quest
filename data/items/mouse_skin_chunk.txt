@@ -1,0 +1,4 @@
+Item: [
+	Name: Mouse Skin Chunk
+	Price: 8
+]

@@ -160,7 +160,7 @@ craft(Game* game)
 					if (!recipe_craftable(game, selected_recipe))
 						snprintf(log, 128,
 							BRIGHT RED " >> " WHITE
-							"You’re missing a few ingreidents to complete "
+							"You’re missing a few ingredients to complete "
 							"this recipe!" NOCOLOR);
 					else if (craft_item(game, selected_recipe))
 						snprintf(log, 128,

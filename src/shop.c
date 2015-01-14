@@ -48,15 +48,27 @@ print_item(Item* item)
 			printf(BRIGHT WHITE "    provides a support attack\n" NOCOLOR);
 	}
 
+	if (item->consumable)
+	{
+		printf("    " WHITE "is consumed after use\n");
+	}
+
 	if (item->on_use)
 	{
-		if (item->on_use->gives_health)
-			printf("    %s%+i HP\n" NOCOLOR,
-				stat_color(item->on_use->gives_health), item->on_use->gives_health);
+		if (item->on_use->strikes)
+		{
+			printf("    " WHITE "inflicts a %i-%i %s attack\n",
+				item->on_use->damage, item->on_use->strikes,
+				type_to_string(item->on_use->type));
+		}
 
-		if (item->on_use->mana_cost)
+		if (item->on_use->health)
+			printf("    %s%+i HP\n" NOCOLOR,
+				stat_color(item->on_use->health), item->on_use->health);
+
+		if (item->on_use->mana)
 			printf("    %s%+i MP\n" NOCOLOR,
-				stat_color(-item->on_use->mana_cost), -item->on_use->mana_cost);
+				stat_color(item->on_use->mana), item->on_use->mana);
 	}
 
 	if (item->health_bonus)

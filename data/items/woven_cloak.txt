@@ -1,0 +1,20 @@
+Item: [
+	Name: Woven Cloak
+	Max mana: 10
+	Mana on focus: 2
+	Health on focus: 2
+	Defense bonus: -1
+	Price: 440
+	Slot: armor
+]
+# That recipe kinda sucks, but as long as strings are so rare and as long as
+# there’s no possible intermediate crafting item, it’ll have to stay like that.
+Recipe: [
+	Output: Woven Cloak
+	Skill: Tailoring
+	Level: 3
+	Ingredient: [
+		Item: String
+		Quantity: 20
+	]
+]

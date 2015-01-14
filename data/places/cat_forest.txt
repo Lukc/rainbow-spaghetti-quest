@@ -3,5 +3,61 @@ Place: [
 	Name: Cat Forest
 
 	Leads to: Felinopolis - West Gate
+	Leads to: Cat Hills - South
+
+	Random Enemy: [
+		Class: Living Tree
+		Frequency: 3
+	]
+	Random Enemy: [
+		Class: Living Bush
+		Frequency: 5
+	]
+	Random Enemy: [
+		Class: Living Weeds
+		Frequency: 1
+	]
+	Random Enemy: [
+		Class: Lost Squirrel
+		Frequency: 1
+	]
+
+	Skill: [
+		Name: Woodcutting
+		Drop: [
+			Item: Log
+			Rarity: 6
+			Quantity: 4
+		]
+		Drop: [
+			Item: Branch
+			Rarity: 4
+			Quantity: 10
+		]
+		Drop: [
+			Item: Twigs
+			Rarity: 3
+			Quantity: 6
+		]
+	]
+
+	Skill: [
+		Name: Gathering
+		Drop: [
+			Item: Small Red Fruit
+			Rarity: 8
+			Quantity: 6
+		]
+		Drop: [
+			Item: Branch
+			Rarity: 4
+			Quantity: 10
+		]
+		Drop: [
+			Item: Twigs
+			Rarity: 4
+			Quantity: 7
+		]
+	]
 ]
 

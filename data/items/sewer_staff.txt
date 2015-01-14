@@ -1,0 +1,34 @@
+Item: [
+	Name: Sewer Staff
+	Attack bonus: 0
+	Attack: [
+		Name: Rotten Cheese
+		Damage: 0
+		Strikes: 4
+		Type: poison
+		Mana: -3
+	]
+	Attack: [
+		Name: Water Spray
+		Damage: 2
+		Strikes: 2
+		Type: cold
+		Mana: -3
+	]
+	Price: 150
+	Slot: weapon
+]
+Recipe: [
+	Output: Sewer Staff
+	# FIXME: Not sure about that choice of skill.
+	Skill: Woodworking
+	Level: 3
+	Ingredient: [
+		Item: Branch
+		Quantity: 3
+	]
+	Ingredient: [
+		Item: Sewer Tail
+		Quantity: 18
+	]
+]

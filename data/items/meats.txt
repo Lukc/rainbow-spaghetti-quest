@@ -1,0 +1,4 @@
+Item: [
+	Name: Rotten Meat
+	Price: 0
+]

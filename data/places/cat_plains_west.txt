@@ -4,5 +4,6 @@ Place: [
 
 	Leads to: Felinopolis - East Gate
 	Leads to: Cat River - East
+	Leads to: Cat Hills - South
 ]
 

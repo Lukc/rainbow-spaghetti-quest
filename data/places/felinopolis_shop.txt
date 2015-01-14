@@ -3,6 +3,12 @@ Place: [
 
 	@include felinopolis
 
+	Shop Item: Wooden Sword
+	Shop Item: Wooden Spear
+	Shop Item: Wooden Halberd
+	Shop Item: Wooden Torch
+	Shop Item: String
+
 	Image: felinopolis
 
 	Character: [

@@ -7,17 +7,28 @@ Class: [
 		Strikes: 1
 		Type: impact
 		Name: Bite
-		Mana: 1
+		Mana: -1
 	]
 	Attack bonus: 1
 	Defense bonus: 0
 	Health on focus: 2
 	Mana on focus: 1
 
+	Poison resistance: 66
+
 	Gold on kill: 1
 
 	Drop: [
 		Item: Sewer Tail
 		Rarity: 2
+	]
+	Drop: [
+		Item: Rotten Meat
+		Rarity: 3
+	]
+	Drop: [
+		Item: Mouse Skin Chunk
+		Rarity: 7
+		Quantity: 3
 	]
 ]
