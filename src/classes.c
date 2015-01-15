@@ -7,6 +7,9 @@
 #include "classes.h"
 #include "parser.h"
 
+#include "parser/drop.h"
+#include "parser/attack.h"
+
 static int
 check_type_resistance(Class* class, ParserElement* element, Logs* logs)
 {
@@ -75,14 +78,14 @@ load_class(Game* game, List* list)
 			class->gold_on_kill = parser_get_integer(element, logs);
 		else if (!strcmp(field, "attack"))
 		{
-			Attack* attack = parser_get_attack(element, logs);
+			Attack* attack = parser_get_attack(element);
 
 			if (attack)
 				list_add(&class->attacks, (void*) attack);
 		}
 		else if (!strcmp(field, "drop"))
 		{
-			Drop* drop = parser_get_drop(element, logs);
+			Drop* drop = parser_get_drop(element);
 
 			if (drop)
 				list_add(&class->drop, drop);

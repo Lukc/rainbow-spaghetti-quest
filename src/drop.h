@@ -8,9 +8,11 @@
 
 typedef struct Drop {
 	Item* item;
-	char* item_name; /* Temporary container used at load-time */
 	int rarity;
 	int quantity;
+
+	/* Temporary container used at load-time. */
+	char* item_name;
 } Drop;
 
 List* give_drop(struct Entity*, List*);

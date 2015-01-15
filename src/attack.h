@@ -27,7 +27,7 @@ typedef struct Attack {
 	/* Statuses cured when using this attack. */
 	List* cures_statuses; /* List* of Status* */
 
-	/* Fields required at load-time. */
+	/* Temporary containers used at load-time. */
 	char* inflicts_status_name;
 	char* self_inflicts_status_name;
 	List* cures_status_names; /* List of char* */

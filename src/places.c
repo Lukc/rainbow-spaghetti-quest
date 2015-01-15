@@ -14,6 +14,8 @@
 #include "enemies.h"
 #include "characters.h"
 
+#include "parser/drop.h"
+
 static List*
 comas_to_list(char* input)
 {
@@ -97,7 +99,7 @@ _load_skill(Place* place, ParserElement* element, Logs* logs)
 			name = parser_get_string(element, logs);
 		else if (!strcmp(element->name, "drop"))
 		{
-			Drop* drop = parser_get_drop(element, logs);
+			Drop* drop = parser_get_drop(element);
 
 			if (drop)
 				list_add(&drops, drop);

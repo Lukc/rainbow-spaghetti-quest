@@ -18,14 +18,18 @@
 #include "events/condition.h"
 #include "events/items.h"
 
+#include "parser/class.h"
+#include "parser/item.h"
+#include "parser/recipe.h"
+#include "parser/place.h"
+#include "parser/event.h"
+
 /**
  * Opens and reads a file and returns a List* of ParserElement* representing
  * the content of the file, assuming it was a valid Spaghetti Quest file.
  *
  * Try not to mess with this. That code hates everyone.
  */
-#define IDENTIFIER 0
-#define VALUE 1
 static int
 ignore_comments(int c, FILE* f)
 {
@@ -42,6 +46,9 @@ ignore_comments(int c, FILE* f)
 static List*
 parser_helper(FILE* f, char* filename, int* lineno, int has_parent)
 {
+#	define IDENTIFIER 0
+#	define VALUE 1
+
 	List* list = NULL;
 	ParserElement* element;
 	int expecting = IDENTIFIER;
@@ -83,11 +90,6 @@ parser_helper(FILE* f, char* filename, int* lineno, int has_parent)
 
 				if (c == '\n')
 					(*lineno)++;
-
-				if (!isalnum(c) && c != ' ' && c != ':')
-				{
-					printf(" <<<%c>>>\n", c);
-				}
 
 				buffer[buffer_index] = '\0';
 
@@ -262,6 +264,9 @@ parser_helper(FILE* f, char* filename, int* lineno, int has_parent)
 		}
 	}
 
+#	undef IDENTIFIER
+#	undef VALUE
+
 	return list;
 }
 
@@ -276,8 +281,6 @@ parse_file(char* filename)
 
 	return parser_helper(f, filename, &lineno, 0);
 }
-#undef IDENTIFIER
-#undef VALUE
 
 void
 parser_free(ParserElement* element)
@@ -319,8 +322,8 @@ parser_get_string(ParserElement* element, Logs* logs)
 			logs_add(logs, log);
 		}
 		else
-			fprintf(stderr, "[:%i] %s: String expected.\n",
-				element->lineno, element->name);
+			fprintf(stderr, "<%s:%i> %s: String expected.\n",
+				element->filename, element->lineno, element->name);
 
 		return NULL;
 	}
@@ -343,123 +346,11 @@ parser_get_integer(ParserElement* element, Logs* logs)
 			logs_add(logs, log);
 		}
 		else
-			fprintf(stderr, "[:%i] %s: Integer expected.\n",
-				element->lineno, element->name);
+			fprintf(stderr, "<%s:%i> %s: Integer expected.\n",
+				element->filename, element->lineno, element->name);
 
-		return 0;
+		return 0; /* Great… what if the value’s a zero? … */
 	}
-}
-
-Drop*
-parser_get_drop(ParserElement* element, Logs* logs)
-{
-	List* list;
-	Drop* drop = (Drop*) malloc(sizeof(Drop));
-
-	if (element->type != PARSER_LIST)
-	{
-		logs_add(logs,
-			strdup("Drop that is not a list found.\n"));
-		free(drop);
-
-		return NULL;
-	}
-	else
-	{
-		memset(drop, 0, sizeof(Drop));
-		drop->quantity = 1;
-
-		for (list = element->value; list; list = list->next)
-		{
-			element = list->data;
-
-			if (!strcmp(element->name, "item"))
-			{
-				/* Will be transformed into an Item* later */
-				drop->item_name = parser_get_string(element, logs);
-			}
-			else if (!strcmp(element->name, "rarity"))
-				drop->rarity = parser_get_integer(element, logs);
-			else if (!strcmp(element->name, "quantity"))
-				drop->quantity = parser_get_integer(element, logs);
-			else
-				fprintf(stderr, "[Drop:%i] Unknown element: %s.\n",
-					element->lineno, element->name);
-		}
-
-		return drop;
-	}
-}
-
-Attack*
-parser_get_attack(ParserElement* element, Logs* logs)
-{
-	List* list;
-	Attack* attack = (Attack*) malloc(sizeof(Attack));
-
-	if (element->type != PARSER_LIST)
-	{
-		logs_add(logs,
-				strdup("Trying to add attack improperly defined.\n"));
-		free(attack);
-	}
-	else
-	{
-		memset(attack, 0, sizeof(Attack));
-		attack->inflicts_status = NULL;
-
-		for (list = element->value; list; list = list->next)
-		{
-			element = list->data;
-
-			if (!strcmp(element->name, "damage"))
-				attack->damage = parser_get_integer(element, logs);
-			else if (!strcmp(element->name, "strikes"))
-				attack->strikes = parser_get_integer(element, logs);
-			else if (!strcmp(element->name, "name"))
-				attack->name = parser_get_string(element, logs);
-			else if (!strcmp(element->name, "cures"))
-				list_add(&attack->cures_status_names,
-					parser_get_string(element, logs));
-			else if (!strcmp(element->name, "health"))
-				attack->health = parser_get_integer(element, logs);
-			else if (!strcmp(element->name, "mana"))
-				attack->mana = parser_get_integer(element, logs);
-			else if (!strcmp(element->name, "inflicts"))
-				attack->inflicts_status_name = parser_get_string(element, logs);
-			else if (!strcmp(element->name, "self inflicts"))
-				attack->self_inflicts_status_name = parser_get_string(element, logs);
-			else if (!strcmp(element->name, "type"))
-			{
-				char* type = parser_get_string(element, logs);
-
-				if (type)
-				{
-					attack->type = string_to_type(type);
-
-					if (attack->type == -1)
-					{
-						char* log = (char*) malloc(sizeof(char) * 128);
-						snprintf(log, 128, "Invalid type: “%s”.", type);
-						logs_add(logs, log);
-
-						free_attack(attack);
-
-						return NULL;
-					}
-				}
-			}
-			else
-			{
-				char* log = (char*) malloc(sizeof(char) * 128);
-				snprintf(log, 128, "[Attack:%i] Unknown field ignored: %s.",
-					element->lineno, element->name);
-				logs_add(logs, log);
-			}
-		}
-	}
-
-	return attack;
 }
 
 void
@@ -524,7 +415,7 @@ import_dir(Game* game, char* dirname)
 						load_class(game, element->value);
 					else
 						fprintf(stderr,
-							"Item is not a list of keys and values.\n");
+							"Class is not a list of keys and values.\n");
 				}
 				else if (!strcmp(field, "place"))
 				{
@@ -532,7 +423,7 @@ import_dir(Game* game, char* dirname)
 						load_place(game, element->value);
 					else
 						fprintf(stderr,
-							"Item is not a list of keys and values.\n");
+							"Place is not a list of keys and values.\n");
 				}
 				else if (!strcmp(field, "recipe"))
 				{
@@ -567,55 +458,6 @@ import_dir(Game* game, char* dirname)
 }
 
 /**
- * Makes an Attack* usable in-game.
- *
- * Strings representing statuses are converted into pointers.
- */
-static void
-update_attack(Game* game, Attack* attack)
-{
-	List* list;
-
-	if (attack->inflicts_status_name)
-	{
-		attack->inflicts_status =
-			get_status_by_name(game->statuses,
-				attack->inflicts_status_name);
-
-		if (!attack->inflicts_status)
-		{
-			fprintf(stderr, "[Attack:%s] Inflicts unknown status: %s!\n",
-				attack->name, attack->inflicts_status_name);
-		}
-	}
-
-	if (attack->self_inflicts_status_name)
-	{
-		attack->self_inflicts_status =
-			get_status_by_name(game->statuses,
-				attack->self_inflicts_status_name);
-
-		if (!attack->self_inflicts_status)
-		{
-			fprintf(stderr, "[Attack:%s] Self inflicts unknown status: %s!\n",
-				attack->name, attack->self_inflicts_status_name);
-		}
-	}
-
-	for (list = attack->cures_status_names; list; list = list->next)
-	{
-		char* name = list->data;
-		Status* status = get_status_by_name(game->statuses, name);
-
-		if (status)
-			list_add(&attack->cures_statuses, status);
-		else
-			fprintf(stderr, "[Attack:%s] Cures unknown status: %s\n",
-				attack->name, name);
-	}
-}
-
-/**
  * Loads the game’s data in two stages.
  *
  * The first stage is about reading files and storing their data in the
@@ -636,291 +478,25 @@ load_game(Game* game, char* dirname)
 	import_dir(game, dirname);
 
 	/* Phase 2 */
-	/* FIXME: Put somewhere else? */
+	/* Updating game structures’ content and making sure that content is
+	 * consistent. */
 
 	/* Items-related updates. */
 	for (l = game->classes; l; l = l->next)
-	{
-		Class* class = l->data;
-		List* l2;
+		parser_load_class(game, (Class*) l->data);
 
-		for (l2 = class->drop; l2; l2 = l2->next)
-		{
-			Drop* drop = l2->data;
-
-			drop->item = get_item_by_name(game->items, drop->item_name);
-
-			if (!drop->item)
-			{
-				fprintf(stderr,
-					"Item “%s” does not exist!\n", drop->item_name);
-
-				exit(0);
-			}
-
-			free(drop->item_name);
-		}
-	}
-
-	/* Attacks-related updates. */
-	for (l = game->classes; l; l = l->next)
-	{
-		Class* class = l->data;
-		List* sl;
-
-		for (sl = class->attacks; sl; sl = sl->next)
-		{
-			Attack* attack = sl->data;
-
-			update_attack(game, attack);
-		}
-	}
-
-	/* Exactly the same code as above, but the Classes are being replaced
-	 * by Items… */
 	for (l = game->items; l; l = l->next)
-	{
-		Item* item = l->data;
-		List* sl;
+		parser_load_item(game, (Item*) l->data);
 
-		for (sl = item->attacks; sl; sl = sl->next)
-		{
-			Attack* attack = sl->data;
-
-			update_attack(game, attack);
-		}
-	}
-
-	/* Places-related updates. And tons of them. */
 	for (l = game->places; l; l = l->next)
-	{
-		Place* place = l->data;
-		List* sl;
-		List* next;
-		List** prev;
-
-		prev = &place->destinations;
-		for (sl = place->destinations; sl; sl = next)
-		{
-			Destination* dest;
-			Place* place;
-
-			next = sl->next;
-
-			dest = sl->data;
-			if (!strcmp(dest->name, ((Place*) l->data)->name))
-			{
-				*prev = sl->next;
-
-				free(dest->name);
-				free(dest);
-
-				continue;
-			}
-
-			place = get_place_by_name(game->places, dest->name);
-
-			if (place)
-			{
-				List* ssl;
-
-				dest->place = place;
-
-				for (ssl = dest->condition.items; ssl; ssl = ssl->next)
-				{
-					char* name;
-					Item* item;
-
-					name = ssl->data;
-					item = get_item_by_name(game->items, name);
-
-					if (item)
-					{
-						ssl->data = item;
-						free(name);
-					}
-					else
-					{
-						fprintf(stderr, "Unknown item: %s\n", name);
-						exit(1);
-					}
-				}
-			}
-			else
-			{
-				fprintf(stderr, "Unknown place: %s\n", dest->name);
-				exit(1);
-			}
-
-			prev = &sl->next;
-		}
-
-		for (sl = place->skill_drops; sl; sl = sl->next)
-		{
-			char* name;
-			SkillDrops* sd = sl->data;
-
-			name = (char*) sd->skill;
-
-			sd->skill = get_skill_by_name(game->skills, name);
-
-			if (sd->skill)
-			{
-				List* ssl;
-
-				for (ssl = sd->drops; ssl; ssl = ssl->next)
-				{
-					char* name;
-					Drop* drop;
-					Item* item;
-
-					drop = ssl->data;
-					name = (char*) drop->item_name;
-					item = get_item_by_name(game->items, name);
-
-					if (item)
-						drop->item = item;
-					else
-					{
-						fprintf(stderr, "[Place/%s] Undefined item: %s.\n",
-							place->name, name);
-						exit(1);
-					}
-				}
-			}
-			else
-			{
-				fprintf(stderr, "[Place/%s] Undefined skill: %s.\n",
-					place->name, name);
-				exit(1);
-			}
-		}
-
-		for (sl = place->shop_item_names; sl; sl = sl->next)
-		{
-			char* name = sl->data;
-			Item* item = get_item_by_name(game->items, name);
-
-			if (item)
-				list_add(&place->shop_items, item);
-			else
-				fprintf(stderr, "[Place:%s/Shop Items] Unknown item: %s.\n",
-					place->name, name);
-		}
-
-		for (sl = place->random_enemies; sl; sl = sl->next)
-		{
-			RandomEnemy* r = sl->data;
-			char* name = (char*) r->class;
-			Class* class = get_class_by_name(game->classes, name);
-
-			if (class)
-			{
-				r->class = class;
-
-				free(name);
-			}
-			else
-			{
-				fprintf(stderr, "[Place:%s/Enemies] Unknown class: %s.\n",
-					place->name, name);
-
-				free(name);
-
-				exit(0);
-			}
-				
-		}
-	}
+		parser_load_place(game, (Place*) l->data);
 
 	for (l = game->recipes; l; l = l->next)
-	{
-		Recipe* recipe = l->data;
-		List* sl;
-
-		recipe->output = get_item_by_name(game->items, (char*) recipe->output);
-
-		if (!recipe->output)
-		{
-			fprintf(stderr,
-				"[Recipe:??] Item “%s” does not exist!\n", (char*) recipe->output);
-
-			exit(1);
-		}
-
-		if (recipe->skill)
-		{
-			char* name = (char*) recipe->skill;
-
-			if (!(recipe->skill = get_skill_by_name(game->skills, name)))
-			{
-				fprintf(stderr, "[Recipe/%s] Undefined skill: %s.\n",
-					recipe->output->name, name);
-				exit(1);
-			}
-		}
-
-		for (sl = recipe->ingredients; sl; sl = sl->next)
-		{
-			Ingredient* ig = sl->data;
-			Item* item = get_item_by_name(game->items, (char*) ig->item);
-
-			if (item)
-				ig->item = item;
-			else
-			{
-				fprintf(stderr, "[Recipe:%s] Unknown item: %s\n",
-					recipe->output->name, (char*) ig->item);
-
-				exit(1);
-			}
-		}
-	}
+		parser_load_recipe(game, (Recipe*) l->data);
 
 	/* Most important thing of any RPG. \o/ */
 	for (l = game->events; l; l = l->next)
-	{
-		Event* event = l->data;
-
-		if (event->type == EVENT_CONDITION)
-		{
-			ConditionEvent* e = (ConditionEvent*) event;
-			List* sl;
-			ItemStack* stack;
-
-			for (sl = e->condition.items; sl; sl = sl->next)
-			{
-				char* name;
-
-				stack = sl->data;
-				name = (char*) stack->item;
-
-				stack->item = get_item_by_name(game->items, name);
-
-				if (!stack->item)
-				{
-					fprintf(stderr, "Non-existent item: %s\n", name);
-
-					exit(1);
-				}
-			}
-		}
-		else if (event->type == EVENT_GIVE_ITEM ||
-		         event->type == EVENT_REMOVE_ITEM)
-		{
-			GiveItemEvent* e = (GiveItemEvent*) event;
-			char* name = (char*) e->item;
-
-			e->item = get_item_by_name(game->items, name);
-
-			if (!e->item)
-			{
-				fprintf(stderr, "Non-existent item: %s\n", name);
-
-				exit(1);
-			}
-		}
-	}
+		parser_load_event(game, (Event*) l->data);
 }
 
 void

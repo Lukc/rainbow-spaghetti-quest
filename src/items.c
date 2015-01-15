@@ -12,6 +12,8 @@
 
 #include "parser.h"
 
+#include "parser/attack.h"
+
 static int
 check_type_resistance(Item* item, ParserElement* element, Logs* logs)
 {
@@ -113,7 +115,7 @@ load_item(Game* game, List* list)
 		else if (!strcmp(field, "max mana"))
 			item->mana_bonus = parser_get_integer(element, logs);
 		else if (!strcmp(field, "on use"))
-			item->on_use = parser_get_attack(element, logs);
+			item->on_use = parser_get_attack(element);
 		else if (!strcmp(field, "slot"))
 		{
 			char* slot = parser_get_string(element, logs);
@@ -123,7 +125,7 @@ load_item(Game* game, List* list)
 		}
 		else if (!strcmp(field, "attack"))
 		{
-			Attack* attack = parser_get_attack(element, logs);
+			Attack* attack = parser_get_attack(element);
 
 			if (attack)
 				list_add(&item->attacks, (void*) attack);
