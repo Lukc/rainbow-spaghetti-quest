@@ -15,6 +15,9 @@
 #include "characters.h"
 #include "list.h"
 
+#include "events/condition.h"
+#include "events/items.h"
+
 /**
  * Opens and reads a file and returns a List* of ParserElement* representing
  * the content of the file, assuming it was a valid Spaghetti Quest file.
