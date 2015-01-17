@@ -14,7 +14,7 @@ ai_action(Game* game, Logs* logs)
 	Entity* player;
 	Entity* enemy;
 	List* available_attacks;
-	Attack* selected_attack;
+	AttackData* selected_attack;
 	char* log;
 
 	player = game->player;
@@ -24,8 +24,8 @@ ai_action(Game* game, Logs* logs)
 	{
 		available_attacks = get_all_attacks(enemy);
 		selected_attack = list_nth(
-			available_attacks,
-			rand() % list_size(available_attacks));
+			enemy->attacks,
+			rand() % list_size(enemy->attacks));
 
 		if (can_use_attack(enemy, selected_attack))
 		{
@@ -33,13 +33,13 @@ ai_action(Game* game, Logs* logs)
 			snprintf(log, 128,
 				BRIGHT WHITE "%s used “%s”",
 				enemy->name,
-				selected_attack->name
+				selected_attack->attack->name
 			);
 			logs_add(logs, log);
 
 			attack(
 				enemy,
-				selected_attack,
+				selected_attack->attack,
 				player,
 				logs
 			);

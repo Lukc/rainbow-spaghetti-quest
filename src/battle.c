@@ -58,7 +58,7 @@ loot_screen(List* list)
 
 /**
  * Prints the attacks’ selection menu of the battle interface.
- * @param list: The List* of Attack* to display.
+ * @param list: The List* of AttackData* to display.
  */
 static void
 print_attacks(Entity* player, List* list, int selection)
@@ -73,105 +73,33 @@ print_attacks(Entity* player, List* list, int selection)
 
 	for (i = 0; i < 5; i++)
 	{
-		Attack* attack = NULL;
-		
+		AttackData* ad;
+		Attack* attack;
+
 		if (list)
 		{
-			int mana_cost;
-			char* name;
-
-			attack = list->data;
-
-			mana_cost = get_mana_cost(player, attack);
-
-			if (attack->name)
-				name = strdup(attack->name);
-			else
-				name = strdup(type_to_attack_name(attack->type));
-
-			if (strlen(name) > 13)
-				name[14] = '\0';
-
-			if (i == selection % 5)
-			{
-				bg(4, 4, 4);
-
-				if (-mana_cost > player->mana)
-					fg(5, 5, 5);
-				else
-					fg(0, 0, 0);
-			}
-			else
-			{
-				if (-mana_cost > player->mana)
-					fg(1, 1, 1);
-				else
-					fg(4, 4, 4);
-			}
-
-
-			/* name   damage-strikes damage_type */
-			/*  ... OR ...  */
-			/* name */
-			if (attack->strikes)
-			{
-				char string[128];
-				char damage_string[7];
-				size_t len;
-
-				snprintf(string, 128, " %-20s", attack->name);
-
-				len = snprintf(damage_string, 7, "%i-%i",
-					attack->damage + get_attack_bonus(player), attack->strikes
-				);
-
-				string[21 - len] = ' ';
-				snprintf(string + 22 - len, 128 - 22 + len,
-					"%s", damage_string);
-
-				printf("%s %-10s" NOCOLOR,
-					string, type_to_string(attack->type));
-			}
-			else
-			{
-				printf(" %-14s   ", name);
-
-				if (attack->health)
-				{
-					if (attack->health > 0)
-						printf(BRIGHT GREEN);
-					else
-						printf(BRIGHT RED);
-					
-					printf("%+3iHP %-9s" NOCOLOR,
-						attack->health, "");
-				}
-				else
-					printf("%15s" NOCOLOR, "");
-			}
+			ad = list->data;
+			attack = ad->attack;
 
 			if (i == selection % 5)
 			{
 				bg(4, 4, 4);
 				fg(1, 1, 1);
 			}
+			else
+				fg(4, 4, 4);
 
-			if (mana_cost < attack->mana)
-				printf("%s", RED);
-			else if (mana_cost > 0) /* Uh uh, not really a cost, uh? */
-				printf("%s", BLUE);
-
-			printf(" %+3iMP", mana_cost);
+			/* FIXME: Add a cost string. */
+			printf(" %-37s ", attack->name);
 
 			printf("\n" NOCOLOR);
-
-			free(name);
 
 			list = list->next;
 		}
 		else
 		{
-			printf(BLACK " ------------ \n" NOCOLOR);
+			fg(1, 1, 1);
+			printf(" ------------ \n" NOCOLOR);
 		}
 	}
 }
@@ -198,7 +126,6 @@ print_items_menu(Entity* player, int selection)
 			if (i == selection)
 			{
 				bg(4, 4, 4);
-				fg(0, 0, 0);
 			}
 
 			if ((item = player->inventory[i].item))
@@ -207,6 +134,8 @@ print_items_menu(Entity* player, int selection)
 				{
 					if (item->consumable)
 						printf(GREEN);
+					else
+						printf(BLUE);
 				}
 				else
 				{
@@ -226,6 +155,7 @@ print_items_menu(Entity* player, int selection)
 			{
 				int j;
 
+				fg(1, 1, 1);
 				printf(" ");
 				for (j = 0; j < 37; j++)
 					printf("-");
@@ -243,10 +173,12 @@ print_battle_logs(Game* game, Logs* logs)
 	List* list;
 	int i;
 
+	/*
 	print_entity_basestats(game->player);
-	printf(BRIGHT RED "\n -- " WHITE "versus" RED " --\n\n" NOCOLOR);
+	printf(BRIGHT RED " -- " WHITE "versus" RED " --\n" NOCOLOR);
+	*/
 	print_entity_basestats(game->enemy);
-	printf("\n");
+	menu_separator();
 
 	if (logs)
 		list = logs->head;
@@ -273,6 +205,26 @@ print_battle_logs(Game* game, Logs* logs)
 	}
 }
 
+static void
+print_attack_stats(AttackData* ad)
+{
+	int i;
+	Attack* attack = ad->attack;
+
+	for (i = 0; i < 4; i++)
+		printf("\n");
+
+	menu_separator();
+
+	printf("%80s", "");
+	move(0);
+	printf(" %i-%i x %i", attack->damage, attack->damage, attack->strikes);
+	move(18);
+	printf("%s", type_to_string(attack->type));
+
+	printf("\n");
+}
+
 #define ATTACKS 0
 #define ITEMS 1
 
@@ -288,7 +240,6 @@ battle(Game *game)
 	char info[128];
 	Entity *player = game->player;
 	Entity *enemy = game->enemy;
-	List* player_attacks;
 	List* list;
 	int view = LOGS;
 	int menu = ATTACKS; /* Whether the player is choosing an attack or item. */
@@ -307,8 +258,6 @@ battle(Game *game)
 		if (!isexit(input))
 		{
 			info[0] = '\0';
-
-			player_attacks = get_all_attacks(player);
 
 			back_to_top();
 
@@ -347,7 +296,7 @@ battle(Game *game)
 				case KEY_DOWN:
 					if (menu == ATTACKS)
 						attack_index =
-							attack_index < list_size(player_attacks) - 1 ?
+							attack_index < list_size(player->attacks) - 1 ?
 								attack_index + 1 : attack_index;
 					else
 						item_index = item_index < INVENTORY_SIZE - 1 ?
@@ -358,13 +307,16 @@ battle(Game *game)
 
 					if (menu == ATTACKS)
 					{
-						Attack* attack =
-							list_nth(player_attacks, attack_index);
+						AttackData* ad;
+						Attack* attack;
+						
+						ad = list_nth(player->attacks, attack_index);
+						attack = ad->attack;
 
-						if (!can_use_attack(player, attack))
+						if (!can_use_attack(player, ad))
 						{
 							snprintf(info, 128,
-								BRIGHT RED " >> " WHITE "Not enough mana...");
+								BRIGHT RED " >> " WHITE "Not enough mana/health or cooldown issue...");
 						}
 						else
 						{
@@ -428,7 +380,11 @@ battle(Game *game)
 			back(16);
 
 			if (view == LOGS)
+			{
 				print_battle_logs(game, logs);
+
+				print_attack_stats(list_nth(player->attacks, attack_index));
+			}
 			else if (view == ENEMY)
 				print_entity(game->enemy);
 			else if (view == PLAYER)
@@ -484,7 +440,7 @@ battle(Game *game)
 			{
 				/* The battle continues! o/ */
 				if (menu == ATTACKS)
-					print_attacks(player, player_attacks, attack_index);
+					print_attacks(player, player->attacks, attack_index);
 				else if (menu == ITEMS)
 					print_items_menu(player, item_index);
 
@@ -513,8 +469,13 @@ battle(Game *game)
 
 				move(40);
 				printf("%40s\n", "");
+
 				move(40);
-				printf("%40s\n", "");
+				printf("%40s", "");
+				move(40);
+				printf("    %i/%iHP", player->health, get_max_health(player));
+				move(60);
+				printf("    %i/%iMP\n", player->mana, get_max_mana(player));
 			}
 
 			menu_separator();
@@ -577,6 +538,30 @@ get_random_enemy(List* list)
 }
 
 void
+prepare_for_battle(Entity* e)
+{
+	List* attacks;
+	AttackData* ad;
+
+	e->attacks = NULL;
+	attacks = list_rev_and_free(get_all_attacks(e));
+
+	for (; attacks; attacks = attacks->next)
+	{
+		Attack* attack = attacks->data;
+
+		ad = malloc(sizeof(*ad));
+
+		ad->attack = attack;
+		ad->cooldown = 0;
+
+		list_add(&e->attacks, ad);
+	}
+
+	list_free(attacks, NULL);
+}
+
+void
 enter_battle(Game* game)
 {
 	Class* enemy_class = NULL;
@@ -596,6 +581,9 @@ enter_battle(Game* game)
 		return;
 
 	init_entity_from_class(enemy, enemy_class);
+
+	prepare_for_battle(player);
+	prepare_for_battle(enemy);
 
 	if ((result = battle(game)) == 1)
 	{

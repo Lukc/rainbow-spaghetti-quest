@@ -20,6 +20,10 @@ typedef struct Attack {
 	int damage;
 	int strikes;
 
+	/* Number of turns you’ll have to wait ’till the attack becomes available
+	 * again. */
+	int cooldown;
+
 	/* Statuses inflicted to the user or its adversary. */
 	struct Status* inflicts_status;
 	struct Status* self_inflicts_status;
@@ -32,6 +36,11 @@ typedef struct Attack {
 	char* self_inflicts_status_name;
 	List* cures_status_names; /* List of char* */
 } Attack;
+
+typedef struct {
+	Attack* attack;
+	int cooldown;
+} AttackData;
 
 void free_attack(Attack*);
 

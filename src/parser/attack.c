@@ -83,6 +83,8 @@ parser_get_attack(ParserElement* element)
 				attack->damage = parser_get_integer(element, NULL);
 			else if (!strcmp(element->name, "strikes"))
 				attack->strikes = parser_get_integer(element, NULL);
+			else if (!strcmp(element->name, "cooldown"))
+				attack->cooldown = parser_get_integer(element, NULL);
 			else if (!strcmp(element->name, "name"))
 				attack->name = parser_get_string(element, NULL);
 			else if (!strcmp(element->name, "cures"))

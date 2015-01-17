@@ -36,6 +36,9 @@ typedef struct Entity {
 
 	Item* equipment[EQ_MAX];
 	ItemStack inventory[INVENTORY_SIZE];
+
+	/* Data sensible only during battles. */
+	List* attacks; /* List* of AttackData* */
 } Entity;
 
 int get_max_mana(Entity*);

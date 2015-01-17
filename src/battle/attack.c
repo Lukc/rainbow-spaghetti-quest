@@ -14,9 +14,14 @@
  * Checks whether someone has enough mana to use an attack or not.
  */
 int
-can_use_attack(Entity* attacker, Attack* attack)
+can_use_attack(Entity* attacker, AttackData* ad)
 {
-	return attacker->mana + get_mana_cost(attacker, attack) >= 0;
+	Attack* attack = ad->attack;
+
+	return
+		attacker->mana + get_mana_cost(attacker, attack) >= 0 &&
+		attacker->health + attack->health >= 0 &&
+		ad->cooldown == 0;
 }
 
 /**

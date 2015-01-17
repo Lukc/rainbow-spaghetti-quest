@@ -6,7 +6,7 @@
 #include "../commands.h"
 #include "../attack.h"
 
-int can_use_attack(Entity*, Attack*);
+int can_use_attack(Entity*, AttackData*);
 
 void attack(Entity*, Attack*, Entity*, Logs*);
 Logs* command_attack(Game*, Attack*);
