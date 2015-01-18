@@ -10,6 +10,8 @@
 #include "parser/drop.h"
 #include "parser/attack.h"
 
+#include "events.h"
+
 static int
 check_type_resistance(Class* class, ParserElement* element, Logs* logs)
 {
@@ -92,6 +94,14 @@ load_class(Game* game, List* list)
 		}
 		else if (check_type_resistance(class, element, logs))
 			;
+		else if (!strcmp(field, "start turn events"))
+		{
+			if (element->type == PARSER_LIST)
+				load_events(game, &class->start_turn_events, element->value);
+			else
+				fprintf(stderr, "<%s:%i> “Start Turn Events” is not a list.\n",
+					element->filename, element->lineno);
+		}
 		else
 		{
 			char* log = (char*) malloc(sizeof(char) * 128);

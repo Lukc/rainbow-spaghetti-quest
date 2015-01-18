@@ -51,7 +51,7 @@ load_set_variable_event(ParserElement* element)
 	}
 	else
 	{
-		fprintf(stderr, "[:%i] “Set Variable” with no Name field.\n",
+		fprintf(stderr, "[:%i] “Set Variable” with no “Variable” field.\n",
 			element->lineno);
 
 		return NULL;

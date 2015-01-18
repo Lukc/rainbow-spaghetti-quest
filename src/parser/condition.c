@@ -25,7 +25,26 @@ parser_load_condition(Game* game, Condition* condition)
 		}
 		else
 		{
-			fprintf(stderr, "Unknown item: %s\n", name);
+			fprintf(stderr, "Unknown item: %s.\n", name);
+			exit(1);
+		}
+	}
+
+	for (l = condition->has_statuses; l; l = l->next)
+	{
+		Status* status;
+		char* name = l->data;
+
+		status = get_status_by_name(game->statuses, name);
+
+		if (status)
+		{
+			l->data = status;
+			free(name);
+		}
+		else
+		{
+			fprintf(stderr, "Unknown status: %s.\n", name);
 			exit(1);
 		}
 	}

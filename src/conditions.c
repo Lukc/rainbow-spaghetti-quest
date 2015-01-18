@@ -4,6 +4,8 @@
 
 #include "conditions.h"
 #include "parser.h"
+#include "items.h"
+#include "statuses.h"
 
 int
 condition_check(Game* game, Condition* c)
@@ -16,6 +18,14 @@ condition_check(Game* game, Condition* c)
 		ItemStack* stack = l->data;
 
 		if (get_count_from_inventory(game->player->inventory, stack->item) < stack->quantity)
+			failed = 1;
+	}
+
+	for (l = c->has_statuses; l && !failed; l = l->next)
+	{
+		Status* status = l->data;
+
+		if (!has_status(game->player, status))
 			failed = 1;
 	}
 
@@ -82,6 +92,8 @@ void
 load_condition(Condition* condition, List* elements)
 {
 	ParserElement* e;
+
+	memset(condition, 0, sizeof(*condition));
 
 	for (; elements; elements = elements->next)
 	{
@@ -213,6 +225,8 @@ load_condition(Condition* condition, List* elements)
 
 			list_add(&condition->items, is);
 		}
+		else if (!strcmp(e->name, "has status"))
+			list_add(&condition->has_statuses, parser_get_string(e, NULL));
 		else
 			fprintf(stderr, "[:%i] Unrecognized field: %s.\n",
 				e->lineno, e->name);

@@ -12,6 +12,7 @@
 #include "colors.h"
 #include "term.h"
 #include "entities.h"
+#include "events.h"
 
 #include "battle/attack.h"
 #include "battle/focus.h"
@@ -465,6 +466,9 @@ battle(Game *game)
 						BRIGHT RED " >> " WHITE "Unrecognized key..."
 					);
 			}
+
+			if (enemy->class->start_turn_events)
+				fire_events(game, enemy->class->start_turn_events);
 
 			for (i = 0; i < 16; i++)
 			{

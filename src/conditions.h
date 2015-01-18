@@ -27,6 +27,7 @@ typedef struct {
 typedef struct {
 	List* items; /* List* of ItemStack* */
 	List* variables; /* List* of VariableCondition* */
+	List* has_statuses; /* List* of Status* */
 } Condition;
 
 int condition_check(Game*, Condition*);

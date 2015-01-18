@@ -24,6 +24,11 @@ typedef struct Class {
 	/* Random loot for random mobs. */
 	List* drop;
 
+	/* Events to call during battles. */
+	/* All of them are List* of Event* */
+	List* start_turn_events;
+	List* end_battle_events;
+
 	int health_regen_on_focus;
 	int mana_regen_on_focus;
 } Class;

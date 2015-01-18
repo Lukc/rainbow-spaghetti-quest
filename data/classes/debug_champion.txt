@@ -6,6 +6,7 @@ Class: [
 	Health on focus: 256
 	Attack bonus: 5
 	Defense bonus: 5
+
 	Attack: [
 		Name: Sword Slash
 		Type: slashing
@@ -51,10 +52,43 @@ Class: [
 		Cures: poison
 		Cooldown: 4
 	]
+
 	Arcane Resistance: 50
 	Fire Resistance: 50
 	Cold Resistance: 20
 	# Well... it gotta have some weakness, right?
 	Poison Resistance: -80
 	Gold on kill: 8000
+
+	Start Turn Events: [
+		Condition: [
+			If: [
+				Variable: [
+					Name: seen confusion
+					Not equals: 1
+				]
+				# Has Status is always related to the player and can only be
+				# true during battle.
+				Has Status: confusion
+			]
+			Then: [
+				Set Variable: [
+					Variable: seen confusion
+					Value: 1
+				]
+				Message: [
+					Text: Oh oh oh, someone’s been confused, here!
+				]
+				Message: [
+					Text: Confusion doubles the mana cost of any of your attacks that requires mana!
+				]
+				Message: [
+					Text: Hopefully, most amulets are able to cure it.
+				]
+				Message: [
+					Text: You should try to do that if you don’t want your mana reserves to melt like ice in a volcano.
+				]
+			]
+		]
+	]
 ]
