@@ -1,0 +1,12 @@
+Item: [
+	Name: Debug Shield
+	Slot: shield
+	Max health: 12
+	Defense bonus: 3
+	Attack: [
+		Name: Bash
+		Strikes: 1
+		Damage: 14
+		Inflicts: confusion
+	]
+]

@@ -27,8 +27,10 @@ ai_action(Game* game, Logs* logs)
 			enemy->attacks,
 			rand() % list_size(enemy->attacks));
 
-		if (can_use_attack(enemy, selected_attack))
+		if (can_use_attack(enemy, selected_attack) > 0)
 		{
+			begin_turn(enemy, logs);
+
 			log = (char*) malloc(sizeof(char) * 128);
 			snprintf(log, 128,
 				BRIGHT WHITE "%s used “%s”",

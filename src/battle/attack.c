@@ -12,16 +12,26 @@
 
 /**
  * Checks whether someone has enough mana to use an attack or not.
+ *
+ * @return 1 if the attack can be used.
+ * @return < 0 if the attack cannot be used.
+ *   For the exact return values, see battle/attack.h
  */
 int
 can_use_attack(Entity* attacker, AttackData* ad)
 {
 	Attack* attack = ad->attack;
 
-	return
-		attacker->mana + get_mana_cost(attacker, attack) >= 0 &&
-		attacker->health + attack->health >= 0 &&
-		ad->cooldown == 0;
+	if (attacker->mana + get_mana_cost(attacker, attack) < 0)
+		return E_NO_MANA;
+
+	if (attacker->health + attack->health < 0)
+		return E_NO_HEALTH;
+
+	if (ad->cooldown > 0)
+		return E_COOLDOWN;
+
+	return 1;
 }
 
 /**
@@ -193,7 +203,7 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 }
 
 Logs*
-command_attack(Game* game, Attack* player_attack)
+command_attack(Game* game, AttackData* player_attack)
 {
 	Entity* player;
 	Entity* enemy;
@@ -205,15 +215,19 @@ command_attack(Game* game, Attack* player_attack)
 	player = game->player;
 	enemy = game->enemy;
 
+	begin_turn(game->player, logs);
+
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(log, 128,
 		BRIGHT WHITE "%s uses “%s”",
 		player->name,
-		player_attack->name
+		player_attack->attack->name
 	);
 	logs_add(logs, log);
 
-	attack(player, player_attack, enemy, logs);
+	attack(player, player_attack->attack, enemy, logs);
+
+	player_attack->cooldown = player_attack->attack->cooldown;
 
 	if (enemy->health <= 0)
 	{

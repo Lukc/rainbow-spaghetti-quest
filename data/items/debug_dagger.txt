@@ -1,0 +1,20 @@
+Item: [
+	Name: Debug Dagger
+	Slot: ranged weapon
+	Attack bonus: 3
+	Attack: [
+		Name: Dagger
+		Damage: 5
+		Strikes: 4
+		Type: slashing
+		Mana: 0
+	]
+	Attack: [
+		Name: Poisonous Dagger
+		Damage: 5
+		Strikes: 3
+		Type: poison
+		Inflicts: poison
+		Mana: -1
+	]
+]

@@ -1,0 +1,60 @@
+Class: [
+	Name: Debug Champion
+	Health: 4000
+	Mana: 40
+	Mana on focus: 8
+	Health on focus: 256
+	Attack bonus: 5
+	Defense bonus: 5
+	Attack: [
+		Name: Sword Slash
+		Type: slashing
+		Damage: 7
+		Strikes: 4
+		Cures: bleeding
+		Cooldown: 2
+	]
+	Attack: [
+		Name: Quick Sword Slash
+		Type: slashing
+		Damage: 5
+		Strikes: 7
+		Cures: bleeding
+		Cooldown: 1
+	]
+	Attack: [
+		Name: Troll
+		Type: arcane
+		Damage: 5
+		Strikes: 7
+		Mana: -4
+		Inflicts: confusion
+		Cures: confusion
+		Cures: poison
+	]
+	Attack: [
+		Name: Flame
+		Type: fire
+		Damage: 9
+		Strikes: 3
+		Mana: -5
+		Inflicts: burn
+		Cures: freeze
+	]
+	Attack: [
+		Name: Flame of the Strongest
+		Type: cold
+		Damage: 18
+		Strikes: 2
+		Mana: -8
+		Inflicts: freeze
+		Cures: poison
+		Cooldown: 4
+	]
+	Arcane Resistance: 50
+	Fire Resistance: 50
+	Cold Resistance: 20
+	# Well... it gotta have some weakness, right?
+	Poison Resistance: -80
+	Gold on kill: 8000
+]

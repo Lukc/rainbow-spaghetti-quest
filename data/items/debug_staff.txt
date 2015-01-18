@@ -1,34 +1,36 @@
 Item: [
 	Name: Debug Staff
-	Attack bonus: 1
+	Slot: weapon
+	Attack bonus: 3
 	Attack: [
 		Name: Needles
 		Damage: 0
-		Strikes: 8
+		Strikes: 10
 		Type: piercing
 		Mana: -2
+		Inflicts: bleeding
 	]
 	Attack: [
 		Name: Flame
-		Damage: 6
-		Strikes: 3
+		Damage: 10
+		Strikes: 4
 		Type: fire
+		Mana: -2
+		Inflicts: burn
+	]
+	Attack: [
+		Name: Thunder
+		Type: electric
+		Damage: 32
+		Strikes: 1
 		Mana: -2
 	]
 	Attack: [
 		Name: Troll Trance
 		Type: arcane
-		Mana: 5
-		Health: -10
+		Mana: 12
+		Health: -12
 		Self inflicts: troll trance
+		Cures: confusion
 	]
-	Attack: [
-		Name: Insta-kill
-		Type: electric
-		Damage: 666
-		Strikes: 42
-		Mana: 0
-	]
-	Price: 320
-	Slot: weapon
 ]

@@ -65,6 +65,7 @@ print_attacks(Entity* player, List* list, int selection)
 {
 	int i;
 	int begin;
+	int can_use;
 
 	begin = selection - selection % 5;
 
@@ -81,16 +82,33 @@ print_attacks(Entity* player, List* list, int selection)
 			ad = list->data;
 			attack = ad->attack;
 
+			can_use = can_use_attack(player, ad);
+
 			if (i == selection % 5)
 			{
 				bg(4, 4, 4);
-				fg(1, 1, 1);
+				printf(BLACK);
 			}
 			else
-				fg(4, 4, 4);
+			{
+				if (can_use > 0)
+					printf(WHITE);
+				else
+					fg(1, 1, 1);
+			}
 
-			/* FIXME: Add a cost string. */
 			printf(" %-37s ", attack->name);
+
+			move(27);
+
+			if (can_use > 0)
+				printf(" -- READY --");
+			else if (can_use == E_COOLDOWN)
+				printf(" -- CDN %i --", ad->cooldown);
+			else if (can_use == E_NO_MANA)
+				printf(" -- NO MP --");
+			else if (can_use == E_NO_HEALTH)
+				printf(" -- NO HP --");
 
 			printf("\n" NOCOLOR);
 
@@ -173,10 +191,8 @@ print_battle_logs(Game* game, Logs* logs)
 	List* list;
 	int i;
 
-	/*
 	print_entity_basestats(game->player);
-	printf(BRIGHT RED " -- " WHITE "versus" RED " --\n" NOCOLOR);
-	*/
+	printf("\n");
 	print_entity_basestats(game->enemy);
 	menu_separator();
 
@@ -206,21 +222,101 @@ print_battle_logs(Game* game, Logs* logs)
 }
 
 static void
-print_attack_stats(AttackData* ad)
+print_attack_stats(Attack* attack, Entity* player)
 {
-	int i;
-	Attack* attack = ad->attack;
-
-	for (i = 0; i < 4; i++)
-		printf("\n");
+	int first = 1;
 
 	menu_separator();
 
 	printf("%80s", "");
 	move(0);
-	printf(" %i-%i x %i", attack->damage, attack->damage, attack->strikes);
-	move(18);
-	printf("%s", type_to_string(attack->type));
+
+	if (attack->mana)
+	{
+		int mana = get_mana_cost(player, attack);
+		if (attack->mana > 0)
+			printf(BLUE);
+		else if (attack->mana < mana)
+			printf(RED);
+		else
+			printf(WHITE);
+
+		printf("%+iMP", mana);
+		printf(NOCOLOR);
+
+		first = 0;
+	}
+
+	if (attack->health)
+	{
+		if (first)
+			first = 0;
+		else
+			printf(", ");
+
+		if (attack->health > 0)
+			printf(GREEN);
+		else
+			printf(RED);
+
+		printf("%+iHP", attack->health);
+		printf(NOCOLOR);
+	}
+
+	if (attack->cooldown)
+	{
+		if (first)
+			first = 0;
+		else
+			printf(", ");
+
+		printf(WHITE);
+		printf("cooldown: %i", attack->cooldown);
+		printf(NOCOLOR);
+	}
+
+	if (attack->strikes)
+	{
+		if (first)
+			first = 0;
+		else
+			printf(", ");
+
+		printf(WHITE);
+		printf("(%i-%i)x%i", attack->damage, attack->damage, attack->strikes);
+		printf(" %s damage", type_to_string(attack->type));
+	}
+
+	if (attack->inflicts_status)
+	{
+		printf(NOCOLOR);
+		printf(", ");
+		printf(MAGENTA);
+		printf("inflicts %s", attack->inflicts_status->name);
+	}
+
+	if (attack->self_inflicts_status)
+	{
+		printf(NOCOLOR);
+		printf(", ");
+		printf(MAGENTA);
+		printf("self-inflicts %s", attack->self_inflicts_status->name);
+	}
+
+	if (attack->cures_statuses)
+	{
+		List* l;
+
+		for (l = attack->cures_statuses; l; l = l->next)
+		{
+			Status* status = l->data;
+
+			printf(NOCOLOR);
+			printf(", ");
+			printf(CYAN);
+			printf("cures %s", status->name);
+		}
+	}
 
 	printf("\n");
 }
@@ -313,7 +409,7 @@ battle(Game *game)
 						ad = list_nth(player->attacks, attack_index);
 						attack = ad->attack;
 
-						if (!can_use_attack(player, ad))
+						if (can_use_attack(player, ad) < 1)
 						{
 							snprintf(info, 128,
 								BRIGHT RED " >> " WHITE "Not enough mana/health or cooldown issue...");
@@ -323,7 +419,7 @@ battle(Game *game)
 							if (logs)
 								logs_free(logs);
 
-							logs = command_attack(game, attack);
+							logs = command_attack(game, ad);
 						}
 					}
 					else if (menu == ITEMS)
@@ -383,7 +479,26 @@ battle(Game *game)
 			{
 				print_battle_logs(game, logs);
 
-				print_attack_stats(list_nth(player->attacks, attack_index));
+				if (menu == ATTACKS)
+				{
+					AttackData* ad = list_nth(player->attacks, attack_index);
+					print_attack_stats(ad->attack, player);
+				}
+				else
+				{
+					Item* item = player->inventory[item_index].item;
+
+					if (item && is_item_usable(item))
+						print_attack_stats(
+							player->inventory[item_index].item->on_use,
+							player
+						);
+					else
+					{
+						menu_separator();
+						printf("%-80s\n", "Item cannot be used in battle.");
+					}
+				}
 			}
 			else if (view == ENEMY)
 				print_entity(game->enemy);

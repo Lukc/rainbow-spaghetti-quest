@@ -1,0 +1,6 @@
+Item: [
+	Name: Debug Helmet
+	Slot: ears
+	Attack bonus: 1
+	Defense bonus: 2
+]

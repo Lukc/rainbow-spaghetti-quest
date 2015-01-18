@@ -133,6 +133,8 @@ command_focus(Game* game)
 
 	logs = logs_new();
 
+	begin_turn(game->player, logs);
+
 	focus(game->player, logs);
 
 	end_turn(game->player, logs);

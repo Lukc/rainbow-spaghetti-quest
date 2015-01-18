@@ -32,6 +32,8 @@ command_use_item(Game* game, Entity* player, Item* item)
 
 	logs = logs_new();
 
+	begin_turn(game->player, logs);
+
 	use_item(player, item, game->enemy, logs);
 
 	end_turn(player, logs);

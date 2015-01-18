@@ -8,6 +8,21 @@
 #include "../commands.h"
 
 void
+begin_turn(Entity* e, Logs* logs)
+{
+	(void) logs;
+	List* l;
+
+	for (l = e->attacks; l; l = l->next)
+	{
+		AttackData* ad = l->data;
+
+		if (ad->cooldown > 0)
+			ad->cooldown -= 1;
+	}
+}
+
+void
 end_turn(Entity* e, Logs* logs)
 {
 	List* l;

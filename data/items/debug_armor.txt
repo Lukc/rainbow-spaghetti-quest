@@ -1,0 +1,13 @@
+Item: [
+	Name: Debug Armor
+	Slot: armor
+
+	Max health: 62
+	Defense bonus: 4
+	Attack bonus: 1
+
+	Arcane resistance: -25
+	Fire resistance: 25
+	Cold resistance: 25
+	Electric resistance: 25
+]

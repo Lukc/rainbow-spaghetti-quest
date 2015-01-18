@@ -311,18 +311,11 @@ print_entity_basestats(Entity* e)
 
 	if (e->statuses)
 	{
-		printf(WHITE "  <");
-	
-		if (e->statuses->next)
-			for (List* l = e->statuses; l; l = l->next)
-				printf("%c",
-					toupper(((StatusData*) l->data)->status->
-						affliction_name[0]));
-		else
-			printf("%s",
-				((StatusData*) e->statuses->data)->status->affliction_name);
-
-		printf(">" NOCOLOR);
+		for (List* l = e->statuses; l; l = l->next)
+		{
+			printf(" <%s>",
+				((StatusData*) l->data)->status->affliction_name);
+		}
 	}
 
 	printf("\n");

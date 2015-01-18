@@ -1,0 +1,17 @@
+Item: [
+	Name: Debug Amulet
+	Slot: amulet
+	Max mana: 22
+	Max health: 10
+	Mana on focus: 5
+	Health on focus: 28
+	Attack: [
+		Name: Curing Amulet
+		Mana: -8
+		Cures: poison
+		Cures: burn
+		Cures: freeze
+		Cures: confusion
+		Health: 20
+	]
+]

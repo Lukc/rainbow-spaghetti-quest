@@ -5,6 +5,8 @@ Place: [
 
 	@include felinopolis
 
+	Random Enemy: Debug Champion
+
 	Character: [
 		Name: Old Priest
 		Description: Always in the mood to answer questions.
