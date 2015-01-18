@@ -284,7 +284,7 @@ print_attack_stats(Attack* attack, Entity* player)
 			printf(", ");
 
 		printf(WHITE);
-		printf("(%i-%i)x%i", attack->damage, attack->damage, attack->strikes);
+		printf("(%i-%i)x%i", attack->damage.min, attack->damage.max, attack->strikes);
 		printf(" %s damage", type_to_string(attack->type));
 	}
 

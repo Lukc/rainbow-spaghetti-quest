@@ -296,8 +296,10 @@ print_attacks(Entity* e)
 
 		move(40);
 		if (attack->strikes)
-			printf(WHITE "    %i-%i  %s\n" NOCOLOR,
-				attack->damage + get_attack_bonus(e), attack->strikes,
+			printf(WHITE "    (%i-%i)x%i  %s\n" NOCOLOR,
+				attack->damage.min + get_attack_bonus(e),
+				attack->damage.max + get_attack_bonus(e),
+				attack->strikes,
 				type_to_string(attack->type));
 		else
 			printf(WHITE "    support attack\n" NOCOLOR);

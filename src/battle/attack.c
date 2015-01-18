@@ -41,6 +41,7 @@ can_use_attack(Entity* attacker, AttackData* ad)
 void
 attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 {
+	float random_modifier;
 	int strikes;
 	int damage_inflicted = 0;
 	int mana_cost;
@@ -93,25 +94,24 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 
 		type_modifier = get_type_resistance(defender, attack->type);
 
-		/* Calculating for a single strike */
+		random_modifier = (float) (rand() % 100) / 100;
+
 		damage_inflicted =
-			(int) (((get_attack_bonus(attacker) + attack->damage) *
-					(100. - type_modifier)) / 100.) -
-			get_defense_bonus(defender);
-
-		/* Taking care of negative damages... */
-		damage_inflicted = damage_inflicted < 0 ? 0 : damage_inflicted;
-
-		/* Taking the number of strikes into account now */
-		damage_inflicted = damage_inflicted * strikes;
+			(int) (
+				(get_attack_bonus(attacker) - get_defense_bonus(defender)
+				 + attack->damage.min + random_modifier *
+					(attack->damage.max - attack->damage.min)) *
+				(100 - type_modifier) / 100
+			) * strikes;
 
 		defender->health -= damage_inflicted;
 
 		snprintf(attack_string, 64,
-			RED " >>>" WHITE " %s " RED "-%iHP " WHITE "<%i-%i %s>",
+			RED " >>>" WHITE " %s " RED "-%iHP " WHITE "<(%i-%i)x%i %s>",
 			defender->name,
 			damage_inflicted,
-			get_attack_bonus(attacker) + attack->damage,
+			get_attack_bonus(attacker) + attack->damage.min,
+			get_attack_bonus(attacker) + attack->damage.max,
 			strikes, type_to_string(attack->type)
 		);
 	}

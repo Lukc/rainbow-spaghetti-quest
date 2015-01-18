@@ -4,7 +4,10 @@ Item: [
 	Attack bonus: 3
 	Attack: [
 		Name: Needles
-		Damage: 0
+		Damage: [
+			Min: 0
+			Max: 1
+		]
 		Strikes: 10
 		Type: piercing
 		Mana: -2
@@ -12,7 +15,10 @@ Item: [
 	]
 	Attack: [
 		Name: Flame
-		Damage: 10
+		Damage: [
+			Min: 9
+			Max: 11
+		]
 		Strikes: 4
 		Type: fire
 		Mana: -2
@@ -21,7 +27,10 @@ Item: [
 	Attack: [
 		Name: Thunder
 		Type: electric
-		Damage: 32
+		Damage: [
+			Min: 30
+			Max: 36
+		]
 		Strikes: 1
 		Mana: -2
 	]

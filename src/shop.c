@@ -42,8 +42,9 @@ print_item(Item* item)
 		Attack* attack = list->data;
 
 		if (attack->strikes > 0)
-			printf(BRIGHT WHITE "    provides a %i-%i %s attack\n" NOCOLOR,
-				attack->damage, attack->strikes, type_to_string(attack->type));
+			printf(BRIGHT WHITE "    provides a (%i-%i)x%i %s attack\n" NOCOLOR,
+				attack->damage.min, attack->damage.max, attack->strikes,
+				type_to_string(attack->type));
 		else
 			printf(BRIGHT WHITE "    provides a support attack\n" NOCOLOR);
 	}
@@ -57,9 +58,9 @@ print_item(Item* item)
 	{
 		if (item->on_use->strikes)
 		{
-			printf("    " WHITE "inflicts a %i-%i %s attack\n",
-				item->on_use->damage, item->on_use->strikes,
-				type_to_string(item->on_use->type));
+			printf("    " WHITE "inflicts a (%i-%i)x%i %s attack\n",
+				item->on_use->damage.min, item->on_use->damage.max,
+				item->on_use->strikes, type_to_string(item->on_use->type));
 		}
 
 		if (item->on_use->health)

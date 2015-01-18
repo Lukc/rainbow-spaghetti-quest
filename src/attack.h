@@ -17,7 +17,10 @@ typedef struct Attack {
 
 	/* Amount of damage per strike and number of strikes per use of the
 	 * Attack*. */
-	int damage;
+	struct {
+		int min;
+		int max;
+	} damage;
 	int strikes;
 
 	/* Number of turns you’ll have to wait ’till the attack becomes available

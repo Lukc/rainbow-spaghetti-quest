@@ -80,7 +80,38 @@ parser_get_attack(ParserElement* element)
 			element = list->data;
 
 			if (!strcmp(element->name, "damage"))
-				attack->damage = parser_get_integer(element, NULL);
+			{
+				if (element->type == PARSER_INTEGER)
+				{
+					attack->damage.min = parser_get_integer(element, NULL);
+					attack->damage.max = attack->damage.min;
+				}
+				else if (element->type == PARSER_LIST)
+				{
+					List* l;
+
+					for (l = element->value; l; l = l->next)
+					{
+						element = l->data;
+
+						if (!strcmp(element->name, "min"))
+							attack->damage.min = parser_get_integer(element, NULL);
+						else if (!strcmp(element->name, "max"))
+							attack->damage.max = parser_get_integer(element, NULL);
+						else
+							fprintf(stderr,
+								"<%s:%i> Damage field contains an unknown element: %s\n",
+								element->filename, element->lineno, element->name);
+					}
+				}
+				else
+				{
+					fprintf(stderr,
+						"<%s:%i> “damage” field is not an integer or a list.\n",
+						element->filename, element->lineno);
+					fprintf(stderr, " -> Attack will be useless.\n");
+				}
+			}
 			else if (!strcmp(element->name, "strikes"))
 				attack->strikes = parser_get_integer(element, NULL);
 			else if (!strcmp(element->name, "cooldown"))
