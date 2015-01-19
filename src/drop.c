@@ -19,13 +19,11 @@ give_drop(Entity* to, List* droplist)
 	List* out = NULL;
 	List* list;
 	Drop* drop;
-	Item* item;
 	int i;
 
 	for (list = droplist; list; list = list->next)
 	{
 		drop = list->data;
-		item = drop->item;
 
 		for (i = 0; i < drop->quantity; i++)
 			if (rand() % drop->rarity == 0)

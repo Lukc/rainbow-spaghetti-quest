@@ -10,8 +10,9 @@
 void
 begin_turn(Entity* e, Logs* logs)
 {
-	(void) logs;
 	List* l;
+
+	(void) logs;
 
 	for (l = e->attacks; l; l = l->next)
 	{

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "string.h"
 #include "parser.h"
 #include "statuses.h"
 

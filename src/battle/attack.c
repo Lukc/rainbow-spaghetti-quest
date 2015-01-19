@@ -7,6 +7,7 @@
 #include "mana_cost.h"
 #include "ai.h"
 
+#include "../string.h"
 #include "../colors.h"
 #include "../term.h"
 

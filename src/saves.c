@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 
+#include "string.h"
 #include "characters.h"
 #include "term.h"
 #include "game.h"

@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#include "string.h"
 #include "parser.h"
 #include "skills.h"
 #include "destinations.h"
@@ -54,7 +55,7 @@ parser_helper(FILE* f, char* filename, int* lineno, int has_parent)
 	int expecting = IDENTIFIER;
 	char buffer[4096];
 	int buffer_index = 0;
-	int c;
+	int c, i;
 
 	while ((c = getc(f)) > 0)
 	{
@@ -97,7 +98,7 @@ parser_helper(FILE* f, char* filename, int* lineno, int has_parent)
 				element->lineno = *lineno;
 				element->filename = strdup(filename);
 				element->name = strdup(buffer);
-				for (int i = 0; element->name[i]; i++)
+				for (i = 0; element->name[i]; i++)
 					element->name[i] = tolower(element->name[i]);
 
 				expecting = VALUE;
@@ -156,7 +157,7 @@ parser_helper(FILE* f, char* filename, int* lineno, int has_parent)
 							list = included;
 						}
 						else
-							; /* Empty include? Oh, well, whatever. */
+							{} /* Empty include? Oh, well, whatever. */
 					}
 					else
 					{

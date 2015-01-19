@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <dirent.h>
 
+#include "string.h"
 #include "images.h"
 #include "places.h"
 #include "items.h"

@@ -129,7 +129,6 @@ char*
 equip_item(Entity* player, Item* selected_item)
 {
 	int slot;
-	Item* old_item;
 	int i;
 
 	if (!selected_item)
@@ -138,7 +137,6 @@ equip_item(Entity* player, Item* selected_item)
 	if (get_count_from_inventory(player->inventory, selected_item) > 0)
 	{
 		slot = selected_item->slot;
-		old_item = player->equipment[slot];
 
 		for (i = 0; player->inventory[i].item != selected_item; i++)
 			;;

@@ -4,6 +4,8 @@
 
 #include "set_variable.h"
 
+#include "../string.h"
+
 Event*
 load_set_variable_event(ParserElement* element)
 {

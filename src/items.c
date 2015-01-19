@@ -71,7 +71,6 @@ get_slot(char* string, Logs* logs)
 void
 load_item(Game* game, List* list)
 {
-	List* temp;
 	ParserElement* element;
 	Item* item;
 	Logs* logs;
@@ -139,7 +138,6 @@ load_item(Game* game, List* list)
 			logs_add(logs, log);
 		}
 
-		temp = list;
 		list = list->next;
 	}
 

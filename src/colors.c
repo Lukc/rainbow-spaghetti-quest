@@ -2,7 +2,7 @@
 
 #include "colors.h"
 
-static inline int
+static int
 t256code(int r, int g, int b)
 {
 	r = r > 5 ? 5 : r;

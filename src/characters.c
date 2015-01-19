@@ -80,7 +80,6 @@ void
 quests(Game* game)
 {
 	int input = KEY_CLEAR;
-	char* log;
 	int i;
 	int selection = 0;
 	Place* location;
@@ -95,7 +94,6 @@ quests(Game* game)
 		switch (input)
 		{
 			case ' ':
-				log = NULL;
 			case KEY_CLEAR:
 				break;
 			case KEY_UP:

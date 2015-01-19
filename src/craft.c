@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 
+#include "string.h"
 #include "craft.h"
 #include "colors.h"
 #include "term.h"

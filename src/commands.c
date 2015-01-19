@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "commands.h"
+#include "string.h"
 #include "colors.h"
 
 Logs*
@@ -109,7 +110,7 @@ logs_print(Logs* l)
 
 	while (link)
 	{
-		printf("%s\n", link->data);
+		printf("%s\n", (char*) link->data);
 
 		link = link->next;
 	}

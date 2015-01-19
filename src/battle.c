@@ -215,7 +215,7 @@ print_battle_logs(Game* game, Logs* logs)
 		{
 			back(1);
 
-			printf("%s\n", list->data);
+			printf("%s\n", (char*) list->data);
 
 			list = list->next;
 		}
@@ -405,10 +405,8 @@ battle(Game *game)
 					if (menu == ATTACKS)
 					{
 						AttackData* ad;
-						Attack* attack;
 						
 						ad = list_nth(player->attacks, attack_index);
-						attack = ad->attack;
 
 						if (can_use_attack(player, ad) < 1)
 						{
@@ -685,12 +683,10 @@ enter_battle(Game* game)
 {
 	Class* enemy_class = NULL;
 	Entity* player, *enemy;
-	List* classes;
 	int result;
 
 	player = game->player;
 	enemy = game->enemy;
-	classes = game->classes;
 
 	if (game->location->random_enemies)
 		enemy_class =

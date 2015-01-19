@@ -81,7 +81,7 @@ fire_event(Game* game, Event* event)
 	else if (event->type == EVENT_SET_VARIABLE)
 		fire_set_variable_event(game, event);
 	else
-		; /* Broken event? We have nowhere to log it anyway… */
+		{} /* Broken event? We have nowhere to log it anyway… */
 }
 
 void

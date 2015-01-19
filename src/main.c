@@ -80,6 +80,8 @@ main(int argc, char* argv[])
 	int i;
 	Game game;
 
+	(void) argc; (void) argv;
+
 	memset(&game, 0, sizeof(game));
 
 	load_game(&game, "data");

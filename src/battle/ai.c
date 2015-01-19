@@ -13,7 +13,6 @@ ai_action(Game* game, Logs* logs)
 {
 	Entity* player;
 	Entity* enemy;
-	List* available_attacks;
 	AttackData* selected_attack;
 	char* log;
 
@@ -22,7 +21,6 @@ ai_action(Game* game, Logs* logs)
 
 	if (player->health > 0)
 	{
-		available_attacks = get_all_attacks(enemy);
 		selected_attack = list_nth(
 			enemy->attacks,
 			rand() % list_size(enemy->attacks));

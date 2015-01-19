@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "string.h"
 #include "types.h"
 #include "statuses.h"
 #include "colors.h"
@@ -214,7 +215,6 @@ print_bar(
 {
 	int i;
 	int printed;
-	int r, g, b;
 
 	printed = printf("%s", statstring);
 
@@ -227,35 +227,16 @@ print_bar(
 
 	size = size - text_size;
 
-	r = 0;
-	g = 0;
-	b = 0;
-
-	printf(BRIGHT "<");
+	printf(BRIGHT WHITE "<%s", colorset);
 	for (i = 0; i < size; i++)
 	{
-		/* Feel free to change some of those values. I just thought
-		 * they were kinda sweet compared to what I had before and left
-		 * them there. */
-		if (colorset == GREEN)
-			fg(3 - i * 3 / size, 5, 0);
-		else if (colorset == YELLOW)
-			fg(3 - i * 2 / size, 1 + i * 4 / size, 0);
-		else if (colorset == RED)
-			/* Assuming it won’t be a lot of chars, here... */
-			fg(2 + i * 20 / size, i * 5 / size, i * 5 / size);
-		else if (colorset == BLUE)
-			fg(2 - i * 3 / size, 2, 3 + i * 2 / size);
-		else
-			fg(1 + i * 4 / size, 1 + i * 4 / size, 1 + i * 4 / size);
-
 		if (current != 0 && ((float) i) / size <= ((float) current) / max)
 			printf("=");
 		else
 			printf(" ");
 	}
 
-	printf("%s>\n" NOCOLOR, colorset);
+	printf(BRIGHT WHITE ">\n" NOCOLOR);
 }
 
 static void
@@ -309,11 +290,13 @@ print_attacks(Entity* e)
 void
 print_entity_basestats(Entity* e)
 {
+	List* l;
+
 	printf(BRIGHT BLUE ">> %s" NOCOLOR, e->name);
 
 	if (e->statuses)
 	{
-		for (List* l = e->statuses; l; l = l->next)
+		for (l = e->statuses; l; l = l->next)
 		{
 			printf(" <%s>",
 				((StatusData*) l->data)->status->affliction_name);
@@ -338,6 +321,8 @@ print_entity_basestats(Entity* e)
 void
 print_entity(Entity *e)
 {
+	int i;
+
 	print_entity_basestats(e);
 
 	/* FIXME: That’s ugly. Not just the code, the output as well! */
@@ -354,7 +339,7 @@ print_entity(Entity *e)
 	printf("\n");
 
 	printf(WHITE "Resistances:\n" NOCOLOR);
-	for (int i = 0; i < TYPE_MAX; i++)
+	for (i = 0; i < TYPE_MAX; i++)
 	{
 		print_resistance(e, i);
 	}
@@ -363,7 +348,7 @@ print_entity(Entity *e)
 	print_attacks(e);
 
 	back_to_top();
-	for (int i = 0; i < 16; i++)
+	for (i = 0; i < 16; i++)
 		printf("\n");
 }
 
