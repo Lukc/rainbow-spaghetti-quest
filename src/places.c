@@ -16,74 +16,8 @@
 #include "characters.h"
 
 #include "parser/drop.h"
-
-static List*
-comas_to_list(char* input)
-{
-	char* string = NULL;
-	int i;
-	List* list = NULL;
-
-	string = strtok(input, ",");
-
-	while (string)
-	{
-		for (i = 0; string[i] == ' '; i++)
-			;;
-
-		string = string + i;
-
-		for (i = strlen(string); string[i] && string[i] != ' '; i--)
-			;;
-
-		/* In case we stopped at ' '. */
-		string[i] = '\0';
-
-		list_add(&list, strdup(string));
-
-		string = strtok(NULL, ",");
-	}
-
-	return list;
-}
-
-Destination*
-parse_destination(List* elements, Logs* logs)
-{
-	ParserElement* element;
-	Destination* destination;
-	char* field;
-
-	destination = (Destination*) malloc(sizeof(Destination));
-	memset(destination, 0, sizeof(Destination));
-
-	for (; elements; elements = elements->next)
-	{
-		element = elements->data;
-		field = element->name;
-
-		if (!strcmp(field, "name"))
-		{
-			destination->name = parser_get_string(element, logs);
-		}
-		else if (!strcmp(field, "if"))
-		{
-			if (element->type == PARSER_LIST)
-				load_condition(&destination->condition, element->value);
-			else
-				fprintf(stderr, "[:%i] “if” field is not a list.\n",
-					element->lineno);
-		}
-		else
-		{
-			char* log = (char*) malloc(sizeof(char) * 128);
-			snprintf(log, 128, "Unknown field: “%s”.", element->name);
-			logs_add(logs, log);
-		}
-	}
-
-	return destination;
-}
+#include "parser/destination.h"
+#include "parser/spawn_data.h"
 
 static int
 _load_skill(Place* place, ParserElement* element, Logs* logs)
@@ -135,8 +69,6 @@ void
 load_place (Game* game, List* elements)
 {
 	List* list = elements;
-	List* temp;
-	List* helper;
 	ParserElement* element;
 	Place* place;
 	Logs* logs;
@@ -164,89 +96,21 @@ load_place (Game* game, List* elements)
 			char* string = parser_get_string(element, logs);
 
 			if (string)
-			{
-				temp = comas_to_list(string);
-
-				for (helper = temp; helper; helper = helper->next)
-				{
-					list_add(&place->shop_item_names, helper->data);
-				}
-			}
+				list_add(&place->shop_item_names, string);
 		}
 		else if (!strcmp(field, "leads to"))
 		{
-			Destination* dest;
+			Destination* dest = parser_get_destination(element);
 
-			if (element->type == PARSER_STRING)
-			{
-				dest = (Destination*) malloc(sizeof(Destination));
-				memset(dest, 0, sizeof(Destination));
-
-				dest->name = parser_get_string(element, logs);
-
+			if (dest)
 				list_add(&place->destinations, dest);
-			}
-			else if (element->type == PARSER_LIST)
-			{
-				list_add(&place->destinations,
-					parse_destination(element->value, logs));
-			}
 		}
 		else if (!strcmp(field, "random enemy"))
 		{
-			RandomEnemy* r;
+			SpawnData* spawn = parser_get_spawn_data(element);
 
-			if (element-> type == PARSER_STRING)
-			{
-				char* string = parser_get_string(element, logs);
-
-				if (string)
-				{
-					r = malloc(sizeof(*r));
-
-					/* Will be converted to Class* later. */
-					r->class = (Class*) string;
-					r->frequency = 1;
-
-					list_add(&place->random_enemies, r);
-				}
-			}
-			else if (element->type == PARSER_LIST)
-			{
-				char* class = NULL;
-				int frequency = 0;
-				List* sl = element->value;
-
-				for (; sl; sl = sl->next)
-				{
-					element = sl->data;
-					field = element->name;
-
-					if (!strcmp(field, "class"))
-						class = parser_get_string(element, logs);
-					else if (!strcmp(field, "frequency"))
-						frequency = parser_get_integer(element, logs);
-					else
-						fprintf(stderr,
-							"[Place:%s/Random Enemy:%i] Unknown field: %s\n",
-							place->name ? place->name : "??",
-							element->lineno, field);
-				}
-
-				if (class)
-				{
-					r = malloc(sizeof(*r));
-
-					r->class = (Class*) class;
-					r->frequency = frequency > 0 ? frequency : 1;
-
-					list_add(&place->random_enemies, r);
-				}
-			}
-			else
-				fprintf(stderr,
-					"[Place:%s:%i] <Random enemy> field is not a string or a list.\n",
-					place->name ? place->name : "??", element->lineno);
+			if (spawn)
+				list_add(&place->random_enemies, spawn);
 		}
 		else if (!strcmp(field, "image"))
 		{
@@ -264,22 +128,15 @@ load_place (Game* game, List* elements)
 		}
 		else if (!strcmp(field, "on first visit"))
 		{
-			List* helper;
-			List* names = comas_to_list(parser_get_string(element, logs));
+			/* FIXME: We want events, here! */
+			char* name = parser_get_string(element, logs);
+			char* filename = (char*) malloc(42 + strlen(name));
 
-			for (helper = names; helper; helper = helper->next)
-			{
-				char* name = helper->data;
-				char* filename = (char*) malloc(42 + strlen(name));
+			snprintf(filename, 42 + strlen(name), "data/images/%s", name);
 
-				snprintf(filename, 42 + strlen(name), "data/images/%s", name);
+			list_add(&place->on_first_visit, load_image(filename));
 
-				helper->data = load_image(filename);
-
-				free(name);
-			}
-
-			place->on_first_visit = list_rev_and_free(names);
+			free(name);
 		}
 		else if (!strcmp(field, "character"))
 		{

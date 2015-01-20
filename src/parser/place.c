@@ -93,13 +93,13 @@ parser_load_place(Game* game, Place* place)
 
 	for (sl = place->random_enemies; sl; sl = sl->next)
 	{
-		RandomEnemy* r = sl->data;
-		char* name = (char*) r->class;
+		SpawnData* spawn = sl->data;
+		char* name = (char*) spawn->class;
 		Class* class = get_class_by_name(game->classes, name);
 
 		if (class)
 		{
-			r->class = class;
+			spawn->class = class;
 
 			free(name);
 		}

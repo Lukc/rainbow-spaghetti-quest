@@ -2,10 +2,10 @@
 #ifndef ENEMIES_H
 #define ENEMIES_H
 
-typedef struct RandomEnemy {
+typedef struct SpawnData {
 	Class* class;
 	int frequency;
-} RandomEnemy;
+} SpawnData;
 
 #endif
 

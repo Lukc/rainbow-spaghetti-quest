@@ -625,16 +625,16 @@ battle(Game *game)
 static Class*
 get_random_enemy(List* list)
 {
-	RandomEnemy* r;
+	SpawnData* spawn;
 	List* l = list;
 	int max = 0;
 	int selection;
 
 	while (l)
 	{
-		r = l->data;
+		spawn = l->data;
 
-		max += r->frequency;
+		max += spawn->frequency;
 
 		l = l->next;
 	}
@@ -642,12 +642,12 @@ get_random_enemy(List* list)
 	selection = rand() % max;
 	for (l = list; l; l = l->next)
 	{
-		r = l->data;
+		spawn = l->data;
 
-		if (selection <= r->frequency - 1)
-			return r->class;
+		if (selection <= spawn->frequency - 1)
+			return spawn->class;
 		else
-			selection -= r->frequency;
+			selection -= spawn->frequency;
 	}
 
 	/* Should not happen. */
