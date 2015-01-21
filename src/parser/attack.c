@@ -121,6 +121,8 @@ parser_get_attack(ParserElement* element)
 			else if (!strcmp(element->name, "cures"))
 				list_add(&attack->cures_status_names,
 					parser_get_string(element, NULL));
+			else if (!strcmp(element->name, "charge"))
+				attack->charge = parser_get_integer(element, NULL);
 			else if (!strcmp(element->name, "health"))
 				attack->health = parser_get_integer(element, NULL);
 			else if (!strcmp(element->name, "mana"))

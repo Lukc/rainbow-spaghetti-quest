@@ -103,7 +103,18 @@ print_attacks(Entity* player, List* list, int selection)
 			move(27);
 
 			if (can_use > 0)
-				printf(" -- READY --");
+			{
+				if (ad->charge < attack->charge)
+					printf(" --  " YELLOW "%i/%i" WHITE "  --",
+						ad->charge, attack->charge);
+				else
+				{
+					if (attack->charge)
+						printf(YELLOW);
+
+					printf(" -- READY --");
+				}
+			}
 			else if (can_use == E_COOLDOWN)
 				printf(" -- CDN %i --", ad->cooldown);
 			else if (can_use == E_NO_MANA)
@@ -317,6 +328,18 @@ print_attack_stats(Attack* attack, Entity* player)
 			printf(CYAN);
 			printf("cures %s", status->name);
 		}
+	}
+
+	if (attack->charge)
+	{
+		printf(NOCOLOR);
+		printf(", ");
+		printf(YELLOW);
+
+		if (attack->charge == 1)
+			printf("charges 1 turn");
+		else
+			printf("charges %i turns", attack->charge);
 	}
 
 	printf("\n");
@@ -671,6 +694,7 @@ prepare_for_battle(Entity* e)
 
 		ad->attack = attack;
 		ad->cooldown = 0;
+		ad->charge = 0;
 
 		list_add(&e->attacks, ad);
 	}

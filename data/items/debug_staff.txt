@@ -40,6 +40,7 @@ Item: [
 		Mana: 12
 		Health: -12
 		Self inflicts: troll trance
+		Charge: 1
 		Cures: confusion
 	]
 ]

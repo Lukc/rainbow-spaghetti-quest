@@ -14,6 +14,7 @@
 #define E_COOLDOWN   -3
 
 int can_use_attack(Entity*, AttackData*);
+void reset_charges(Entity*);
 
 void attack(Entity*, Attack*, Entity*, Logs*);
 Logs* command_attack(Game*, AttackData*);

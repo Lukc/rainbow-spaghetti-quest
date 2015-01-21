@@ -36,6 +36,18 @@ can_use_attack(Entity* attacker, AttackData* ad)
 }
 
 /**
+ * Puts all attacks’ charge counter to 0.
+ */
+void
+reset_charges(Entity* e)
+{
+	List* l;
+
+	for (l = e->attacks; l; l = l->next)
+		((AttackData*) l->data)->charge = 0;
+}
+
+/**
  * Takes care of A attacking B with a specified attack.
  * Adds a corresponding log entry in “logs”.
  */
@@ -190,6 +202,8 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 
 	attacker->mana += mana_cost;
 
+	reset_charges(attacker);
+
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(log, 128,
 		BRIGHT WHITE "  %s%s%s%s%s%s",
@@ -226,7 +240,14 @@ command_attack(Game* game, AttackData* player_attack)
 	);
 	logs_add(logs, log);
 
-	attack(player, player_attack->attack, enemy, logs);
+	if (player_attack->charge >= player_attack->attack->charge)
+		attack(player, player_attack->attack, enemy, logs);
+	else
+	{
+		player_attack->charge += 1;
+		logs_add(logs, strdup(BRIGHT YELLOW "   >>> "
+			WHITE "The attack is charging!"));
+	}
 
 	player_attack->cooldown = player_attack->attack->cooldown;
 

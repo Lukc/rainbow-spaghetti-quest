@@ -27,6 +27,11 @@ typedef struct Attack {
 	 * again. */
 	int cooldown;
 
+	/* Number of turns required of charging before the attack actually attacks
+	 * anything. This value concerns multiple-turns interruptible (active)
+	 * attacks. */
+	int charge;
+
 	/* Statuses inflicted to the user or its adversary. */
 	struct Status* inflicts_status;
 	struct Status* self_inflicts_status;
@@ -43,6 +48,7 @@ typedef struct Attack {
 typedef struct {
 	Attack* attack;
 	int cooldown;
+	int charge;
 } AttackData;
 
 void free_attack(Attack*);
