@@ -10,12 +10,14 @@ function binary.build {
 	write
 
 	for i in ${src[@]}; do
+		local dirname="$(dirname "$i")"
+
 		write -n "${i%.c}.o: ${i}"
 
-		for h in $(dirname $i)/*.h; do
-			if grep -q "#include \"$h\"" $i; then
-				write -n " $h"
-			fi
+		sed '/^#include "/!d;s/^#include "//;s/"$//' $i | while read h; do
+			h="$dirname/$h"
+
+			write -n " $h"
 		done
 		write
 
