@@ -45,10 +45,10 @@ menu_separator()
 {
 	int i;
 
-	printf(NOCOLOR);
+	nocolor();
 	for (i = 0; i < 80; i++)
 		printf("─");
-	printf("\n" NOCOLOR);
+	printf("\n");
 }
 
 /**

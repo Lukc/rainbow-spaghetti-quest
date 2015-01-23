@@ -81,7 +81,7 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 	{
 		inflict_status(attacker, attack->self_inflicts_status);
 
-		snprintf(self_status_string, 64, MAGENTA " <<< %s", attack->self_inflicts_status->name);
+		snprintf(self_status_string, 64, " <<< %s", attack->self_inflicts_status->name);
 	}
 
 	if (attack->strikes)
@@ -120,7 +120,7 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 		defender->health -= damage_inflicted;
 
 		snprintf(attack_string, 64,
-			RED " >>>" WHITE " %s " RED "-%iHP " WHITE "<(%i-%i)x%i %s>",
+			" >>> %s -%iHP <(%i-%i)x%i %s>",
 			defender->name,
 			damage_inflicted,
 			get_attack_bonus(attacker) + attack->damage.min,
@@ -135,7 +135,7 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 
 		snprintf(
 			status_string, 64,
-			MAGENTA " >>> %s",
+			" >>> %s",
 			attack->inflicts_status->name
 		);
 	}
@@ -151,7 +151,7 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 			cure_status(attacker, status);
 		}
 
-		cure_string = BRIGHT WHITE " -" CYAN "Cured!" WHITE "-";
+		cure_string = " -Cured!-";
 	}
 
 	if (attack->health)
@@ -176,14 +176,14 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 
 				snprintf(
 					healing_string, 64,
-					GREEN " <<< +%iHP" WHITE,
+					" <<< +%iHP",
 					attack->health
 				);
 			}
 			else
 				snprintf(
 					healing_string, 64,
-					MAGENTA " <<< -recovery prevented-"
+					" <<< -recovery prevented-"
 				);
 		}
 		else
@@ -192,13 +192,12 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 
 			snprintf(
 				injury_string, 64,
-				RED " <<< %+iHP", attack->health
+				" <<< %+iHP", attack->health
 			);
 		}
 	}
 
-	snprintf(mana_string, 64, BLUE " <<< %s%+iMP",
-		mana_cost < 0 ? GRAY : "", mana_cost);
+	snprintf(mana_string, 64, " <<< %+iMP", mana_cost);
 
 	attacker->mana += mana_cost;
 
@@ -206,7 +205,7 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(log, 128,
-		BRIGHT WHITE "  %s%s%s%s%s%s",
+		"  %s%s%s%s%s%s",
 		injury_string,
 		healing_string,
 		attack_string,
@@ -234,7 +233,7 @@ command_attack(Game* game, AttackData* player_attack)
 
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(log, 128,
-		BRIGHT WHITE "%s uses “%s”",
+		"%s uses “%s”",
 		player->name,
 		player_attack->attack->name
 	);
@@ -245,8 +244,7 @@ command_attack(Game* game, AttackData* player_attack)
 	else
 	{
 		player_attack->charge += 1;
-		logs_add(logs, strdup(BRIGHT YELLOW "   >>> "
-			WHITE "The attack is charging!"));
+		logs_add(logs, strdup("   >>> The attack is charging!"));
 	}
 
 	player_attack->cooldown = player_attack->attack->cooldown;

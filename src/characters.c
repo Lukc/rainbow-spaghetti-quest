@@ -14,12 +14,12 @@ selection_color(int selected)
 {
 	if (selected)
 	{
-		bg(4, 4, 4);
-		fg(0, 0, 0);
+		bg(WHITE);
+		fg(BLACK);
 	}
 	else
 	{
-		printf(WHITE);
+		fg(WHITE);
 	}
 }
 
@@ -123,20 +123,20 @@ quests(Game* game)
 				Character* c = l->data;
 
 				selection_color(i == selection);
-				printf("  - " BRIGHT "%-56s" NOCOLOR, c->name);
+				printf("  - %-56s", c->name);
 
-				selection_color(i == selection);
-				printf(MAGENTA);
+				fg(MAGENTA);
 				printf("%-10s", c->quester ? "quester" : "");
 
-				printf(GREEN);
+				fg(GREEN);
 				printf("%-10s", c->trader ? "trader" : "");
 
-				printf("\n" NOCOLOR);
+				printf("\n");
+				nocolor();
 				selection_color(i == selection);
 				printf("    %-76s\n", c->description);
 
-				printf(NOCOLOR);
+				nocolor();
 
 				l = l->next;
 			}
@@ -146,10 +146,11 @@ quests(Game* game)
 
 		menu_separator();
 
-		printf(WHITE "  (t) Talk to\n" NOCOLOR);
+		fg(WHITE);
+		printf("  (t) Talk to\n");
 		back(1);
 		move(40);
-		printf(WHITE "  (l) Leave\n" NOCOLOR);
+		printf("  (l) Leave\n");
 
 		menu_separator();
 

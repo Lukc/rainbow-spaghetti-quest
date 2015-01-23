@@ -66,15 +66,17 @@ fire_message_event(Event* event)
 
 	if (e->from)
 	{
-		fg(5, 5, 0);
-		printf(BRIGHT "  >> ");
-		printf(WHITE);
+		fg(YELLOW);
+		printf("  >> ");
+		fg(WHITE);
 		printf("%s\n", e->from);
 	}
 
-	printf(NOCOLOR WHITE " %s\n", e->text);
+	fg(WHITE);
+	printf(" %s\n", e->text);
 
-	printf(NOCOLOR "\nPress any key to continue...\n");
+	printf("\nPress any key to continue...\n");
+	nocolor();
 
 	/* Removing the above line after a key’s pressed. */
 	getch();

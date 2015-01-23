@@ -16,8 +16,7 @@ use_item(Entity* entity, Item* item, Entity* enemy, Logs* logs)
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(
 		log, 128,
-		BRIGHT WHITE "%s uses “%s” <" YELLOW "inventory" WHITE ">"
-		NOCOLOR,
+		"%s uses “%s” <inventory>",
 		entity->name, item->name
 	);
 	logs_add(logs, log);

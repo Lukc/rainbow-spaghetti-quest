@@ -86,12 +86,12 @@ selection_color(int selected)
 {
 	if (selected)
 	{
-		bg(4, 4, 4);
-		fg(0, 0, 0);
+		bg(WHITE);
+		fg(BLACK);
 	}
 	else
 	{
-		printf(WHITE);
+		fg(WHITE);
 	}
 }
 
@@ -144,7 +144,7 @@ fire_choice_event(Game* game, Event* event)
 
 			selection_color(selection == i);
 			printf("    - %-74s\n", option->text);
-			printf(NOCOLOR);
+			nocolor();
 
 			i++;
 		}

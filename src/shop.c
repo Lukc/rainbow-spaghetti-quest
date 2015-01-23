@@ -7,15 +7,15 @@
 #include "term.h"
 #include "colors.h"
 
-static char*
+static int
 stat_color(int i)
 {
 	if (i == 0)
 		return WHITE;
 	else if (i > 0)
-		return BRIGHT GREEN;
+		return GREEN;
 	else
-		return BRIGHT RED;
+		return RED;
 }
 
 void
@@ -32,7 +32,8 @@ print_item(Item* item)
 	}
 	back(10);
 
-	printf(BRIGHT BLUE " > Selected item: %s\n" NOCOLOR, item->name);
+	fg(BLUE);
+	printf(" > Selected item: %s\n", item->name);
 
 	/* FIXME: Too many stats means stats are not displayed.
 	 *        Also, try to display everything in a much nicer fashion */
@@ -42,58 +43,78 @@ print_item(Item* item)
 		Attack* attack = list->data;
 
 		if (attack->strikes > 0)
-			printf(BRIGHT WHITE "    provides a (%i-%i)x%i %s attack\n" NOCOLOR,
+		{
+			fg(WHITE);
+			printf("    provides a (%i-%i)x%i %s attack\n",
 				attack->damage.min, attack->damage.max, attack->strikes,
 				type_to_string(attack->type));
+		}
 		else
-			printf(BRIGHT WHITE "    provides a support attack\n" NOCOLOR);
+		{
+			fg(WHITE);
+			printf("    provides a support attack\n");
+		}
 	}
 
 	if (item->consumable)
 	{
-		printf("    " WHITE "is consumed after use\n");
+		fg(WHITE);
+		printf("    is consumed after use\n");
 	}
 
 	if (item->on_use)
 	{
 		if (item->on_use->strikes)
 		{
-			printf("    " WHITE "inflicts a (%i-%i)x%i %s attack\n",
+			fg(WHITE);
+			printf("    inflicts a (%i-%i)x%i %s attack\n",
 				item->on_use->damage.min, item->on_use->damage.max,
 				item->on_use->strikes, type_to_string(item->on_use->type));
 		}
 
 		if (item->on_use->health)
-			printf("    %s%+i HP\n" NOCOLOR,
-				stat_color(item->on_use->health), item->on_use->health);
+		{
+			fg(stat_color(item->on_use->health));
+			printf("    %+i HP\n", item->on_use->health);
+		}
 
 		if (item->on_use->mana)
-			printf("    %s%+i MP\n" NOCOLOR,
-				stat_color(item->on_use->mana), item->on_use->mana);
+		{
+			fg(stat_color(item->on_use->mana));
+			printf("    %+i MP\n", item->on_use->mana);
+		}
 	}
 
 	if (item->health_bonus)
-		printf("    %s%+i max health\n" NOCOLOR,
-			stat_color(item->health_bonus), item->health_bonus);
+	{
+		fg(stat_color(item->health_bonus));
+		printf("    %+i max health\n", item->health_bonus);
+	}
 
 	if (item->mana_bonus)
-		printf("    %s%+i max mana\n" NOCOLOR,
-			stat_color(item->mana_bonus), item->mana_bonus);
+	{
+		fg(stat_color(item->mana_bonus));
+		printf("    %+i max mana\n", item->mana_bonus);
+	}
 
 	if (item->attack_bonus)
-		printf("    %s%+i base attack\n" NOCOLOR,
-			stat_color(item->attack_bonus), item->attack_bonus);
+	{
+		fg(stat_color(item->attack_bonus));
+		printf("    %+i base attack\n", item->attack_bonus);
+	}
 
 	if (item->defense_bonus)
-		printf("    %s%+i base defense\n" NOCOLOR,
-			stat_color(item->defense_bonus), item->defense_bonus);
+	{
+		fg(stat_color(item->defense_bonus));
+		printf("    %+i base defense\n", item->defense_bonus);
+	}
 
 	for (i = 0; i < TYPE_MAX; i++)
 	{
 		if (item->type_resistance[i])
 		{
-			printf("    %s%+i%% %s resistance\n" NOCOLOR,
-				stat_color(item->type_resistance[i]),
+			fg(stat_color(item->type_resistance[i]));
+			printf("    %+i%% %s resistance\n",
 				item->type_resistance[i], type_to_string(i));
 		}
 	}
@@ -211,7 +232,8 @@ print_equipment(Entity* player)
 	int i, j, printed;
 	Item* item;
 
-	printf(BRIGHT BLUE " > Current equipment:\n" NOCOLOR);
+	fg(BLUE);
+	printf(" > Current equipment:\n");
 
 	for (i = 0; i < EQ_MAX; i++)
 	{
@@ -223,15 +245,18 @@ print_equipment(Entity* player)
 		printf("\n");
 		back(1);
 
-		printf(WHITE);
+		fg(WHITE);
 		printed = printf("  - %s: ", equipment_string(i));
-		printf(NOCOLOR);
+		nocolor();
 		for (j = 0; j < 22 - printed; j++)
 			printf("-");
 		printf(" ");
 
 		if (item)
-			printf(WHITE "%s\n" NOCOLOR, item->name);
+		{
+			fg(WHITE);
+			printf("%s\n", item->name);
+		}
 		else
 			printf("(nothing)\n");
 	}
@@ -337,16 +362,19 @@ enter_shop(Game* game)
 				item = (Item*) list->data;
 
 				if (i == selection)
-					printf(NOCOLOR "\033[47m");
+				{
+					bg(WHITE);
+					fg(BLACK);
+				}
 
 				if (item->price <= player->gold)
-					printf(GREEN);
+					fg(GREEN);
 				else if (get_count_from_inventory(player->inventory, item))
 					/* Sellable. That’s an action, let’s not print the entry
 					 * as “disabled black”.*/
-					printf(YELLOW);
+					fg(YELLOW);
 				else
-					fg(1, 1, 1);
+					fg(BLACK);
 
 				printed = printf("  - %-48s (%s)",
 					item->name, item->slot == EQ_WEAPON_RANGED ?
@@ -360,7 +388,7 @@ enter_shop(Game* game)
 				for (j = 0; j < 12 - printed; j++)
 					printf(" ");
 
-				printf("\n" NOCOLOR);
+				printf("\n");
 			}
 
 			i++;
@@ -371,17 +399,21 @@ enter_shop(Game* game)
 
 		menu_separator();
 
-		printf(WHITE " Money: %i%-5s" NOCOLOR, player->gold, "gp");
+		fg(WHITE);
+		printf(" Money: %i%-5s", player->gold, "gp");
 		move(40);
-		printf(WHITE " (b)  Buy\n" NOCOLOR);
+		printf(" (b)  Buy\n");
 		if (selected_item)
-			printf(WHITE " In inventory: %i" NOCOLOR,
+		{
+			fg(WHITE);
+			printf(" In inventory: %i",
 				get_count_from_inventory(player->inventory, selected_item));
+		}
 		move(40);
-		printf(WHITE
-			" (e)  Equip\n" NOCOLOR);
+		fg(WHITE);
+		printf(" (e)  Equip\n");
 		move(40);
-		printf(WHITE "%-20s%-20s\n" NOCOLOR, " (s)  Sell", " (l)  Leave");
+		printf("%-20s%-20s\n", " (s)  Sell", " (l)  Leave");
 
 		menu_separator();
 

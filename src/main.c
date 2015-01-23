@@ -31,42 +31,47 @@ print_menu(Game* game)
 	menu_separator();
 
 	if (location->random_enemies)
-		printf(WHITE);
+		fg(WHITE);
 	else
-		fg(1, 1, 1);
-	printf("  (b) Random battle\n" NOCOLOR);
+		fg(BLACK);
+	printf("  (b) Random battle\n");
 
 	if (location->shop_items)
-		printf(WHITE);
+		fg(WHITE);
 	else
-		fg(1, 1, 1);
-	printf("  (s) Enter shop\n" NOCOLOR);
-	printf(WHITE "  (i) Open inventory\n");
-	fg(1, 1, 1);
-	printf("  (d) Enter dungeon\n" NOCOLOR);
-	printf(WHITE "  (t) Travel\n" NOCOLOR);
+		fg(BLACK);
+	printf("  (s) Enter shop\n");
+
+	fg(WHITE);
+	printf("  (i) Open inventory\n");
+
+	fg(BLACK); /* Unimplemented. Uh uh. */
+	printf("  (d) Enter dungeon\n");
+
+	fg(WHITE); /* Better be available. That, or you’re in trouble. */
+	printf("  (t) Travel\n");
 
 	back(5);
 	move(40);
-	printf(WHITE " (c) Craft items\n" NOCOLOR);
+	printf(" (c) Craft items\n");
 	move(40);
-	printf(WHITE " (k) Use skills\n" NOCOLOR);
+	printf(" (k) Use skills\n");
 	move(40);
 	if (location->characters)
-		printf(WHITE);
+		fg(WHITE);
 	else
-		fg(1, 1, 1);
-	printf(" (p) Talk to people\n" NOCOLOR);
+		fg(BLACK);
+	printf(" (p) Talk to people\n");
 	printf("\n");
 	move(40);
-	printf(WHITE);
-	printf(" (S) Save" NOCOLOR);
+	fg(WHITE);
+	printf(" (S) Save");
 	move(53);
-	fg(5, 2, 0);
+	fg(RED);
 	printf(" (L) Load");
 	move(66);
-	printf(WHITE);
-	printf(" (Q) Quit\n" NOCOLOR);
+	fg(WHITE);
+	printf(" (Q) Quit\n");
 
 	menu_separator();
 }
@@ -131,14 +136,14 @@ main(int argc, char* argv[])
 				if (game.location->random_enemies)
 					enter_battle(&game);
 				else
-					error = BRIGHT RED " >> " WHITE
+					error = " >> "
 						"This is a peaceful place, with no-one to fight.";
 				break;
 			case 's':
 				if (game.location->shop_items)
 					enter_shop(&game);
 				else
-					error = BRIGHT RED " >> " WHITE
+					error = " >> "
 						"There is no shop at your current location!";
 				break;
 			case 'i':
@@ -160,16 +165,16 @@ main(int argc, char* argv[])
 			/* Unimplemented stuff */
 			case 'S':
 				save(&game, 0);
-				error = BRIGHT GREEN " >> " WHITE "Game saved!";
+				error = " >> Game saved!";
 				break;
 			case 'L':
 				load(&game, 0);
-				error = BRIGHT GREEN " >> " WHITE "Game loaded! (but stuff is probably broken, now)";
+				error = " >> Game loaded! (but stuff is probably broken, now)";
 				break;
 			case 'd':
 				break;
 			default:
-				error = BRIGHT RED " >> " WHITE "Unrecognized key.";
+				error = " >> Unrecognized key.";
 		}
 
 		player.health = get_max_health(&player);

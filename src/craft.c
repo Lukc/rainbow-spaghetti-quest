@@ -159,21 +159,18 @@ craft(Game* game)
 					log = malloc(sizeof(char) * 128);
 
 					if (!recipe_craftable(game, selected_recipe))
-						snprintf(log, 128,
-							BRIGHT RED " >> " WHITE
+						snprintf(log, 128, " >> "
 							"You’re missing a few ingredients to complete "
-							"this recipe!" NOCOLOR);
+							"this recipe!");
 					else if (craft_item(game, selected_recipe))
-						snprintf(log, 128,
-							BRIGHT GREEN " >> " WHITE
-								"Successfully crafted a %s!" NOCOLOR,
+						snprintf(log, 128, " >> "
+								"Successfully crafted a %s!",
 							selected_recipe->output->name
 						);
 					else
-						snprintf(log, 128,
-							BRIGHT RED " >> " WHITE
+						snprintf(log, 128, " >> "
 								"Your level is too low!"
-								" You failed to craft the item!" NOCOLOR
+								" You failed to craft the item!"
 						);
 
 
@@ -236,19 +233,25 @@ craft(Game* game)
 					if (i == selected_index % 8)
 					{
 						if (recipe_craftable(game, recipe))
-							printf("\033[47m" BLACK);
+						{
+							bg(WHITE);
+							fg(BLACK);
+						}
 						else
 						{
-							bg(1, 1, 1);
-							fg(0, 0, 0);
+							nocolor();
+							bg(GRAY);
+							fg(BLACK);
 						}
 					}
 					else if (!recipe_craftable(game, recipe))
-						fg(1, 1, 1);
+						fg(BLACK);
 					else
-						printf(WHITE);
+						fg(WHITE);
 
-					printf(" %-39s\n" NOCOLOR , recipe->output->name);
+					printf(" %-39s\n" , recipe->output->name);
+
+					nocolor();
 
 					l = l->next;
 				}
@@ -270,9 +273,9 @@ craft(Game* game)
 					Ingredient* ig = l->data;
 
 					if (get_count_from_inventory(game->player->inventory, ig->item) < ig->quantity)
-						printf(RED);
+						fg(RED);
 					else
-						printf(WHITE);
+						fg(WHITE);
 
 					if (ig->quantity == 1)
 						printf("%-38s\n", ig->item->name);
@@ -285,7 +288,7 @@ craft(Game* game)
 						printf("\n");
 					}
 
-					printf(NOCOLOR);
+					nocolor();
 
 					l = l->next;
 				}
@@ -305,20 +308,27 @@ craft(Game* game)
 		printf("%-40s\n", "");
 		back(1);
 		if (selected_recipe && selected_recipe->skill)
-			printf(WHITE "Related skill: %s", selected_recipe->skill->name);
+		{
+			fg(WHITE);
+			printf("Related skill: %s", selected_recipe->skill->name);
+		}
 		move(40);
 		if (selected_item)
-			printf(WHITE);
+			fg(WHITE);
 		else
-			printf(BLACK);
-		printf(" (b) Build\n" NOCOLOR);
+			fg(BLACK);
+		printf(" (b) Build\n");
 
 		printf("%-40s\n", "");
 		back(1);
 		if (selected_recipe && selected_recipe->skill)
-			printf(WHITE "Required level: %i", selected_recipe->level);
+		{
+			fg(WHITE);
+			printf("Required level: %i", selected_recipe->level);
+		}
 		move(40);
-		printf(WHITE " (l) Leave\n" NOCOLOR);
+		fg(WHITE);
+		printf(" (l) Leave\n");
 
 		menu_separator();
 

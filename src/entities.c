@@ -191,7 +191,7 @@ init_entity_from_class(Entity* e, Class* c)
 	return 42;
 }
 
-static const char*
+static int
 health_color(Entity* e)
 {
 	int cur, max, ratio;
@@ -210,7 +210,7 @@ health_color(Entity* e)
 
 static void
 print_bar(
-	const char* statstring, const char* colorset,
+	const char* statstring, int colorset,
 	int current, int max, int text_size, int size)
 {
 	int i;
@@ -218,7 +218,7 @@ print_bar(
 
 	printed = printf("%s", statstring);
 
-	printf("%s", colorset);
+	fg(colorset);
 
 	printed += printf("%i/%i  ", current, max);
 
@@ -227,7 +227,9 @@ print_bar(
 
 	size = size - text_size;
 
-	printf(BRIGHT WHITE "<%s", colorset);
+	fg(WHITE);
+	printf("<");
+	fg(colorset);
 	for (i = 0; i < size; i++)
 	{
 		if (current != 0 && ((float) i) / size <= ((float) current) / max)
@@ -236,7 +238,9 @@ print_bar(
 			printf(" ");
 	}
 
-	printf(BRIGHT WHITE ">\n" NOCOLOR);
+	fg(WHITE);
+	printf(">\n");
+	nocolor();
 }
 
 static void
@@ -249,7 +253,7 @@ print_resistance(Entity* e, int type)
 	string = strdup(type_to_string(type));
 	string[0] = toupper(string[0]);
 
-	printf(WHITE);
+	fg(WHITE);
 	printed = printf("  %s: ", string);
 	
 	resistance = get_type_resistance(e, type);
@@ -257,7 +261,12 @@ print_resistance(Entity* e, int type)
 	for (i = printed; i < 16; i++)
 		printf(" ");
 
-	printf(BRIGHT "%i\n" NOCOLOR, resistance);
+	if (resistance < 0)
+		fg(YELLOW);
+	else if (resistance > 0)
+		fg(GREEN);
+
+	printf("%i\n", resistance);
 }
 
 static void
@@ -270,20 +279,21 @@ print_attacks(Entity* e)
 	attacks = get_all_attacks(e);
 
 	move(40);
-	printf(BRIGHT WHITE "  Attacks:\n" NOCOLOR);
+	fg(WHITE);
+	printf("  Attacks:\n");
 	for (list = attacks; list; list = list->next)
 	{
 		attack = list->data;
 
 		move(40);
 		if (attack->strikes)
-			printf(WHITE "    (%i-%i)x%i  %s\n" NOCOLOR,
+			printf("    (%i-%i)x%i  %s\n",
 				attack->damage.min + get_attack_bonus(e),
 				attack->damage.max + get_attack_bonus(e),
 				attack->strikes,
 				type_to_string(attack->type));
 		else
-			printf(WHITE "    support attack\n" NOCOLOR);
+			printf("    support attack\n");
 	}
 }
 
@@ -292,7 +302,10 @@ print_entity_basestats(Entity* e)
 {
 	List* l;
 
-	printf(BRIGHT BLUE ">> %s" NOCOLOR, e->name);
+	fg(BLUE);
+	printf(" >> ");
+	fg(WHITE);
+	printf("%s", e->name);
 
 	if (e->statuses)
 	{
@@ -306,16 +319,27 @@ print_entity_basestats(Entity* e)
 	printf("\n");
 
 	print_bar(
-		BRIGHT WHITE "  Health:   ",
+		"  Health:   ",
 		health_color(e),
 		e->health, get_max_health(e), 34, 80
 	);
 
 	print_bar(
-		BRIGHT WHITE "  Mana:     ",
+		"  Mana:     ",
 		BLUE,
 		e->mana, get_max_mana(e), 34, 80
 	);
+}
+
+static void
+tag(const char* name, int value, int color)
+{
+	fg(WHITE);
+	printf("[%s ", name);
+	fg(color);
+	printf("%i", value);
+	fg(WHITE);
+	printf("]");
 }
 
 void
@@ -326,19 +350,12 @@ print_entity(Entity *e)
 	print_entity_basestats(e);
 
 	/* FIXME: That’s ugly. Not just the code, the output as well! */
-	printf(
-		BRIGHT WHITE "  [Def. " BLUE  "%i"
-		BRIGHT WHITE "] - [Att. "
-		BRIGHT RED "%i" BRIGHT WHITE "]" NOCOLOR
-		"\n"
-		,
-		get_defense_bonus(e),
-		get_attack_bonus(e)
-	);
+	tag("Def.", get_defense_bonus(e), BLUE);
+	tag("Att.", get_attack_bonus(e), BLUE);
 
 	printf("\n");
 
-	printf(WHITE "Resistances:\n" NOCOLOR);
+	printf("Resistances:\n");
 	for (i = 0; i < TYPE_MAX; i++)
 	{
 		print_resistance(e, i);

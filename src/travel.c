@@ -105,7 +105,8 @@ travel(Game* game)
 			info = "Hey! Invalid input!";
 		}
 
-		printf(BRIGHT BLUE "\n >> Places you can go to:\n\n" NOCOLOR);
+		fg(BLUE);
+		printf("\n >> Places you can go to:\n\n");
 
 		i = 0;
 		for (list = game->location->destinations; list; list = list->next)
@@ -113,19 +114,22 @@ travel(Game* game)
 			destination = list->data;
 
 			if (can_travel_to(game, destination))
-				printf(WHITE "  (%i)  %-40s %s %s %s\n" NOCOLOR,
+			{
+				fg(WHITE);
+				printf("  (%i)  %-40s %s %s %s\n",
 					i + 1, destination->name,
 					destination->place->shop_items ?
-						"<" BRIGHT GREEN "sh" NOCOLOR WHITE ">" : "    ",
+						"<sh>" : "    ",
 					destination->place->random_enemies ?
-						"<" BRIGHT RED "en" NOCOLOR WHITE ">" : "    ",
+						"<en>" : "    ",
 					has_visited(game, destination->place) ? "" :
-						"<" BRIGHT YELLOW "unvisited" NOCOLOR WHITE ">"
+						"<unvisited>"
 				);
+			}
 			else
 			{
-				fg(1, 1, 1);
-				printf("  (%i)  %s\n" NOCOLOR,
+				fg(BLACK);
+				printf("  (%i)  %s\n",
 					i + 1, destination->name);
 			}
 
@@ -136,11 +140,13 @@ travel(Game* game)
 		for (; i < 14; i++)
 			printf("\n");
 
+		fg(WHITE);
 		printf("\nPlease select a destination.\n\n");
 
 		menu_separator();
 
-		printf(WHITE "  (l)  Cancel\n" NOCOLOR);
+		fg(WHITE);
+		printf("  (l)  Cancel\n");
 
 		menu_separator();
 

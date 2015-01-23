@@ -40,15 +40,14 @@ loot_screen(List* list)
 		{
 			Item* item = list->data;
 
-			printf(BRIGHT);
 			if (item->slot >= 0)
-				printf(WHITE);
+				fg(WHITE);
 			else if (item->on_use && item->on_use->strikes > 0)
-				printf(YELLOW);
+				fg(YELLOW);
 			else if (is_item_usable(item))
-				printf(GREEN);
+				fg(GREEN);
 
-			printf("  - %s\n" NOCOLOR, item->name);
+			printf("  - %s\n", item->name);
 		}
 
 		printf("\nPress any key to continue...\n\n");
@@ -87,15 +86,15 @@ print_attacks(Entity* player, List* list, int selection)
 
 			if (i == selection % 5)
 			{
-				bg(4, 4, 4);
-				printf(BLACK);
+				bg(WHITE);
+				fg(BLACK);
 			}
 			else
 			{
 				if (can_use > 0)
-					printf(WHITE);
+					fg(WHITE);
 				else
-					fg(1, 1, 1);
+					bg(BLACK);
 			}
 
 			printf(" %-37s ", attack->name);
@@ -105,12 +104,17 @@ print_attacks(Entity* player, List* list, int selection)
 			if (can_use > 0)
 			{
 				if (ad->charge < attack->charge)
-					printf(" --  " YELLOW "%i/%i" WHITE "  --",
-						ad->charge, attack->charge);
+				{
+					printf(" --  ");
+					fg(YELLOW);
+					printf("%i/%i", ad->charge, attack->charge);
+					fg(WHITE);
+					printf("  --");
+				}
 				else
 				{
 					if (attack->charge)
-						printf(YELLOW);
+						fg(YELLOW);
 
 					printf(" -- READY --");
 				}
@@ -122,14 +126,15 @@ print_attacks(Entity* player, List* list, int selection)
 			else if (can_use == E_NO_HEALTH)
 				printf(" -- NO HP --");
 
-			printf("\n" NOCOLOR);
+			printf("\n");
+			nocolor();
 
 			list = list->next;
 		}
 		else
 		{
-			fg(1, 1, 1);
-			printf(" ------------ \n" NOCOLOR);
+			fg(BLACK);
+			printf(" ------------ \n");
 		}
 	}
 }
@@ -155,7 +160,7 @@ print_items_menu(Entity* player, int selection)
 
 			if (i == selection)
 			{
-				bg(4, 4, 4);
+				bg(WHITE);
 			}
 
 			if ((item = player->inventory[i].item))
@@ -163,37 +168,39 @@ print_items_menu(Entity* player, int selection)
 				if (is_item_usable(item))
 				{
 					if (item->consumable)
-						printf(GREEN);
+						fg(GREEN);
 					else
-						printf(BLUE);
+						fg(BLUE);
 				}
 				else
 				{
 					if (i == selection)
-						fg(2, 2, 2);
+						fg(GRAY);
 					else
-						fg(1, 1, 1);
+						fg(BLACK);
 				}
 
 				if (player->inventory[i].quantity > 1)
-					printf(" %ix %-37s\n" NOCOLOR,
+					printf(" %ix %-37s\n",
 						player->inventory[i].quantity, item->name);
 				else
-					printf(" %-39s\n" NOCOLOR, item->name);
+					printf(" %-39s\n", item->name);
 			}
 			else
 			{
 				int j;
 
-				fg(1, 1, 1);
+				fg(BLACK);
 				printf(" ");
 				for (j = 0; j < 37; j++)
 					printf("-");
-				printf(" \n" NOCOLOR);
+				printf(" \n");
 			}
 		}
 		else
 			printf("\n");
+
+		nocolor();
 	}
 }
 
@@ -247,14 +254,14 @@ print_attack_stats(Attack* attack, Entity* player)
 	{
 		int mana = get_mana_cost(player, attack);
 		if (attack->mana > 0)
-			printf(BLUE);
+			fg(BLUE);
 		else if (attack->mana < mana)
-			printf(RED);
+			fg(RED);
 		else
-			printf(WHITE);
+			fg(WHITE);
 
 		printf("%+iMP", mana);
-		printf(NOCOLOR);
+		nocolor();
 
 		first = 0;
 	}
@@ -267,12 +274,12 @@ print_attack_stats(Attack* attack, Entity* player)
 			printf(", ");
 
 		if (attack->health > 0)
-			printf(GREEN);
+			fg(GREEN);
 		else
-			printf(RED);
+			fg(RED);
 
 		printf("%+iHP", attack->health);
-		printf(NOCOLOR);
+		nocolor();
 	}
 
 	if (attack->cooldown)
@@ -282,9 +289,9 @@ print_attack_stats(Attack* attack, Entity* player)
 		else
 			printf(", ");
 
-		printf(WHITE);
+		fg(WHITE);
 		printf("cooldown: %i", attack->cooldown);
-		printf(NOCOLOR);
+		nocolor();
 	}
 
 	if (attack->strikes)
@@ -294,24 +301,24 @@ print_attack_stats(Attack* attack, Entity* player)
 		else
 			printf(", ");
 
-		printf(WHITE);
+		fg(WHITE);
 		printf("(%i-%i)x%i", attack->damage.min, attack->damage.max, attack->strikes);
 		printf(" %s damage", type_to_string(attack->type));
 	}
 
 	if (attack->inflicts_status)
 	{
-		printf(NOCOLOR);
+		nocolor();
 		printf(", ");
-		printf(MAGENTA);
+		fg(MAGENTA);
 		printf("inflicts %s", attack->inflicts_status->name);
 	}
 
 	if (attack->self_inflicts_status)
 	{
-		printf(NOCOLOR);
+		nocolor();
 		printf(", ");
-		printf(MAGENTA);
+		fg(MAGENTA);
 		printf("self-inflicts %s", attack->self_inflicts_status->name);
 	}
 
@@ -323,18 +330,18 @@ print_attack_stats(Attack* attack, Entity* player)
 		{
 			Status* status = l->data;
 
-			printf(NOCOLOR);
+			nocolor();
 			printf(", ");
-			printf(CYAN);
+			fg(CYAN);
 			printf("cures %s", status->name);
 		}
 	}
 
 	if (attack->charge)
 	{
-		printf(NOCOLOR);
+		nocolor();
 		printf(", ");
-		printf(YELLOW);
+		fg(YELLOW);
 
 		if (attack->charge == 1)
 			printf("charges 1 turn");
@@ -434,7 +441,7 @@ battle(Game *game)
 						if (can_use_attack(player, ad) < 1)
 						{
 							snprintf(info, 128,
-								BRIGHT RED " >> " WHITE "Not enough mana/health or cooldown issue...");
+								" >> Not enough mana/health or cooldown issue...");
 						}
 						else
 						{
@@ -468,23 +475,18 @@ battle(Game *game)
 							}
 							else
 								snprintf(
-									info, 128,
-									BRIGHT RED " >> " WHITE
-										"Item cannot be used."
+									info, 128, " >> Item cannot be used."
 								);
 						}
 						else
 							snprintf(
-								info, 128,
-								BRIGHT RED " >> " WHITE
-									"Inventory slot empty."
+								info, 128, " >> Inventory slot empty."
 							);
 					}
 					break;
 				default:
 					snprintf(
-						info, 128,
-						BRIGHT RED " >> " WHITE "Unrecognized key..."
+						info, 128, " >> Unrecognized key..."
 					);
 			}
 
@@ -584,28 +586,31 @@ battle(Game *game)
 				else if (menu == ITEMS)
 					print_items_menu(player, item_index);
 
+				fg(WHITE);
+
 				back(5);
 				move(40);
-				printf(WHITE "  (u) %-14s" NOCOLOR,
+				printf("  (u) %-14s",
 					menu == ATTACKS ? "attack" : "use item");
 				move(60);
-				fg(4, 3, 0);
+				fg(YELLOW);
 				printf("  (v) %-14s\n",
 					menu == ATTACKS ? "view attack" : "view items");
 				move(40);
-				printf(WHITE "  (f) focus" NOCOLOR);
+				fg(WHITE);
+				printf("  (f) focus");
 				move(60);
-				printf(WHITE "  (d) view %-9s\n",
+				printf("  (d) view %-9s\n",
 					view == LOGS ? "enemy" :
 					view == ENEMY ? "player" : "battle");
 
 				move(40);
 				if (menu == ITEMS)
-					printf(WHITE "%-40s" NOCOLOR, "  (i) view actions");
+					printf("%-40s", "  (i) view actions");
 				else
-					printf(WHITE "  (i) view items" NOCOLOR);
+					printf("  (i) view items");
 				move(60);
-				printf(WHITE "  (l) flee\n");
+				printf("  (l) flee\n");
 
 				move(40);
 				printf("%40s\n", "");

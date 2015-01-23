@@ -31,7 +31,7 @@ ai_action(Game* game, Logs* logs)
 
 			log = (char*) malloc(sizeof(char) * 128);
 			snprintf(log, 128,
-				BRIGHT WHITE "%s used “%s”",
+				"%s used “%s”",
 				enemy->name,
 				selected_attack->attack->name
 			);

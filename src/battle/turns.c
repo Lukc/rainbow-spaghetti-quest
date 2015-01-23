@@ -49,8 +49,7 @@ end_turn(Entity* e, Logs* logs)
 		e->health -= health_lost;
 
 		log = malloc(sizeof(char) * 128);
-		snprintf(log, 128, BRIGHT MAGENTA " <<< " RED "%+iHP"
-			MAGENTA " (statuses)",
+		snprintf(log, 128, " <<< %+iHP (statuses)",
 			-health_lost);
 		logs_add(logs, log);
 	}

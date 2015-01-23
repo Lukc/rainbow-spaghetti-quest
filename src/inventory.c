@@ -98,7 +98,11 @@ inventory(Game* game)
 			printf("│");
 
 			if (i == 0)
-				printf(BRIGHT BLUE " >> %s" NOCOLOR, player->name);
+			{
+				fg(BLUE);
+				printf(" >> %s", player->name);
+				nocolor();
+			}
 			else if (i == 1)
 				printf("  <att %i> <def %i>",
 					get_attack_bonus(player), get_defense_bonus(player));
@@ -157,34 +161,35 @@ inventory(Game* game)
 					for (j = 0; j < 26 - printed; j++)
 						printf(" ");
 
-					printf(NOCOLOR);
+					nocolor();
 				}
 
 			printf("\n");
 
-			printf(NOCOLOR);
+			nocolor();
 		}
 
 		menu_separator();
 
-		printf(WHITE);
+		fg(WHITE);
 		printf("  (e)  Equip stuff.\n");
 
 		back(1);
 		move(40);
-		printf(WHITE "Money:     %-8i\n" NOCOLOR, player->gold);
+		printf("Money:     %-8i\n", player->gold);
 
 		if (!game->location->shop_items)
-			printf(BLACK);
+			fg(BLACK);
 		else
-			printf(WHITE);
+			fg(WHITE);
 		printf("  (s)  Sell stuff.\n");
 
 		back(1);
 		move(40);
 		if (game->location->shop_items && player->inventory[selection].item)
 		{
-			printf(WHITE "Sell price %-8i\n" NOCOLOR,
+			fg(WHITE);
+			printf("Sell price %-8i\n",
 				player->inventory[selection].item->price * 2 / 3);
 		}
 		else
@@ -194,13 +199,14 @@ inventory(Game* game)
 			printf("\n");
 		}
 
-		printf(WHITE "  (l)  Leave\n" NOCOLOR);
+		fg(WHITE);
+		printf("  (l)  Leave\n");
 
 		back(1);
 		move(40);
-		printf(WHITE "  (v)  View item.\n" NOCOLOR);
+		printf("  (v)  View item.\n");
 
-		printf(NOCOLOR);
+		nocolor();
 
 		menu_separator();
 

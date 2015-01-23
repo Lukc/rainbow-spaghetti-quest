@@ -56,16 +56,12 @@ focus(Entity* entity, Logs* logs)
 	}
 
 	if (cured)
-		snprintf(cure_string, 64, BRIGHT WHITE " -" CYAN "Cured!" WHITE "-");
+		snprintf(cure_string, 64, " -Cured!-");
 	else
 		cure_string[0] = '\0';
 
 	log = (char*) malloc(sizeof(char) * 128);
-	snprintf(
-		log, 128,
-		BRIGHT WHITE "%s focuses"
-		NOCOLOR,
-		entity->name);
+	snprintf(log, 128, "%s focuses", entity->name);
 	logs_add(logs, log);
 
 	if (can_recover)
@@ -81,7 +77,7 @@ focus(Entity* entity, Logs* logs)
 
 		snprintf(
 			health_string, 64,
-			GREEN " +%iHP" WHITE,
+			" +%iHP",
 			health_gained
 		);
 
@@ -91,10 +87,7 @@ focus(Entity* entity, Logs* logs)
 	{
 		health_gained = 0;
 
-		snprintf(
-			health_string, 64,
-			MAGENTA BRIGHT "<recovery prevented>" NOCOLOR WHITE
-		);
+		snprintf(health_string, 64, "<recovery prevented>");
 	}
 
 	mana_gained = entity->class->mana_regen_on_focus;
@@ -109,20 +102,13 @@ focus(Entity* entity, Logs* logs)
 	entity->mana += mana_gained;
 
 	if (mana_gained)
-		snprintf(
-			mana_string, 64,
-			BRIGHT BLUE " +%iMP" WHITE,
-			mana_gained
-		);
+		snprintf(mana_string, 64, " +%iMP", mana_gained);
 	else
 		mana_string[0] = '\0';
 
 	log = (char*) malloc(sizeof(char) * 128);
 	snprintf(
-		log, 128,
-		BRIGHT WHITE "   " BLUE "<<< %s%s%s"
-		NOCOLOR,
-		health_string, mana_string, cure_string);
+		log, 128, "   <<< %s%s%s", health_string, mana_string, cure_string);
 	logs_add(logs, log);
 }
 

@@ -73,41 +73,41 @@ print_skill(Skill* skill, Game* game, int selected)
 
 	drops = get_skill_drops(skill, game->location);
 
-	printf(BRIGHT WHITE " %c%c " NOCOLOR, c, c);
+	fg(WHITE);
+	printf(" %c%c ", c, c);
 	if (drops)
 	{
 		if (skill->cooldown)
-			printf(BRIGHT YELLOW);
+			fg(YELLOW);
 		else
-			printf(BRIGHT GREEN);
+			fg(GREEN);
 	}
 	else
-		fg(1, 1, 1);
+		fg(BLACK);
 
-	printf(" %s", skill->name);
-	printf(NOCOLOR "\n");
+	printf(" %s\n", skill->name);
 
 	if (drops)
-		printf(WHITE);
+		fg(WHITE);
 	else
-		fg(1, 1, 1);
+		fg(BLACK);
 	printf("  cd: <");
 	if (drops)
 	{
 		if (skill->cooldown)
-			printf(YELLOW);
+			fg(YELLOW);
 		else
-			printf(BLUE);
+			fg(BLUE);
 	}
 	else
-		fg(1, 1, 1);
+		fg(BLACK);
 	for (i = 0; i < 68; i++)
 		printf("%c", i * 100 / 68 < (12 - skill->cooldown) * 100 / 12 ? '=' : ' ');
 
 	if (drops)
-		printf(WHITE);
+		fg(WHITE);
 	else
-		fg(1, 1, 1);
+		fg(BLACK);
 
 	printf(">\n");
 
@@ -118,20 +118,22 @@ print_skill(Skill* skill, Game* game, int selected)
 	);
 	threshold = skill->experience - skill_level_to_experience(
 		get_skill_level(skill->experience));
+
 	if (drops)
-		printf(WHITE);
+		fg(WHITE);
 	else
-		fg(1, 1, 1);
-	printf("  xp: <"BLUE);
+		fg(BLACK);
+	printf("  xp: <");
+	fg(BLUE);
 	for (i = 0; i < 68; i++)
 		printf("%c", i * 100 / 68 < threshold * 100 / max ? '=' : ' ');
 	if (drops)
-		printf(WHITE);
+		fg(WHITE);
 	else
-		fg(1, 1, 1);
+		fg(BLACK);
 	printf(">");
 
-	printf(NOCOLOR "\n");
+	printf("\n");
 }
 
 void
@@ -175,15 +177,13 @@ skills(Game* game)
 					/* 10xp/item collected */
 					skill->experience += skill->cooldown * 5;
 
-					log = strdup(
-						BRIGHT GREEN " >> " WHITE "Items collected." NOCOLOR);
+					log = strdup(" >> Items collected.");
 
 					/* FIXME: Print the obtained items! */
 				}
 				break;
 			default:
-				log = strdup(
-					BRIGHT RED " >> " WHITE "Unrecognized key!" NOCOLOR);
+				log = strdup(" >> Unrecognized key!");
 		}
 
 		skill = list_nth(game->skills, selection);
@@ -212,35 +212,34 @@ skills(Game* game)
 
 		menu_separator();
 
-		printf(WHITE);
+		fg(WHITE);
 		printf("%-20s", "Cooldown:");
 		if (skill->cooldown > 4)
-			printf(BRIGHT RED);
+			fg(RED);
 		else if (skill->cooldown > 0)
-			printf(BRIGHT YELLOW);
+			fg(YELLOW);
 		else
-			printf(BRIGHT);
-		printf("%-5i\n", skill->cooldown);
-		printf(NOCOLOR);
+			fg(WHITE);
+		printf("%-5i", skill->cooldown);
 
-		back(1);
 		move(40);
-		printf(YELLOW " (d)  See drop\n" NOCOLOR);
+		fg(WHITE);
+		printf(" (d)  See drop\n");
 
-		printf(WHITE "%-20s%-5i\n" NOCOLOR,
+		printf("%-20s%-5i\n",
 			"Skill Level:", get_skill_level(skill->experience));
 		back(1);
 		move(40);
-		printf(WHITE " (u)  Use skill\n" NOCOLOR);
+		printf(" (u)  Use skill\n");
 
 		printf("%80s", "");
 		move(0);
-		printf(WHITE "%-20s%i/%i\n" NOCOLOR,
+		printf("%-20s%i/%i\n",
 			"Experience:", skill->experience,
 			skill_level_to_experience(get_skill_level(skill->experience) + 1));
 		back(1);
 		move(40);
-		printf(WHITE " (l)  Leave\n" NOCOLOR);
+		printf(" (l)  Leave\n");
 
 		menu_separator();
 

@@ -2,20 +2,23 @@
 #ifndef COLORS_H
 #define COLORS_H
 
-#define BRIGHT   "\033[01m"
-#define RED      "\033[31m"
-#define GREEN    "\033[32m"
-#define YELLOW   "\033[33m"
-#define BLUE     "\033[34m"
-#define MAGENTA  "\033[35m"
-#define CYAN     "\033[36m"
-#define WHITE    "\033[37m"
-#define GRAY     "\033[38m"
-#define BLACK    "\033[30m"
-#define NOCOLOR  "\033[00m"
+/*#define BRIGHT   "\033[01m"*/
+#define RED      1
+#define GREEN    2
+#define YELLOW   3
+#define BLUE     color(1, 3, 5)
+#define MAGENTA  5
+#define CYAN     6
+#define WHITE    7
+#define GRAY     color(3, 3, 3)
+#define BLACK    color(1, 1, 1)
+/*#define NOCOLOR  "\033[00m"*/
 
-void fg(int, int, int);
-void bg(int, int, int);
+int color(int, int, int);
+
+void fg(int);
+void bg(int);
+void nocolor();
 
 #endif
 

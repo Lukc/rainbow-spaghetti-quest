@@ -2,8 +2,11 @@
 
 #include "colors.h"
 
-static int
-t256code(int r, int g, int b)
+/**
+ * Converts three RGB values between 0 and 6 into a 256-color number.
+ */
+int
+color(int r, int g, int b)
 {
 	r = r > 5 ? 5 : r;
 	g = g > 5 ? 5 : g;
@@ -25,18 +28,20 @@ t256code(int r, int g, int b)
  * limited to 6 shades instead of the 24 available.
  */
 void
-fg(int r, int g, int b)
+fg(int c)
 {
-	printf("\033[38;5;%im", t256code(r, g, b));
+	printf("\033[38;5;%im", c);
 }
 
 void
-bg(int r, int g, int b)
+bg(int c)
 {
-	r = r > 5 ? 5 : r;
-	g = g > 5 ? 5 : g;
-	b = b > 5 ? 5 : b;
+	printf("\033[48;5;%im", c);
+}
 
-	printf("\033[48;5;%im", t256code(r, g, b));
+void
+nocolor()
+{
+	printf("\033[0m");
 }
 
