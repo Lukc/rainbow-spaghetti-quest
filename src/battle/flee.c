@@ -3,19 +3,20 @@
 
 #include "flee.h"
 
-Logs*
+#include "../colors.h"
+#include "../term.h"
+
+Queue*
 command_flee(Game* game)
 {
-	Logs* logs;
-	char* log;
+	Queue* logs;
+	Cell* log;
 
-	logs = logs_new();
+	logs = queue_new();
 
-	log = (char*) malloc(sizeof(char) * 128);
-	snprintf(
-		log, 128,
-		"You fled from battle!");
-	logs_add(logs, log);
+	log = malloc(sizeof(Cell) * 81);
+	ccnprintf(log, 81, WHITE, 0, "You fled from battle!");
+	queue_add(logs, log);
 
 	game->flee = 1;
 

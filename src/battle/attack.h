@@ -3,7 +3,7 @@
 #define BATTLE_ATTACK_H
 
 #include "../entities.h"
-#include "../commands.h"
+#include "../queue.h"
 #include "../attack.h"
 
 /**
@@ -16,8 +16,8 @@
 int can_use_attack(Entity*, AttackData*);
 void reset_charges(Entity*);
 
-void attack(Entity*, Attack*, Entity*, Logs*);
-Logs* command_attack(Game*, AttackData*);
+void attack(Entity*, Attack*, Entity*, Queue*);
+Queue* command_attack(Game*, AttackData*);
 
 #endif
 

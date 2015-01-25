@@ -205,7 +205,7 @@ print_items_menu(Entity* player, int selection)
 }
 
 static void
-print_battle_logs(Game* game, Logs* logs)
+print_battle_logs(Game* game, Queue* logs)
 {
 	List* list;
 	int i;
@@ -227,16 +227,17 @@ print_battle_logs(Game* game, Logs* logs)
 		/* Clearing each line of the logs area before using it. */
 		for (j = 0; j < 80; j++)
 			printf(" ");
-		printf("\n");
+		move(0);
 
 		if (list)
 		{
-			back(1);
-
-			printf("%s\n", (char*) list->data);
+			printc(list->data);
+			printf("\n");
 
 			list = list->next;
 		}
+		else
+			printf("\n");
 	}
 }
 
@@ -362,7 +363,7 @@ print_attack_stats(Attack* attack, Entity* player)
 int
 battle(Game *game)
 {
-	Logs* logs;
+	Queue* logs;
 	char input = KEY_CLEAR;
 	char info[128];
 	Entity *player = game->player;
@@ -395,13 +396,13 @@ battle(Game *game)
 					break;
 				case 'f':
 					if (logs)
-						logs_free(logs);
+						queue_free(logs, NULL);
 
 					logs = command_focus(game);
 					break;
 				case 'l':
 					if (logs)
-						logs_free(logs);
+						queue_free(logs, NULL);
 
 					logs = command_flee(game);
 					break;
@@ -446,7 +447,7 @@ battle(Game *game)
 						else
 						{
 							if (logs)
-								logs_free(logs);
+								queue_free(logs, NULL);
 
 							logs = command_attack(game, ad);
 						}
@@ -461,7 +462,7 @@ battle(Game *game)
 							if (is_item_usable(item))
 							{
 								if (logs)
-									logs_free(logs);
+									queue_free(logs, NULL);
 
 								logs = command_use_item(game, player, item);
 

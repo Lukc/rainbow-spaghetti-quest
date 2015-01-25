@@ -216,6 +216,7 @@ print_bar(
 	int i;
 	int printed;
 
+	fg(WHITE);
 	printed = printf("%s", statstring);
 
 	fg(colorset);

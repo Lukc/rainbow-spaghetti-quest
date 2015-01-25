@@ -7,14 +7,15 @@
 #include "turns.h"
 
 #include "../colors.h"
+#include "../term.h"
 
 void
-ai_action(Game* game, Logs* logs)
+ai_action(Game* game, Queue* logs)
 {
 	Entity* player;
 	Entity* enemy;
 	AttackData* selected_attack;
-	char* log;
+	Cell* log;
 
 	player = game->player;
 	enemy = game->enemy;
@@ -29,13 +30,13 @@ ai_action(Game* game, Logs* logs)
 		{
 			begin_turn(enemy, logs);
 
-			log = (char*) malloc(sizeof(char) * 128);
-			snprintf(log, 128,
+			log = malloc(sizeof(Cell) * 81);
+			ccnprintf(log, 81, WHITE, 0,
 				"%s used “%s”",
 				enemy->name,
 				selected_attack->attack->name
 			);
-			logs_add(logs, log);
+			queue_add(logs, log);
 
 			attack(
 				enemy,

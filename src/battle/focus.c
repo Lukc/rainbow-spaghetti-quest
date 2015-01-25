@@ -6,10 +6,13 @@
 #include "../game.h"
 #include "../enemies.h"
 #include "../entities.h"
+#include "../term.h"
 #include "../colors.h"
 
 #include "ai.h"
 #include "turns.h"
+
+#define BUFFER_SIZE 64
 
 /**
  * Gives back mana (and possibly health or other stats).
@@ -17,16 +20,16 @@
  * @fixme: Be clearer about recovery being prevented, when it is.
  */
 void
-focus(Entity* entity, Logs* logs)
+focus(Entity* entity, Queue* logs)
 {
 	int mana_gained, health_gained;
 	int can_recover = 1;
-	int i;
-	char health_string[64];
-	char mana_string[64];
-	char cure_string[64];
+	int i, offset;
+	Cell health_string[64];
+	Cell mana_string[64];
+	Cell cure_string[64];
 	int cured = 0;
-	char* log;
+	Cell* log;
 	List* l;
 	List* next;
 
@@ -56,13 +59,13 @@ focus(Entity* entity, Logs* logs)
 	}
 
 	if (cured)
-		snprintf(cure_string, 64, " -Cured!-");
+		ccnprintf(cure_string, 64, CYAN, 0, " -Cured!-");
 	else
-		cure_string[0] = '\0';
+		cure_string[0].ch = '\0';
 
-	log = (char*) malloc(sizeof(char) * 128);
-	snprintf(log, 128, "%s focuses", entity->name);
-	logs_add(logs, log);
+	log = malloc(sizeof(Cell) * 81);
+	ccnprintf(log, 81, WHITE, 0, "%s focuses", entity->name);
+	queue_add(logs, log);
 
 	if (can_recover)
 	{
@@ -75,8 +78,9 @@ focus(Entity* entity, Logs* logs)
 		if (entity->health + health_gained > get_max_health(entity))
 			health_gained = get_max_health(entity) - entity->health;
 
-		snprintf(
+		ccnprintf(
 			health_string, 64,
+			GREEN, 0, 
 			" +%iHP",
 			health_gained
 		);
@@ -87,7 +91,7 @@ focus(Entity* entity, Logs* logs)
 	{
 		health_gained = 0;
 
-		snprintf(health_string, 64, "<recovery prevented>");
+		ccnprintf(health_string, 64, MAGENTA, 0, "<recovery prevented>");
 	}
 
 	mana_gained = entity->class->mana_regen_on_focus;
@@ -102,22 +106,28 @@ focus(Entity* entity, Logs* logs)
 	entity->mana += mana_gained;
 
 	if (mana_gained)
-		snprintf(mana_string, 64, " +%iMP", mana_gained);
+		ccnprintf(mana_string, 64, BLUE, 0, " +%iMP", mana_gained);
 	else
-		mana_string[0] = '\0';
+		mana_string[0].ch = '\0';
 
-	log = (char*) malloc(sizeof(char) * 128);
-	snprintf(
-		log, 128, "   <<< %s%s%s", health_string, mana_string, cure_string);
-	logs_add(logs, log);
+	/* Finally concatenating everything. */
+
+	log = malloc(sizeof(Cell) * 81);
+
+	offset = ccnprintf(log, 81, BLUE, 0,  "   >>>");
+	offset += copy_cells(log + offset, health_string, 81 - offset);
+	offset += copy_cells(log + offset, mana_string, 81 - offset);
+	offset += copy_cells(log + offset, cure_string, 81 - offset);
+
+	queue_add(logs, log);
 }
 
-Logs*
+Queue*
 command_focus(Game* game)
 {
-	Logs* logs;
+	Queue* logs;
 
-	logs = logs_new();
+	logs = queue_new();
 
 	begin_turn(game->player, logs);
 

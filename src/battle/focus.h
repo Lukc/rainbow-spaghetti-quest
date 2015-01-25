@@ -3,11 +3,11 @@
 #define FOCUS_H
 
 #include "../entities.h"
-#include "../commands.h"
+#include "../queue.h"
 #include "../attack.h"
 
-void focus(Entity*, Logs*);
-Logs* command_focus(Game*);
+void focus(Entity*, Queue*);
+Queue* command_focus(Game*);
 
 #endif
 

@@ -3,9 +3,9 @@
 #define FLEE_H
 
 #include "../game.h"
-#include "../commands.h"
+#include "../queue.h"
 
-Logs* command_flee(Game*);
+Queue* command_flee(Game*);
 
 #endif
 

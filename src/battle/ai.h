@@ -6,9 +6,9 @@
  * name of “AI”… */
 
 #include "../game.h"
-#include "../commands.h"
+#include "../queue.h"
 
-void ai_action(Game*, Logs*);
+void ai_action(Game*, Queue*);
 
 #endif
 

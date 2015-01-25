@@ -5,10 +5,10 @@
 
 #include "../colors.h"
 #include "../entities.h"
-#include "../commands.h"
+#include "../term.h"
 
 void
-begin_turn(Entity* e, Logs* logs)
+begin_turn(Entity* e, Queue* logs)
 {
 	List* l;
 
@@ -24,7 +24,7 @@ begin_turn(Entity* e, Logs* logs)
 }
 
 void
-end_turn(Entity* e, Logs* logs)
+end_turn(Entity* e, Queue* logs)
 {
 	List* l;
 	StatusData* sd;
@@ -44,14 +44,14 @@ end_turn(Entity* e, Logs* logs)
 
 	if (health_lost)
 	{
-		char* log;
+		Cell* log;
 
 		e->health -= health_lost;
 
-		log = malloc(sizeof(char) * 128);
-		snprintf(log, 128, " <<< %+iHP (statuses)",
+		log = malloc(sizeof(Cell) * 81);
+		ccnprintf(log, 81, MAGENTA, 0, "  <<< %+iHP (statuses)",
 			-health_lost);
-		logs_add(logs, log);
+		queue_add(logs, log);
 	}
 }
 

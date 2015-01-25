@@ -52,28 +52,30 @@ reset_charges(Entity* e)
  * Adds a corresponding log entry in “logs”.
  */
 void
-attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
+attack(Entity* attacker, Attack* attack, Entity* defender, Queue* logs)
 {
 	float random_modifier;
+	int offset;
 	int strikes;
 	int damage_inflicted = 0;
 	int mana_cost;
 	int type_modifier;
-	char* log;
-	char attack_string[64];
-	char status_string[64];
-	char self_status_string[64];
-	char healing_string[64];
-	char injury_string[64];
-	char mana_string[64];
-	char* cure_string = "";
+	Cell* log;
+	Cell attack_string[64];
+	Cell status_string[64];
+	Cell self_status_string[64];
+	Cell healing_string[64];
+	Cell injury_string[64];
+	Cell mana_string[64];
+	Cell cure_string[64];
 
-	attack_string[0] = '\0';
-	self_status_string[0] = '\0';
-	status_string[0] = '\0';
-	healing_string[0] = '\0';
-	injury_string[0] = '\0';
-	mana_string[0] = '\0';
+	attack_string[0].ch = '\0';
+	self_status_string[0].ch = '\0';
+	status_string[0].ch = '\0';
+	healing_string[0].ch = '\0';
+	injury_string[0].ch = '\0';
+	mana_string[0].ch = '\0';
+	cure_string[0].ch = '\0';
 
 	mana_cost = get_mana_cost(attacker, attack);
 
@@ -81,7 +83,8 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 	{
 		inflict_status(attacker, attack->self_inflicts_status);
 
-		snprintf(self_status_string, 64, " <<< %s", attack->self_inflicts_status->name);
+		ccnprintf(self_status_string, 64,
+				RED, 0, " <<< %s", attack->self_inflicts_status->name);
 	}
 
 	if (attack->strikes)
@@ -119,8 +122,9 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 
 		defender->health -= damage_inflicted;
 
-		snprintf(attack_string, 64,
-			" >>> %s -%iHP <(%i-%i)x%i %s>",
+		offset = ccnprintf(attack_string, 64, RED, 0, ">>>");
+		ccnprintf(attack_string + offset, 64 - offset, WHITE, 0,
+			" %s -%iHP <(%i-%i)x%i %s>",
 			defender->name,
 			damage_inflicted,
 			get_attack_bonus(attacker) + attack->damage.min,
@@ -133,8 +137,8 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 	{
 		inflict_status(defender, attack->inflicts_status);
 
-		snprintf(
-			status_string, 64,
+		ccnprintf(
+			status_string, 64, MAGENTA, 0,
 			" >>> %s",
 			attack->inflicts_status->name
 		);
@@ -151,7 +155,7 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 			cure_status(attacker, status);
 		}
 
-		cure_string = " -Cured!-";
+		ccnprintf(cure_string, 64, CYAN, 0, " -Cured!-");
 	}
 
 	if (attack->health)
@@ -174,15 +178,15 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 			{
 				give_health(attacker, attack->health);
 
-				snprintf(
-					healing_string, 64,
+				ccnprintf(
+					healing_string, 64, GREEN, 0,
 					" <<< +%iHP",
 					attack->health
 				);
 			}
 			else
-				snprintf(
-					healing_string, 64,
+				ccnprintf(
+					healing_string, 64, MAGENTA, 0,
 					" <<< -recovery prevented-"
 				);
 		}
@@ -190,68 +194,72 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Logs* logs)
 		{
 			attacker->health += attack->health;
 
-			snprintf(
-				injury_string, 64,
-				" <<< %+iHP", attack->health
+			ccnprintf(
+				injury_string, 64, RED, 0,
+				"<<< %+iHP ", attack->health
 			);
 		}
 	}
 
-	snprintf(mana_string, 64, " <<< %+iMP", mana_cost);
+	if (mana_cost)
+		ccnprintf(mana_string, 64, BLUE, 0, " <<< %+iMP", mana_cost);
+	else
+		mana_string[0].ch = '\0';
 
 	attacker->mana += mana_cost;
 
 	reset_charges(attacker);
 
-	log = (char*) malloc(sizeof(char) * 128);
-	snprintf(log, 128,
-		"  %s%s%s%s%s%s",
-		injury_string,
-		healing_string,
-		attack_string,
-		status_string,
-		cure_string,
-		mana_string
-	);
-	logs_add(logs, log);
+	log = (Cell*) malloc(sizeof(Cell) * 81);
+
+	offset = ccnprintf(log, 4, 0, 0, "   ");
+
+	offset += copy_cells(log + offset, injury_string, 81 - offset);
+	offset += copy_cells(log + offset, healing_string, 81 - offset);
+	offset += copy_cells(log + offset, attack_string, 81 - offset);
+	offset += copy_cells(log + offset, status_string, 81 - offset);
+	offset += copy_cells(log + offset, cure_string, 81 - offset);
+	offset += copy_cells(log + offset, mana_string, 81 - offset);
+
+	queue_add(logs, log);
 }
 
-Logs*
+Queue*
 command_attack(Game* game, AttackData* player_attack)
 {
 	Entity* player;
 	Entity* enemy;
-	Logs* logs;
-	char* log;
+	Queue* logs;
+	Cell* log;
 
-	logs = logs_new();
+	logs = queue_new();
 
 	player = game->player;
 	enemy = game->enemy;
 
 	begin_turn(game->player, logs);
 
-	log = (char*) malloc(sizeof(char) * 128);
-	snprintf(log, 128,
+	log = malloc(sizeof(Cell) * 81);
+	ccnprintf(log, 81, WHITE, 0,
 		"%s uses “%s”",
 		player->name,
 		player_attack->attack->name
 	);
-	logs_add(logs, log);
+	queue_add(logs, log);
 
 	if (player_attack->charge >= player_attack->attack->charge)
 		attack(player, player_attack->attack, enemy, logs);
 	else
 	{
 		player_attack->charge += 1;
-		logs_add(logs, strdup("   >>> The attack is charging!"));
+		queue_add(logs, strtocells("   >>> The attack is charging!", WHITE, 0));
 	}
 
 	player_attack->cooldown = player_attack->attack->cooldown;
 
 	if (enemy->health <= 0)
 	{
-		logs_add(logs, strdup("Your enemy is dead."));
+		queue_add(logs, strtocells("Your enemy is dead.", WHITE, 0));
 	}
 	else
 	{

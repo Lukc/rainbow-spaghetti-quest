@@ -7,29 +7,30 @@
 #include "ai.h"
 
 #include "../colors.h"
+#include "../term.h"
 
 void
-use_item(Entity* entity, Item* item, Entity* enemy, Logs* logs)
+use_item(Entity* entity, Item* item, Entity* enemy, Queue* logs)
 {
-	char* log;
+	Cell* log;
 
-	log = (char*) malloc(sizeof(char) * 128);
-	snprintf(
-		log, 128,
+	log = (Cell*) malloc(sizeof(Cell) * 81);
+	ccnprintf(
+		log, 81, WHITE, 0,
 		"%s uses “%s” <inventory>",
 		entity->name, item->name
 	);
-	logs_add(logs, log);
+	queue_add(logs, log);
 
 	attack(entity, item->on_use, enemy, logs);
 }
 
-Logs*
+Queue*
 command_use_item(Game* game, Entity* player, Item* item)
 {
-	Logs* logs;
+	Queue* logs;
 
-	logs = logs_new();
+	logs = queue_new();
 
 	begin_turn(game->player, logs);
 
