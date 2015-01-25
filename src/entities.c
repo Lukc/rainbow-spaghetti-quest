@@ -333,11 +333,11 @@ print_entity_basestats(Entity* e)
 }
 
 static void
-tag(const char* name, int value, int color)
+tag(const char* name, int value, int tag_color)
 {
 	fg(WHITE);
 	printf("[%s ", name);
-	fg(color);
+	fg(tag_color);
 	printf("%i", value);
 	fg(WHITE);
 	printf("]");
