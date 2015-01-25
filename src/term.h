@@ -23,6 +23,7 @@ void back(int);
 
 void term_init();
 int ccnprintf(Cell*, size_t, int, int, const char*, ...);
+int printcf(int, int, const char*, ...);
 void printc(Cell*);
 
 Cell* strtocells(const char*, int, int);

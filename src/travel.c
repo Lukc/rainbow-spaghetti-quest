@@ -116,15 +116,29 @@ travel(Game* game)
 			if (can_travel_to(game, destination))
 			{
 				fg(WHITE);
-				printf("  (%i)  %-40s %s %s %s\n",
-					i + 1, destination->name,
-					destination->place->shop_items ?
-						"<sh>" : "    ",
-					destination->place->random_enemies ?
-						"<en>" : "    ",
-					has_visited(game, destination->place) ? "" :
-						"<unvisited>"
+				printf("  (%i)  %-70s",
+					i + 1, destination->name
 				);
+
+				if (destination->place->shop_items)
+				{
+					move(50);
+					printcf(GREEN, 0, "<sh>");
+				}
+
+				if (destination->place->random_enemies)
+				{
+					move(60);
+					printcf(RED, 0, "<en>");
+				}
+
+				if (!has_visited(game, destination->place))
+				{
+					move(70);
+					printcf(YELLOW, 0, "<unvisited>");
+				}
+
+				printf("\n");
 			}
 			else
 			{

@@ -111,6 +111,27 @@ ccnprintf(Cell* dest, size_t n, int fg, int bg, const char* format, ...)
 }
 
 /**
+ * Similar to printf, but changes the colors of the foreground and background
+ * right before printing.
+ */
+int
+printcf(int fg_color, int bg_color, const char* format, ...)
+{
+	int r;
+	va_list l;
+
+	fg(fg_color);
+	bg(bg_color);
+
+	va_start(l, format);
+	r = vprintf(format, l);
+	va_end(l);
+
+	return r;
+}
+
+
+/**
  * Prints an array of cells to stdout.
  * Takes care of color changes and everything.
  */
