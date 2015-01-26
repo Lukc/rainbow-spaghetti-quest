@@ -140,8 +140,8 @@ printc(Cell* cells)
 {
 	int i;
 	/* Let’s always assume default values… */
-	int lfg = 0;
-	int lbg = 0;
+	int lfg = -1;
+	int lbg = -1;
 
 	for (i = 0; cells[i].ch; i++)
 	{
