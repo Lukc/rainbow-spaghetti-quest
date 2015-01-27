@@ -185,7 +185,7 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Queue* logs)
 
 			offset += ccnprintf(
 				log + offset, 81 - offset, RED, 0,
-				"<<< %+iHP ", attack->health
+				" <<< %+iHP ", attack->health
 			);
 		}
 	}
