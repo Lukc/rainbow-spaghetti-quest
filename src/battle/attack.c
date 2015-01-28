@@ -77,6 +77,7 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Queue* logs)
 
 	if (attack->strikes)
 	{
+		int atk, def;
 		List* l;
 
 		strikes = attack->strikes;
@@ -100,13 +101,21 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Queue* logs)
 
 		random_modifier = (float) (rand() % 100) / 100;
 
+		atk = get_attack_bonus(attacker) + attack->damage.min +
+			random_modifier * (attack->damage.max - attack->damage.min);
+		atk += atk * attacker->buffs.attack / 100;
+
+		def = get_defense_bonus(defender);
+		def += def * defender->buffs.defense / 100;
+
 		damage_inflicted =
 			(int) (
-				(get_attack_bonus(attacker) - get_defense_bonus(defender)
-				 + attack->damage.min + random_modifier *
-					(attack->damage.max - attack->damage.min)) *
+				(atk - def) *
 				(100 - type_modifier) / 100
 			) * strikes;
+
+		if (damage_inflicted < 0)
+			damage_inflicted = 0;
 
 		defender->health -= damage_inflicted;
 
@@ -196,6 +205,9 @@ attack(Entity* attacker, Attack* attack, Entity* defender, Queue* logs)
 	attacker->mana += mana_cost;
 
 	reset_charges(attacker);
+
+	entity_add_buff(attacker, &attack->self_buff);
+	entity_add_buff(defender, &attack->enemy_buff);
 
 	queue_add(logs, log);
 }

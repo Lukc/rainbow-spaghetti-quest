@@ -39,8 +39,13 @@ Item: [
 		Type: arcane
 		Mana: 12
 		Health: -12
-		Self inflicts: troll trance
 		Charge: 1
 		Cures: confusion
+
+		Buff: [
+			Name: Troll Trance
+			Attack: 40
+			Defense: -60
+		]
 	]
 ]

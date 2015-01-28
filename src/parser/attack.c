@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "attack.h"
+#include "buff.h"
 
 /**
  * Makes an Attack* usable in-game.
@@ -131,6 +132,30 @@ parser_get_attack(ParserElement* element)
 				attack->inflicts_status_name = parser_get_string(element, NULL);
 			else if (!strcmp(element->name, "self inflicts"))
 				attack->self_inflicts_status_name = parser_get_string(element, NULL);
+			else if (!strcmp(element->name, "buff"))
+			{
+				/* Buff* applied to self. */
+				Buff* buff = parser_get_buff(element);
+
+				if (buff)
+				{
+					memcpy(&attack->self_buff, buff, sizeof(*buff));
+
+					free(buff);
+				}
+			}
+			else if (!strcmp(element->name, "debuff"))
+			{
+				/* Buff* inflicted to enemy. */
+				Buff* buff = parser_get_buff(element);
+
+				if (buff)
+				{
+					memcpy(&attack->enemy_buff, buff, sizeof(*buff));
+
+					free(buff);
+				}
+			}
 			else if (!strcmp(element->name, "type"))
 			{
 				if (element->type == PARSER_STRING)

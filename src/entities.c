@@ -325,11 +325,18 @@ print_entity_basestats(Entity* e)
 		e->health, get_max_health(e), 34, 80
 	);
 
-	print_bar(
-		"  Mana:     ",
-		BLUE,
-		e->mana, get_max_mana(e), 34, 80
-	);
+	fg(WHITE);
+	printf("  Mana: ");
+	fg(BLUE);
+	printf("%i/%i", e->mana, get_max_mana(e));
+
+	move(34);
+	if (e->buffs.attack)
+		printcf(RED, -1, " <%+02i%% ATK>", e->buffs.attack);
+	if (e->buffs.defense)
+		printcf(BLUE, -1, " <%+02i%% DEF>", e->buffs.defense);
+
+	printf("\n");
 }
 
 static void
@@ -433,6 +440,19 @@ remove_statuses(Entity* e)
 	list_free(e->statuses, NULL);
 
 	e->statuses = (List*) NULL;
+}
+
+int
+entity_has_buff(Entity* e)
+{
+	return !buff_is_empty(&e->buffs);
+}
+
+void
+entity_add_buff(Entity* e, Buff* buff)
+{
+	e->buffs.attack += buff->attack;
+	e->buffs.defense += buff->defense;
 }
 
 /* vim: set ts=4 sw=4 cc=80 : */

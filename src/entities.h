@@ -8,6 +8,7 @@
 #include "attack.h"
 #include "items.h"
 #include "skills.h"
+#include "buff.h"
 
 /* Why? Because! */
 #define INVENTORY_SIZE 30
@@ -37,6 +38,8 @@ typedef struct Entity {
 	Item* equipment[EQ_MAX];
 	ItemStack inventory[INVENTORY_SIZE];
 
+	Buff buffs;
+
 	/* Data sensible only during battles. */
 	List* attacks; /* List* of AttackData* */
 } Entity;
@@ -59,6 +62,9 @@ void print_entity_basestats(Entity*);
 void print_entity(Entity*);
 
 void remove_statuses(Entity*);
+
+int entity_has_buff(Entity*);
+void entity_add_buff(Entity*, Buff*);
 
 List* get_all_attacks(Entity*);
 

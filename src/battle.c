@@ -350,6 +350,24 @@ print_attack_stats(Attack* attack, Entity* player)
 			printf("charges %i turns", attack->charge);
 	}
 
+	if (!buff_is_empty(&attack->self_buff))
+	{
+		nocolor();
+		printf(", ");
+
+		fg(BLUE);
+		printf("buffs you");
+	}
+
+	if (!buff_is_empty(&attack->enemy_buff))
+	{
+		nocolor();
+		printf(", ");
+
+		fg(BLUE);
+		printf("inflicts debuffs");
+	}
+
 	printf("\n");
 }
 
@@ -706,6 +724,8 @@ prepare_for_battle(Entity* e)
 	}
 
 	list_free(attacks, NULL);
+
+	memset(&e->buffs, 0, sizeof(Buff));
 }
 
 void

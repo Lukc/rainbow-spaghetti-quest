@@ -3,6 +3,7 @@
 #define ATTACK_H
 
 #include "statuses.h"
+#include "buff.h"
 
 typedef struct Attack {
 	char *name;
@@ -38,6 +39,9 @@ typedef struct Attack {
 
 	/* Statuses cured when using this attack. */
 	List* cures_statuses; /* List* of Status* */
+
+	Buff self_buff;
+	Buff enemy_buff;
 
 	/* Temporary containers used at load-time. */
 	char* inflicts_status_name;
