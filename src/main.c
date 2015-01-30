@@ -135,6 +135,7 @@ main(int argc, char* argv[])
 			case 'b':
 				if (game.location->random_enemies)
 					enter_battle(&game);
+
 				else
 					error = " >> "
 						"This is a peaceful place, with no-one to fight.";
@@ -205,14 +206,10 @@ main(int argc, char* argv[])
 			print_entity_basestats(&player);
 			printf("\n");
 
-			printf(
-				"Gold: %i\n"
-				"\n"
-				,
-				player.gold
-			);
+			printcf(WHITE, -1, "Gold: ");
+			printcf(YELLOW, -1, "%i\n\n", player.gold);
 
-			printf("Current location: %s\n\n", game.location->name);
+			printcf(WHITE, -1, "Current location: %s\n\n", game.location->name);
 
 			for (i = 0; i < 5; i++)
 				printf("\n");

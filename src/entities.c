@@ -186,6 +186,8 @@ init_entity_from_class(Entity* e, Class* c)
 		e->inventory[i].item = NULL;
 	}
 
+	memset(&e->buffs, 0, sizeof(e->buffs));
+
 	e->statuses = NULL;
 
 	return 42;
