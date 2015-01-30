@@ -13,6 +13,7 @@
 #include "term.h"
 #include "entities.h"
 #include "events.h"
+#include "loot.h"
 
 #include "battle/attack.h"
 #include "battle/focus.h"
@@ -22,42 +23,6 @@
 #include "battle/menu_attacks.h"
 #include "battle/menu_items.h"
 #include "battle/attack_stats.h"
-
-/**
- * @fixme: deduplicate (mostly, redundant string operations)
- */
-
-/**
- * @param list: List* of Item*
- */
-static void
-loot_screen(List* list)
-{
-	if (list)
-	{
-		getch();
-		system("clear");
-		printf("\nYou were able to loot the following items:\n");
-
-		for (; list; list = list->next)
-		{
-			Item* item = list->data;
-
-			if (item->slot >= 0)
-				fg(WHITE);
-			else if (item->on_use && item->on_use->strikes > 0)
-				fg(YELLOW);
-			else if (is_item_usable(item))
-				fg(GREEN);
-
-			printf("  - %s\n", item->name);
-		}
-
-		printf("\nPress any key to continue...\n\n");
-	}
-
-	getch();
-}
 
 static void
 print_battle_logs(Game* game, Queue* logs)
@@ -317,6 +282,7 @@ battle(Game *game)
 				printf("\nYou gain %dgp!\n",
 					enemy->class->gold_on_kill);
 				printf("\nPress any key to continue...\n\n");
+				getch();
 
 				loot_screen(list);
 

@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 
+#include "loot.h"
 #include "string.h"
 #include "term.h"
 #include "colors.h"
@@ -179,7 +180,7 @@ skills(Game* game)
 
 					log = strdup(" >> Items collected.");
 
-					/* FIXME: Print the obtained items! */
+					loot_screen(given);
 				}
 				break;
 			default:
